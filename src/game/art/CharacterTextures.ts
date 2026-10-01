@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import type { EnemyKind } from '../enemies/roster';
+import type { EnemyVariant } from '../enemies/variants';
 
 const ink = 0x252b35;
 type Painter = (g: Phaser.GameObjects.Graphics) => void;
@@ -69,7 +70,7 @@ export function prepareMageTextures(scene: Phaser.Scene): void {
   });
 }
 
-export const enemyTexture = (kind: EnemyKind): string => `enemy-${kind}-detail`;
+export const enemyTexture = (kind: EnemyKind, variant: EnemyVariant = 'normal'): string => `enemy-${kind}-detail${variant === 'normal' ? '' : `-${variant}`}`;
 /** Double-resolution source art keeps the original logical size and hit radius. */
 export const enemyArtScale = (kind: EnemyKind, radius: number): number => radius / (kind === 'brute' ? 58 : 40);
 export function prepareEnemyTextures(scene: Phaser.Scene): void {
@@ -141,5 +142,32 @@ export function prepareEnemyTextures(scene: Phaser.Scene): void {
         for(const [x,y] of [[21,42],[108,43],[20,83],[108,84]])g.fillStyle(0xedd19d).fillCircle(x,y,2);
       }
     });
+  }
+  // Distinct silhouettes and insignia remain visible through hit/ice tinting.
+  const variants: [EnemyKind, EnemyVariant][] = [['chaser','splitter'],['swift','dasher'],['ranged','volley'],['brute','guardian']];
+  for (const [kind, variant] of variants) {
+    if (scene.textures.exists(enemyTexture(kind, variant))) continue;
+    const art = scene.textures.createCanvas(enemyTexture(kind, variant),128,128)!;
+    const ctx = art.context;
+    ctx.drawImage(scene.textures.get(enemyTexture(kind)).getSourceImage() as HTMLCanvasElement,0,0);
+    ctx.lineWidth = 3; ctx.strokeStyle = '#263342';
+    if (variant === 'splitter') {
+      ctx.fillStyle = '#76dac6';
+      for (const x of [39,88]) { ctx.beginPath();ctx.arc(x,23,12,0,Math.PI*2);ctx.fill();ctx.stroke(); }
+      ctx.strokeStyle='#bcffdb';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(63,33);ctx.lineTo(58,55);ctx.lineTo(70,73);ctx.lineTo(63,102);ctx.stroke();
+    } else if (variant === 'dasher') {
+      ctx.fillStyle='#ed875b';ctx.beginPath();ctx.moveTo(47,29);ctx.lineTo(64,0);ctx.lineTo(82,30);ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.strokeStyle='#ffd2a0';ctx.lineWidth=5;
+      for(const y of [77,91]) {ctx.beginPath();ctx.moveTo(48,y);ctx.lineTo(64,y-9);ctx.lineTo(80,y);ctx.stroke();}
+    } else if (variant === 'volley') {
+      ctx.fillStyle='#ff8fd2';
+      for(const [x,y] of [[91,22],[106,6],[119,22]]) {ctx.beginPath();ctx.moveTo(x,y-6);ctx.lineTo(x+6,y+3);ctx.lineTo(x,y+11);ctx.lineTo(x-6,y+3);ctx.closePath();ctx.fill();ctx.stroke();}
+      ctx.strokeStyle='#ffc9ec';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(34,85);ctx.lineTo(46,90);ctx.lineTo(57,85);ctx.stroke();
+    } else {
+      ctx.fillStyle='#759fb4';ctx.beginPath();ctx.moveTo(10,61);ctx.lineTo(44,53);ctx.lineTo(52,83);ctx.lineTo(32,113);ctx.lineTo(9,93);ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.strokeStyle='#d9f3ff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(29,63);ctx.lineTo(34,88);ctx.lineTo(23,84);ctx.lineTo(32,101);ctx.stroke();
+      ctx.fillStyle='#b5dcea';ctx.fillRect(49,13,31,5);
+    }
+    art.refresh();
   }
 }

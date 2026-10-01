@@ -22,6 +22,7 @@ document.querySelector<HTMLButtonElement>('#check')!.onclick=()=>{
     // Fixtures inspect internals locally; production exposes no mutation/debug API.
     const internals=arena as unknown as {player:Player;enemies:EnemySystem;ultimate:UltimateSpell};
     const {player,enemies,ultimate}=internals;
+    (enemies as unknown as {random:()=>number}).random=()=>0.9;
     try{
       check(!arena.castUltimate(),'selection allowed ultimate');arena.chooseSchool('fire');
       key();arena.update(0,0);up();check(ultimate.casts===0,'uncharged Q cast');

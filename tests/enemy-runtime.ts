@@ -10,7 +10,7 @@ function run(preview:boolean) {
   game?.destroy(true);
   class Checks extends Phaser.Scene {
     create() {
-      const player=new Player(this),enemies=new EnemySystem(this);
+      const player=new Player(this),enemies=new EnemySystem(this, undefined, undefined, () => 0.9);
       const check=(ok:boolean,message:string)=>{if(!ok)throw Error(message);};
       const reports:unknown[]=[];
       try {

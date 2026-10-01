@@ -34,6 +34,10 @@ export class CombatEffects {
       this.add(x,y,0xffe2ba,9,240,Math.cos(angle)*110,Math.sin(angle)*110,-0.6);
     }
   }
+  block(x:number,y:number,radius:number):void{
+    this.add(x,y,0xbcecff,radius*2.3,280,0,0,0.3,true);
+    this.burst(x,y,0x9bd9ef,4,9,70);
+  }
   death(x:number,y:number,color:number,radius:number):void{
     this.burst(x,y,color,8,12,85);this.add(x,y,color,radius*1.4,450,0,0,1.4,true);
   }

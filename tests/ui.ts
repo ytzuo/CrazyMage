@@ -79,8 +79,9 @@ run.onclick = async () => {
     }
     input([]);check(choices===1,'did not acquire one upgrade by clearing a wave');
     check(combat().kills>=6,'partial wave rewarded early');
-    check(combat().ultimateEnergy===60&&combat().ultimateCasts===0,'first wave did not charge ultimate by 60');
-    check(get('ultimate-charge').textContent==='60 / 100','ultimate HUD does not match energy');
+    const energy=Math.min(100,combat().kills*10);
+    check(combat().ultimateEnergy===energy&&combat().ultimateCasts===0,'kills did not charge ultimate');
+    check(get('ultimate-charge').textContent===(energy===100?'已就绪':`${energy} / 100`),'ultimate HUD does not match energy');
     click('build');const details=get('build-overlay').textContent!;check(details.includes('获取记录'),'history missing');
     const selected=[...doc.querySelectorAll('.build-details ol li')].length-1;check(selected===1,'history does not match choices');
     reports.push({check:'real full wave clear → one choice → shared build history',choices,state:combat(),details});

@@ -12,7 +12,7 @@ document.querySelector<HTMLButtonElement>('#check')!.onclick=()=>{
       const check=(ok:boolean,message:string)=>{if(!ok)throw Error(message);};
       const reports:unknown[]=[];
       try{
-        const player=new Player(this),enemies=new EnemySystem(this);
+        const player=new Player(this),enemies=new EnemySystem(this, undefined, undefined, () => 0.9);
         const figure=player.view.list[2] as Phaser.GameObjects.Container;
         const wand=figure.list[1] as Phaser.GameObjects.Container;
         const baseline=this.children.list.length;

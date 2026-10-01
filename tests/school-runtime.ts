@@ -14,7 +14,7 @@ document.querySelector<HTMLButtonElement>('#check')!.onclick=()=>{
       const check=(ok:boolean,message:string)=>{if(!ok)throw Error(message);};
       const reports:unknown[]=[];
       try {
-        const player=new Player(this),enemies=new EnemySystem(this),iceBuild=initialBuild(1,'ice');
+        const player=new Player(this),enemies=new EnemySystem(this, undefined, undefined, () => 0.9),iceBuild=initialBuild(1,'ice');
         const runner=new SpellRunner(this,compileBuild(iceBuild));
         enemies.reset(player);
         enemies.enemies.forEach((e,i)=>{e.spawning=0;e.view.setPosition(i<3?1300+i*10:2100,i<3?900:1500);});

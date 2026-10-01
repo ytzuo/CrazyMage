@@ -18,7 +18,7 @@ button.onclick = () => {
         const player = new Player(this);
         const completed: number[] = [];
         const store = new BuildStore(() => 0); store.reset();
-        const enemies = new EnemySystem(this, wave => { completed.push(wave); store.completeWave(wave); });
+        const enemies = new EnemySystem(this, wave => { completed.push(wave); store.completeWave(wave); }, undefined, () => 0.9);
         const spec = compileBuild(['fire.multi','fire.pierce','fire.explosion'].reduce(applyUpgrade, initialBuild(1))).fireball;
         const spell = new FireballSpell(this, spec);
         enemies.reset(player);
@@ -123,7 +123,7 @@ stressButton.onclick = () => {
     create(): void {
       this.player = new Player(this);
       this.player.view.setPosition(1200,900);
-      this.enemies = new EnemySystem(this);
+      this.enemies = new EnemySystem(this, undefined, undefined, () => 0.9);
       this.enemies.reset(this.player); this.enemies.waveClock.wave=40; this.enemies.update(60000,this.player);
       this.maxEnemies = this.enemies.enemies.length;
       const spec=compileBuild(['fire.multi','fire.multi','fire.pierce','passive.cooldown','passive.cooldown','passive.cooldown'].reduce(applyUpgrade,initialBuild(1))).fireball;

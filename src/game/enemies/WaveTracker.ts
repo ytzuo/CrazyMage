@@ -9,6 +9,11 @@ export class WaveTracker {
     if (spawned > 0) this.active.set(wave, spawned);
   }
   remaining(wave: number): number { return this.active.get(wave) ?? 0; }
+  /** Offspring extend an active wave before the parent's death is settled. */
+  add(wave: number, spawned: number): void {
+    const remaining = this.active.get(wave);
+    if (remaining !== undefined && spawned > 0) this.active.set(wave, remaining + spawned);
+  }
   defeat(wave: number): boolean {
     const remaining = this.active.get(wave);
     if (remaining === undefined) return false;
