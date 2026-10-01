@@ -199,3 +199,16 @@ button:disabled { opacity: 0.45; cursor: default; }
   .wave-status { top: var(--edge-top); }
   .upgrade-options { grid-template-columns: repeat(3, 1fr); }
 }
+
+.school-card header { justify-content: center; }
+.school-symbol { font-size: 42px; line-height: 1; }
+.school-fire { border-color: #d494615e; }
+.school-fire .school-symbol { color: #ffae70; }
+.school-ice { border-color: #89d0e55e; }
+.school-ice .school-symbol { color: #aeeaff; }
+.school-lightning { border-color: #d0c7815e; }
+.school-lightning .school-symbol { color: #f3e69b; }
+@media (max-width: 760px) {
+  .school-symbol { font-size: 28px; }
+  .school-card h2 { font-size: 22px; }
+}

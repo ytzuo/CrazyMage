@@ -4,12 +4,14 @@ import { ARENA, PLAYER, type MovementState } from './game/config';
 import { MovementInput } from './game/input/MovementInput';
 import { ArenaScene } from './game/scenes/ArenaScene';
 import { observePerformance } from './game/diagnostics/performance';
-import { BuildPanel, fireSummary } from './ui/BuildPanel';
+import { BuildPanel, spellSummary } from './ui/BuildPanel';
+import { SchoolPicker } from './ui/SchoolPicker';
+import { SCHOOL_INFO } from './game/upgrades/definitions';
 import type { BuildSnapshot } from './game/upgrades/BuildStore';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <main class="arena" aria-label="魔法试验场操控原型">
-    <div id="game" role="application" tabindex="0" aria-label="WASD 移动，方向键发射火球；左下角摇杆可移动"></div>
+    <div id="game" role="application" tabindex="0" aria-label="WASD 移动，方向键施法；左下角摇杆可移动"></div>
     <nav class="arena-tools" aria-label="试验场控制">
       <button id="build" class="icon-button" title="查看构筑 (U)" aria-label="查看构筑">✦</button>
       <button id="reset" class="icon-button" title="重新开始" aria-label="重新开始">↺</button>
@@ -34,6 +36,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         </g>
       </svg>
     </aside>
+    <div id="school-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="选择开局流派" hidden></div>
     <div id="build-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="法术构筑与升级" hidden></div>
     <div id="pause-overlay" class="pause-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
       <div class="pause-card"><h2 id="pause-title">已暂停</h2><p id="death-duration" hidden></p><button id="resume">继续 <span>→</span></button></div>
@@ -54,6 +57,8 @@ let lastProgression = '';
 let appliedPause = false;
 let game: Phaser.Game;
 let panel: BuildPanel;
+let picker: SchoolPicker;
+let selectingSchool = true;
 let lastCombat = '';
 let lastWave = 0;
 let lastWaveSeconds = -1;
@@ -63,6 +68,12 @@ const minimapEnemies = document.querySelector<SVGGElement>('#minimap-enemies')!;
 const enemyMarkers = new Map<number, SVGCircleElement>();
 let minimapPosition = minimapPlayer.getAttribute('transform');
 const scene = new ArenaScene(movement, (state: MovementState) => {
+  const wasSelecting = selectingSchool;
+  selectingSchool = state.selectingSchool;
+  picker?.update(selectingSchool);
+  element('build').toggleAttribute('disabled', selectingSchool || state.dead);
+  element('pause').toggleAttribute('disabled', selectingSchool || state.dead);
+  if(wasSelecting !== selectingSchool) queueMicrotask(syncPause);
   const runSeconds = Math.floor(state.elapsedTime / 1000);
   const duration = `${String(Math.floor(runSeconds / 60)).padStart(2, '0')}:${String(runSeconds % 60).padStart(2, '0')}`;
   if (runSeconds !== lastRunSeconds) { element('run-time').textContent = duration; lastRunSeconds = runSeconds; }
@@ -89,20 +100,20 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
   const progressKey = `${state.progression.build.runId}/${state.progression.build.revision}/${state.waveRemaining}`;
   if (progressKey !== lastProgression) {
     const { build } = state.progression;
-    element('spell-level').textContent = `火球 Lv.${build.spellLevel}`;
+    element('spell-level').textContent = selectingSchool ? '选择流派' : `${SCHOOL_INFO[build.school].spell} Lv.${build.spellLevel}`;
     element('wave-remaining').textContent = `本波剩余 ${state.waveRemaining}`;
-    element('spell-level').title = fireSummary(state.progression.effective);
+    element('spell-level').title = spellSummary(state.progression.effective);
     lastProgression = progressKey;
   }
   panel?.update(state.progression, inspecting);
   if (previousChoice !== state.progression.choice?.id) queueMicrotask(syncPause);
   if (import.meta.env.DEV) {
-    const summary = JSON.stringify({ health: state.health, enemies: state.enemies, kills: state.kills, casts: state.casts, dead: state.dead, objects: state.objects, projectiles: state.projectiles, impacts: state.impacts, waveRemaining: state.waveRemaining, wave: state.wave, nextWaveIn: state.nextWaveIn, elapsedTime: state.elapsedTime, runId: state.progression.build.runId, revision: state.progression.build.revision, completedWaves: state.progression.completedWaves, choice: state.progression.choice?.id ?? null });
+    const summary = JSON.stringify({ school: state.progression.build.school, selectingSchool, health: state.health, enemies: state.enemies, kills: state.kills, casts: state.casts, dead: state.dead, objects: state.objects, projectiles: state.projectiles, impacts: state.impacts, waveRemaining: state.waveRemaining, wave: state.wave, nextWaveIn: state.nextWaveIn, elapsedTime: state.elapsedTime, runId: state.progression.build.runId, revision: state.progression.build.revision, completedWaves: state.progression.completedWaves, choice: state.progression.choice?.id ?? null });
     if (summary !== lastCombat) { element('game').dataset.combat = summary; lastCombat = summary; }
   }
   if (dead !== state.dead) {
     dead = state.dead;
-    element('pause').toggleAttribute('disabled', dead);
+    element('pause').toggleAttribute('disabled', dead || selectingSchool);
     element('pause-title').textContent = dead ? '你倒下了' : '已暂停';
     element('death-duration').hidden = !dead;
     if (dead) element('death-duration').textContent = `本局时长 ${duration}`;
@@ -143,6 +154,8 @@ panel = new BuildPanel(element('build-overlay'), id => scene.previewUpgrade(id),
   if (scene.chooseUpgrade(batch, id)) syncPause();
 }, inspectBuild);
 
+picker = new SchoolPicker(element('school-overlay'), school => { if(scene.chooseSchool(school)) syncPause(); });
+
 game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
@@ -166,7 +179,7 @@ if (import.meta.env.DEV) observePerformance(game, 'cached-textures');
 function syncPause(): void {
   if (!game) return;
   const choosing = !!latestBuild?.choice;
-  const next = dead || paused || inspecting || choosing;
+  const next = dead || selectingSchool || paused || inspecting || choosing;
   if (next !== appliedPause) {
     appliedPause = next;
     scene.setPaused(next);
@@ -174,7 +187,7 @@ function syncPause(): void {
     else { game.resume(); game.loop.wake(); }
   }
   if (import.meta.env.DEV && game.canvas) game.canvas.dataset.loopRunning = String(game.loop.running);
-  element('pause-overlay').hidden = !dead && (!paused || inspecting || choosing);
+  element('pause-overlay').hidden = !dead && (!paused || selectingSchool || inspecting || choosing);
   element('pause').innerHTML = paused ? '▶ <span>继续</span>' : 'Ⅱ <span>暂停</span>';
   element('pause').setAttribute('aria-pressed', String(paused));
   if (dead) element('build-overlay').hidden = true;
@@ -187,7 +200,7 @@ function setPaused(next: boolean): void {
   if (next && !inspecting && !latestBuild?.choice) element('resume').focus({ preventScroll: true });
 }
 function inspectBuild(): void {
-  if (dead || !latestBuild) return;
+  if (dead || selectingSchool || !latestBuild) return;
   inspecting = !inspecting;
   syncPause();
   panel.update(latestBuild, inspecting);
@@ -203,6 +216,7 @@ function restart(): void {
 element('resume').addEventListener('click', () => dead ? restart() : setPaused(false), listenerOptions);
 element('reset').addEventListener('click', restart, listenerOptions);
 window.addEventListener('keydown', (event) => {
+  if (selectingSchool) return;
   if (!['Escape', 'Space', 'KeyU'].includes(event.code) || event.repeat) return;
   if (event.target instanceof HTMLElement) {
     if (['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName) || event.target.isContentEditable) return;
@@ -227,6 +241,7 @@ if (import.meta.hot) {
     resizeObserver.disconnect();
     movement.destroy();
     panel.destroy();
+    picker.destroy();
     game.destroy(true);
   });
 }

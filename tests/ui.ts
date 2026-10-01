@@ -2,6 +2,7 @@ export {};
 const frame = document.querySelector<HTMLIFrameElement>('#game-frame')!;
 const result = document.querySelector<HTMLPreElement>('#result')!;
 const run = document.querySelector<HTMLButtonElement>('#run')!;
+const school = document.querySelector<HTMLSelectElement>('#school')!;
 const size = document.querySelector<HTMLSelectElement>('#size')!;
 size.onchange = () => {
   const [width, height] = size.value.split('x');
@@ -20,6 +21,13 @@ run.onclick = async () => {
     const click=(id:string)=>(get(id) as HTMLButtonElement).click();
     const combat=()=>JSON.parse(get('game').dataset.combat!);
     const loop=()=>doc.querySelector('canvas')!.dataset.loopRunning;
+    check(combat().selectingSchool&&combat().enemies===0&&combat().elapsedTime===0,'school selection started combat early');
+    check(loop()==='false','school selection did not sleep loop');
+    await delay(200);check(combat().elapsedTime===0,'selection advanced time');
+    const pick=()=>doc.querySelector<HTMLButtonElement>(`[data-school="${school.value}"]`)!.click();
+    pick();const selectedRun=combat().runId;pick();
+    check(combat().school===school.value&&!combat().selectingSchool&&combat().enemies===6&&combat().runId===selectedRun,'school pick did not start once');
+    reports.push({check:'school selection freezes combat, locks one choice and starts six enemies',school:school.value});
     click('build');check(loop()==='false','build did not sleep loop');
     const before=combat().elapsedTime;await delay(300);check(combat().elapsedTime===before,'build advanced time');
     doc.querySelector<HTMLButtonElement>('[data-close]')!.click();check(loop()==='true','build close did not resume');
@@ -37,6 +45,7 @@ run.onclick = async () => {
       const state=combat();check(!state.dead,'died before upgrade smoke completed');
       const option=get('build-overlay').hidden ? null : doc.querySelector<HTMLButtonElement>('[data-upgrade]');
       if(option) {
+        check([...doc.querySelectorAll<HTMLButtonElement>('[data-upgrade]')].every(button=>button.dataset.upgrade!.startsWith(school.value+'.')||button.dataset.upgrade!.startsWith('passive.')),'choice contains another school');
         input([]);const frozen=combat().elapsedTime;check(loop()==='false','choice did not sleep loop');await delay(200);check(combat().elapsedTime===frozen,'choice advanced time');
         check(combat().nextWaveIn===3000,'arena clear did not reset countdown before choice');
         const oldRevision=combat().revision;
@@ -81,8 +90,11 @@ run.onclick = async () => {
     reports.push({check:'arena clear resets countdown before choice and spawns next wave after three seconds',wave:combat().wave});
     for(let i=0;i<5;i++){click('pause');check(loop()==='false','pause failed');click('resume');check(loop()==='true','resume failed');}
     const counts: number[]=[];
-    for(let i=0;i<10;i++){click('reset');counts.push(combat().objects);check(combat().revision===0&&combat().completedWaves===0&&combat().waveRemaining===6,'restart retained progression');}
+    for(let i=0;i<10;i++){click('reset');check(combat().selectingSchool&&combat().enemies===0&&combat().elapsedTime===0,'restart did not return to selection');pick();counts.push(combat().objects);check(combat().revision===0&&combat().completedWaves===0&&combat().waveRemaining===6,'restart retained progression');}
     check(counts.every(n=>n===counts[0]),'restart object count accumulates');
+    click('reset');const nextSchool=school.value==='ice'?'lightning':'ice';
+    doc.querySelector<HTMLButtonElement>(`[data-school="${nextSchool}"]`)!.click();
+    check(combat().school===nextSchool&&combat().revision===0&&combat().enemies===6&&combat().elapsedTime===0,'restart did not allow a different school');
     click('pause');reports.push({check:'five pause cycles and ten complete restarts',counts});
     result.textContent=JSON.stringify({passed:true,reports},null,2);
   } catch(error) { result.textContent=JSON.stringify({passed:false,error:String(error),reports},null,2); }

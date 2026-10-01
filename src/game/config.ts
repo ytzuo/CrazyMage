@@ -6,6 +6,7 @@ export const ENEMY = { waveInterval: 30000, clearDelay: 3000, spawnWarning: 500,
 export interface Direction { x: number; y: number }
 
 export interface MovementState {
+  selectingSchool: boolean;
   x: number;
   y: number;
   moving: boolean;
