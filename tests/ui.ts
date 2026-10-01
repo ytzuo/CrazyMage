@@ -38,12 +38,13 @@ run.onclick = async () => {
       const option=get('build-overlay').hidden ? null : doc.querySelector<HTMLButtonElement>('[data-upgrade]');
       if(option) {
         input([]);const frozen=combat().elapsedTime;check(loop()==='false','choice did not sleep loop');await delay(200);check(combat().elapsedTime===frozen,'choice advanced time');
+        check(combat().nextWaveIn===3000,'arena clear did not reset countdown before choice');
         const oldRevision=combat().revision;
         doc.querySelector<HTMLButtonElement>('[data-inspect]')!.click();check(!!doc.querySelector('[data-close]'),'choice build details unavailable');doc.querySelector<HTMLButtonElement>('[data-close]')!.click();
         const choose=doc.querySelector<HTMLButtonElement>('[data-upgrade="fire.multi"]')??doc.querySelector<HTMLButtonElement>('[data-upgrade]')!;
         choose.click();choose.click(); await delay(50);
         check(combat().revision===oldRevision+1,'choice applied more than once');
-        check(get('wave-countdown').textContent==='3s','upgrade did not reset countdown to three seconds');
+        check(get('wave-countdown').textContent==='3s','choice did not preserve three-second clear countdown');
         check(combat().elapsedTime<frozen+500,'rescheduling changed run duration');
         choices++;continue;
       }
@@ -77,7 +78,7 @@ run.onclick = async () => {
     const waveBefore = combat().wave;
     await delay(3200);
     check(combat().wave===waveBefore+1&&combat().enemies===6,'next wave did not spawn three seconds after choosing');
-    reports.push({check:'upgrade resets countdown to three seconds and spawns next wave',wave:combat().wave});
+    reports.push({check:'arena clear resets countdown before choice and spawns next wave after three seconds',wave:combat().wave});
     for(let i=0;i<5;i++){click('pause');check(loop()==='false','pause failed');click('resume');check(loop()==='true','resume failed');}
     const counts: number[]=[];
     for(let i=0;i<10;i++){click('reset');counts.push(combat().objects);check(combat().revision===0&&combat().completedWaves===0&&combat().waveRemaining===6,'restart retained progression');}

@@ -24,7 +24,7 @@ test('waves arrive at 30 seconds, preserve remainder, and restart at wave one', 
   assert.equal(clock.elapsedTime, 0);
 });
 
-test('upgrade schedules next wave in three seconds without changing duration or current wave', () => {
+test('arena clear schedules next wave in three seconds without changing duration or current wave', () => {
   const clock = new WaveClock(30000);
   clock.update(12000);
   clock.scheduleNext(3000);
@@ -40,7 +40,7 @@ test('upgrade schedules next wave in three seconds without changing duration or 
   clock.scheduleNext(3000);
   assert.equal(clock.remaining, 3000); // Reset even when less than three seconds remained.
   assert.equal(clock.elapsedTime, 44000);
-  clock.scheduleNext(3000); // Queued choices do not advance active time.
+  clock.scheduleNext(3000); // Repeated scheduling does not advance active time.
   assert.equal(clock.elapsedTime, 44000);
   assert.equal(clock.update(3005), 1);
   assert.equal(clock.remaining, 29995);

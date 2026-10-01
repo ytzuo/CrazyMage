@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { ARENA, ENEMY, FIREBALL, type Direction, type MovementState } from '../config';
+import { ARENA, FIREBALL, type Direction, type MovementState } from '../config';
 import { Player } from '../entities/Player';
 import type { MovementInput } from '../input/MovementInput';
 import { FireballSpell } from '../spells/FireballSpell';
@@ -168,7 +168,6 @@ export class ArenaScene extends Phaser.Scene {
     if (!this.paused || this.player.health.dead) return false;
     if (!this.builds.choose(batchId, id, this.enemies.waveClock.elapsedTime)) return false;
     this.applyBuild();
-    this.enemies.waveClock.scheduleNext(ENEMY.postUpgradeDelay);
     this.publish();
     return true;
   }

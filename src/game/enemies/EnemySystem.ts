@@ -141,6 +141,8 @@ export class EnemySystem {
       this.kills++;
       enemy.view.destroy();
       this.enemies.splice(this.enemies.indexOf(enemy), 1);
+      // Clearing the arena schedules the next wave even when upgrades are exhausted.
+      if (this.enemies.length === 0) this.waveClock.scheduleNext(ENEMY.clearDelay);
       if (this.waves.defeat(enemy.wave)) this.onWaveClear(enemy.wave);
     }
     return true;
