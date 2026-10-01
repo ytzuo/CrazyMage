@@ -6,6 +6,7 @@ const ATTACK_KEYS = new Set(['ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight'])
 /** Keyboard and captured pointers share one bounded movement vector. */
 export class MovementInput {
   private keys = new Set<string>();
+  private ultimatePress = false;
   private attackPress: Direction | null = null;
   private stick = { x: 0, y: 0 };
   private pointerId: number | null = null;
@@ -32,11 +33,12 @@ export class MovementInput {
   }
 
   private onKeyDown = (event: KeyboardEvent): void => {
-    if ((!MOVE_KEYS.has(event.code) && !ATTACK_KEYS.has(event.code)) || this.isEditing(event)) return;
+    if ((!MOVE_KEYS.has(event.code) && !ATTACK_KEYS.has(event.code) && event.code !== 'KeyQ') || this.isEditing(event)) return;
     event.preventDefault();
     // A held key must be released and pressed again after pause or focus loss.
     if (event.repeat && !this.keys.has(event.code)) return;
     if (this.enabled) {
+      if (event.code === 'KeyQ' && !event.repeat && !this.keys.has(event.code)) this.ultimatePress = true;
       this.keys.add(event.code);
       if (ATTACK_KEYS.has(event.code) && !event.repeat) this.attackPress = this.heldAttackDirection();
     }
@@ -88,6 +90,7 @@ export class MovementInput {
   reset = (): void => {
     this.keys.clear();
     this.attackPress = null;
+    this.ultimatePress = false;
     this.resetStick();
   };
 
@@ -122,6 +125,12 @@ export class MovementInput {
     if ([...ATTACK_KEYS].some((key) => this.keys.has(key))) return this.heldAttackDirection();
     // Buffer a quick tap until the next available cast, even if it ends between frames.
     return this.attackPress;
+  }
+
+  consumeUltimate(): boolean {
+    const pressed = this.enabled && this.ultimatePress;
+    this.ultimatePress = false;
+    return pressed;
   }
 
   get touchDevice(): boolean { return this.media.matches; }

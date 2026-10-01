@@ -1,5 +1,6 @@
 import type { BuildSnapshot } from '../game/upgrades/BuildStore';
 import { stacks, type EffectiveBuild } from '../game/upgrades/build';
+import { ultimateSummary } from '../game/ultimates/definitions';
 import { definition, SCHOOL_INFO } from '../game/upgrades/definitions';
 export const number = (value: number): string => Number(value.toFixed(2)).toString();
 export function spellSummary(effective: EffectiveBuild): string {
@@ -58,7 +59,7 @@ export class BuildPanel {
   private details(snapshot: BuildSnapshot): string {
     const p = snapshot.effective.player;
     const history = snapshot.history.map(entry => `<li><time>${Math.floor(entry.elapsed / 60000)}:${String(Math.floor(entry.elapsed / 1000) % 60).padStart(2, '0')}</time> · 第 ${entry.wave} 波 · ${definition(entry.id)!.name} · Lv.${entry.level}</li>`).join('');
-    return `<div class="build-details"><h3>${SCHOOL_INFO[snapshot.build.school].name} · ${SCHOOL_INFO[snapshot.build.school].spell} Lv.${snapshot.build.spellLevel} / 4</h3><p>${spellSummary(snapshot.effective)}</p><p class="combination">${snapshot.build.school === 'fire' && snapshot.effective.fireball.maxTargets > 1 ? "每枚火球独立保留穿透。" : ""}${snapshot.build.school === 'fire' && snapshot.effective.fireball.explosion ? "首次命中爆炸，同次施法溅射不重复。" : ""}${snapshot.build.school === 'ice' ? "冰环与回响保留减速，重复命中刷新寒意。" : snapshot.build.school === 'lightning' ? "首击沿瞄准方向选敌，每次连锁不重复访问目标。" : ""}</p><h3>被动 ${Object.keys(snapshot.build.passives).length} / 3</h3><p>移速 ${number(p.speed)} · 生命上限 ${p.maximum} · 护盾容量 ${p.shield}</p><ul>${snapshot.effective.breakdown.map(text => `<li>${text}</li>`).join('') || '<li>尚未选择强化</li>'}</ul><h3>获取记录</h3><ol><li>开局 · ${SCHOOL_INFO[snapshot.build.school].spell} Lv.1（初始能力）</li>${history}</ol></div>`;
+    return `<div class="build-details"><h3>${SCHOOL_INFO[snapshot.build.school].name} · ${SCHOOL_INFO[snapshot.build.school].spell} Lv.${snapshot.build.spellLevel} / 4</h3><p>${spellSummary(snapshot.effective)}</p><p class="combination">${snapshot.build.school === 'fire' && snapshot.effective.fireball.maxTargets > 1 ? "每枚火球独立保留穿透。" : ""}${snapshot.build.school === 'fire' && snapshot.effective.fireball.explosion ? "首次命中爆炸，同次施法溅射不重复。" : ""}${snapshot.build.school === 'ice' ? "冰环与回响保留减速，重复命中刷新寒意。" : snapshot.build.school === 'lightning' ? "首击沿瞄准方向选敌，每次连锁不重复访问目标。" : ""}</p><h3>专属大招 · Q</h3><p>${ultimateSummary(snapshot.build.school, snapshot.build.spellLevel)}</p><p>普通击杀 10 只充满；大招击杀不回充。随法术等级增加伤害。</p><h3>被动 ${Object.keys(snapshot.build.passives).length} / 3</h3><p>移速 ${number(p.speed)} · 生命上限 ${p.maximum} · 护盾容量 ${p.shield}</p><ul>${snapshot.effective.breakdown.map(text => `<li>${text}</li>`).join('') || '<li>尚未选择强化</li>'}</ul><h3>获取记录</h3><ol><li>开局 · ${SCHOOL_INFO[snapshot.build.school].spell} Lv.1（初始能力）</li>${history}</ol></div>`;
   }
   destroy(): void { this.abort.abort(); }
 }

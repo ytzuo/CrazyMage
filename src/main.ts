@@ -6,13 +6,14 @@ import { ArenaScene } from './game/scenes/ArenaScene';
 import { observePerformance } from './game/diagnostics/performance';
 import { BuildPanel, spellSummary } from './ui/BuildPanel';
 import { SchoolPicker } from './ui/SchoolPicker';
+import { ultimateSpec, ultimateSummary } from './game/ultimates/definitions';
 import { BattleNotice } from './ui/BattleNotice';
 import { SCHOOL_INFO, definition } from './game/upgrades/definitions';
 import type { BuildSnapshot } from './game/upgrades/BuildStore';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <main class="arena" aria-label="魔法试验场操控原型">
-    <div id="game" role="application" tabindex="0" aria-label="WASD 移动，方向键施法；左下角摇杆可移动"></div>
+    <div id="game" role="application" tabindex="0" aria-label="WASD 移动，方向键施法，Q 释放大招；左下角摇杆可移动"></div>
     <nav class="arena-tools" aria-label="试验场控制">
       <button id="build" class="icon-button" title="查看构筑 (U)" aria-label="查看构筑">✦</button>
       <button id="reset" class="icon-button" title="重新开始" aria-label="重新开始">↺</button>
@@ -37,6 +38,9 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         </g>
       </svg>
     </aside>
+    <button id="ultimate" class="ultimate-button" type="button" disabled hidden>
+      <span class="ultimate-key" aria-hidden="true">Q</span><span class="ultimate-content"><strong id="ultimate-name"></strong><small id="ultimate-charge">0 / 100</small><span class="ultimate-track" aria-hidden="true"><span id="ultimate-fill"></span></span></span>
+    </button>
     <div id="battle-notice" class="battle-notice" role="status" aria-live="polite" hidden></div>
     <div id="school-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="选择开局流派" hidden></div>
     <div id="build-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="法术构筑与升级" hidden></div>
@@ -62,6 +66,10 @@ let panel: BuildPanel;
 let picker: SchoolPicker;
 let selectingSchool = true;
 let lastCombat = '';
+let lastUltimate = '';
+let ultimateEnergy = 0;
+let ultimateCasts = 0;
+let ultimateRun = -1;
 let lastWave = 0;
 let lastWaveSeconds = -1;
 let lastRunSeconds = -1;
@@ -75,6 +83,29 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
   const wasSelecting = selectingSchool;
   selectingSchool = state.selectingSchool;
   picker?.update(selectingSchool);
+  const school = state.progression.build.school;
+  const ultimateKey = `${school}/${state.progression.build.spellLevel}/${state.ultimateEnergy}/${state.paused}/${selectingSchool}/${state.dead}/${state.progression.choice?.id}`;
+  if (ultimateKey !== lastUltimate) {
+    const spec = ultimateSpec(school, state.progression.build.spellLevel);
+    const ready = state.ultimateEnergy === 100;
+    const button = element<HTMLButtonElement>('ultimate');
+    button.hidden = selectingSchool;
+    button.disabled = !ready || state.paused || selectingSchool || state.dead || !!state.progression.choice;
+    button.dataset.schoolTone = school;
+    button.classList.toggle('ready', ready);
+    button.title = `${ultimateSummary(school, state.progression.build.spellLevel)}。普通击杀 +10 能量，大招击杀不回充。范围内无目标时不消耗。`;
+    button.setAttribute('aria-label', `${spec.name}，${ready ? '已就绪，按 Q 或点击释放' : `充能 ${state.ultimateEnergy}%`}`);
+    element('ultimate-name').textContent = spec.name;
+    element('ultimate-charge').textContent = ready ? '已就绪' : `${state.ultimateEnergy} / 100`;
+    element('ultimate-fill').style.transform = `scaleX(${state.ultimateEnergy / 100})`;
+    lastUltimate = ultimateKey;
+  }
+  if (ultimateRun === state.progression.build.runId && !selectingSchool) {
+    if (state.ultimateCasts > ultimateCasts) notice.show(ultimateSpec(school, state.progression.build.spellLevel).name, '释放大招', school);
+    else if (state.ultimateEnergy === 100 && ultimateEnergy < 100) notice.show('大招已就绪', ultimateSpec(school, state.progression.build.spellLevel).name, school);
+  }
+  ultimateRun = state.progression.build.runId;
+  ultimateEnergy = state.ultimateEnergy; ultimateCasts = state.ultimateCasts;
   if(selectingSchool) notice.clear();
   if(!selectingSchool && lastEnemyCount > 0 && state.enemies === 0 && !state.dead && !state.progression.choice) notice.show('场上已清空', '下一波即将到来');
   lastEnemyCount = state.enemies;
@@ -118,7 +149,7 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
   panel?.update(state.progression, inspecting);
   if (previousChoice !== state.progression.choice?.id) queueMicrotask(syncPause);
   if (import.meta.env.DEV) {
-    const summary = JSON.stringify({ school: state.progression.build.school, selectingSchool, health: state.health, enemies: state.enemies, kills: state.kills, casts: state.casts, dead: state.dead, objects: state.objects, projectiles: state.projectiles, impacts: state.impacts, waveRemaining: state.waveRemaining, wave: state.wave, nextWaveIn: state.nextWaveIn, elapsedTime: state.elapsedTime, runId: state.progression.build.runId, revision: state.progression.build.revision, completedWaves: state.progression.completedWaves, choice: state.progression.choice?.id ?? null });
+    const summary = JSON.stringify({ ultimateEnergy: state.ultimateEnergy, ultimateCasts: state.ultimateCasts, ultimateEffects: state.ultimateEffects, school: state.progression.build.school, selectingSchool, health: state.health, enemies: state.enemies, kills: state.kills, casts: state.casts, dead: state.dead, objects: state.objects, projectiles: state.projectiles, impacts: state.impacts, waveRemaining: state.waveRemaining, wave: state.wave, nextWaveIn: state.nextWaveIn, elapsedTime: state.elapsedTime, runId: state.progression.build.runId, revision: state.progression.build.revision, completedWaves: state.progression.completedWaves, choice: state.progression.choice?.id ?? null });
     if (summary !== lastCombat) { element('game').dataset.combat = summary; lastCombat = summary; }
   }
   if (dead !== state.dead) {
@@ -220,6 +251,7 @@ function inspectBuild(): void {
   panel.update(latestBuild, inspecting);
   if (!inspecting && paused && !latestBuild.choice) element('resume').focus({ preventScroll: true });
 }
+element('ultimate').addEventListener('click', () => { if(scene.castUltimate()) syncPause(); }, listenerOptions);
 element('build').addEventListener('click', inspectBuild, listenerOptions);
 element('pause').addEventListener('click', () => setPaused(!paused), listenerOptions);
 function restart(): void {

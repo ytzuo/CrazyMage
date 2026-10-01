@@ -3,6 +3,7 @@ import { Player } from '../src/game/entities/Player';
 import { EnemySystem } from '../src/game/enemies/EnemySystem';
 import { SpellRunner } from '../src/game/spells/SpellRunner';
 import { applyUpgrade, compileBuild, initialBuild } from '../src/game/upgrades/build';
+import { UltimateSpell } from '../src/game/ultimates/UltimateSpell';
 import { SCHOOLS } from '../src/game/upgrades/definitions';
 const result=document.querySelector<HTMLPreElement>('#result')!;
 let game:Phaser.Game|undefined;
@@ -70,22 +71,23 @@ document.querySelector<HTMLButtonElement>('#stress')!.onclick=()=>{
     private player!:Player;
     private enemies!:EnemySystem;
     private runner!:SpellRunner;
+    private ultimate!:UltimateSpell;
     private elapsed=0;
     private phase=-1;
     private frames=0;
     private reportTime=0;
     private baseline=0;
-    private reports:{school:string;frames:number;maxEnemies:number;maxShots:number;maxProjectiles:number;maxEffects:number;maxFeedback:number;maxObjects:number;intervals:number[]}[]=[];
-    create(){this.player=new Player(this);this.enemies=new EnemySystem(this);this.runner=new SpellRunner(this,compileBuild(initialBuild(1)));this.prepare(0);this.cameras.main.centerOn(1200,900);}
+    private reports:{school:string;frames:number;maxEnemies:number;maxShots:number;maxProjectiles:number;maxEffects:number;maxFeedback:number;maxUltimate:number;maxObjects:number;intervals:number[]}[]=[];
+    create(){this.player=new Player(this);this.ultimate=new UltimateSpell(this);this.enemies=new EnemySystem(this,()=>{},source=>this.ultimate.charge.onKill(source));this.runner=new SpellRunner(this,compileBuild(initialBuild(1)));this.prepare(0);this.cameras.main.centerOn(1200,900);}
     private prepare(phase:number){
-      this.runner.reset();this.enemies.reset(this.player);this.player.reset();
+      this.runner.reset();this.ultimate.reset();this.enemies.reset(this.player);this.player.reset();
       if(!this.baseline)this.baseline=this.children.list.length;
       if(this.children.list.length!==this.baseline)throw Error('school phase cleanup leaked');
       const school=SCHOOLS[phase];
       const ids=school==='fire'?['fire.multi','fire.multi','fire.pierce']:school==='ice'?['ice.echo','ice.radius','ice.cold']:['lightning.chain','lightning.chain','lightning.conduction'];
       const build=[...ids,'passive.cooldown','passive.cooldown','passive.cooldown'].reduce(applyUpgrade,initialBuild(phase+1,school));
-      this.runner.configure(compileBuild(build));this.enemies.waveClock.wave=40;this.enemies.update(60000,this.player);
-      this.phase=phase;this.reports.push({school,frames:0,maxEnemies:36,maxShots:0,maxProjectiles:0,maxEffects:0,maxFeedback:0,maxObjects:0,intervals:[]});
+      this.runner.configure(compileBuild(build));this.ultimate.configure(school,4);this.enemies.waveClock.wave=40;this.enemies.update(60000,this.player);
+      this.phase=phase;this.reports.push({school,frames:0,maxEnemies:36,maxShots:0,maxProjectiles:0,maxEffects:0,maxFeedback:0,maxUltimate:0,maxObjects:0,intervals:[]});
     }
     update(_time:number,delta:number){
       try{
@@ -93,17 +95,18 @@ document.querySelector<HTMLButtonElement>('#stress')!.onclick=()=>{
         const phase=Math.min(2,Math.floor(this.elapsed/60000));if(phase!==this.phase)this.prepare(phase);
         const report=this.reports[this.phase];report.frames++;if(report.intervals.length<1200)report.intervals.push(delta);
         this.player.health.reset();this.player.update({x:0,y:0},step);
-        this.runner.update(step,this.enemies);this.enemies.update(step,this.player);
+        this.ultimate.update(step);this.runner.update(step,this.enemies);this.enemies.update(step,this.player);
+        this.ultimate.cast(this.player.view.x,this.player.view.y,this.enemies);
         let closest=Infinity,aim={x:1,y:0};
         for(const enemy of this.enemies.enemies){const dx=enemy.view.x-this.player.view.x,dy=enemy.view.y-this.player.view.y,d=Math.hypot(dx,dy);if(enemy.spawning===0&&d>0&&d<closest){closest=d;aim={x:dx/d,y:dy/d};}}
         this.runner.cast(this.player.view.x,this.player.view.y,aim,this.enemies);
         report.maxEnemies=Math.max(report.maxEnemies,this.enemies.enemies.length);report.maxShots=Math.max(report.maxShots,this.enemies.shots.count);
-        report.maxProjectiles=Math.max(report.maxProjectiles,this.runner.projectileCount);report.maxEffects=Math.max(report.maxEffects,this.runner.impactCount);report.maxFeedback=Math.max(report.maxFeedback,this.enemies.effects.count);report.maxObjects=Math.max(report.maxObjects,this.children.list.length);
-        if(report.maxFeedback>96||report.maxEnemies>36||report.maxShots>32||report.maxProjectiles>64||report.maxEffects>(this.phase===1?8:24))throw Error('object cap exceeded');
+        report.maxProjectiles=Math.max(report.maxProjectiles,this.runner.projectileCount);report.maxEffects=Math.max(report.maxEffects,this.runner.impactCount);report.maxUltimate=Math.max(report.maxUltimate,this.ultimate.effectCount);report.maxFeedback=Math.max(report.maxFeedback,this.enemies.effects.count);report.maxObjects=Math.max(report.maxObjects,this.children.list.length);
+        if(report.maxUltimate>40||report.maxFeedback>96||report.maxEnemies>36||report.maxShots>32||report.maxProjectiles>64||report.maxEffects>(this.phase===1?8:24))throw Error('object cap exceeded');
         const seconds=Math.floor(this.elapsed/1000);
         if(seconds!==this.reportTime){this.reportTime=seconds;result.textContent=JSON.stringify({running:true,seconds,school:SCHOOLS[this.phase],frames:this.frames,maxEnemies:report.maxEnemies,maxEffects:report.maxEffects,maxShots:report.maxShots},null,2);}
         if(this.elapsed<180000)return;
-        this.runner.reset();this.enemies.reset(this.player);
+        this.runner.reset();this.ultimate.reset();this.enemies.reset(this.player);
         if(this.children.list.length!==this.baseline)throw Error('final cleanup leaked');
         result.textContent=JSON.stringify({passed:true,seconds:180,frames:this.frames,objectsAfterReset:this.children.list.length,reports:this.reports.map(({intervals,...r})=>{
           const sorted=[...intervals].sort((a,b)=>a-b);return {...r,sample:intervals.length,meanFrameMs:intervals.reduce((sum,n)=>sum+n,0)/intervals.length,p95FrameMs:sorted[Math.floor(sorted.length*0.95)]};

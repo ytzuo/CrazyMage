@@ -5,11 +5,13 @@ import type { MovementInput } from '../input/MovementInput';
 import { SpellRunner } from '../spells/SpellRunner';
 import { isSchool, type School } from '../upgrades/definitions';
 import { EnemySystem } from '../enemies/EnemySystem';
+import { UltimateSpell } from '../ultimates/UltimateSpell';
 import { BuildStore } from '../upgrades/BuildStore';
 
 export class ArenaScene extends Phaser.Scene {
   private player!: Player;
   private spell!: SpellRunner;
+  private ultimate!: UltimateSpell;
   private selectingSchool = true;
   private paused = false;
   private hudElapsed = 0;
@@ -27,7 +29,8 @@ export class ArenaScene extends Phaser.Scene {
     this.player = new Player(this);
     this.spell = new SpellRunner(this, this.builds.effectiveBuild);
     this.spell.reset(this.builds.snapshot.build.runId);
-    this.enemies = new EnemySystem(this, wave => this.builds.completeWave(wave));
+    this.ultimate = new UltimateSpell(this);
+    this.enemies = new EnemySystem(this, wave => this.builds.completeWave(wave), source => this.ultimate.charge.onKill(source));
     this.enemies.reset();
     this.cameras.main.setBounds(0, 0, ARENA.width, ARENA.height);
     this.cameras.main.startFollow(this.player.view, true, 0.12, 0.12);
@@ -36,6 +39,7 @@ export class ArenaScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.scale.off('resize', this.centerCamera, this);
       this.spell.reset();
+      this.ultimate.reset();
       this.enemies.reset();
     });
     this.movement.setEnabled(false);
@@ -127,6 +131,11 @@ export class ArenaScene extends Phaser.Scene {
     const step = Math.min(delta, 50);
     const attack = this.movement.readAttack() ?? this.touchAim();
     this.player.update(this.movement.read(), step, attack);
+    this.ultimate.update(step);
+    if (this.movement.consumeUltimate()) {
+      this.castUltimate();
+      if (this.builds.pendingChoice) return;
+    }
     this.spell.update(step, this.enemies);
     if (this.builds.pendingChoice) { this.movement.setEnabled(false); this.publish(); return; }
     this.enemies.update(step, this.player);
@@ -163,6 +172,7 @@ export class ArenaScene extends Phaser.Scene {
     this.player.reset();
     this.spell.reset(this.builds.snapshot.build.runId);
     this.enemies.reset();
+    this.ultimate.reset();
     this.movement.setEnabled(false);
     this.centerCamera();
     this.publish();
@@ -174,9 +184,19 @@ export class ArenaScene extends Phaser.Scene {
     this.applyBuild();
     this.spell.reset(this.builds.snapshot.build.runId);
     this.enemies.reset(this.player);
+    this.ultimate.reset(school);
     this.selectingSchool = false;
     this.enemies.effects.empower(this.player.view.x, this.player.view.y, school);
     this.movement.setEnabled(!this.paused);
+    this.publish();
+    return true;
+  }
+
+  castUltimate(): boolean {
+    if (!this.player || this.paused || this.selectingSchool || this.player.health.dead || this.builds.pendingChoice) return false;
+    if (!this.ultimate.cast(this.player.view.x, this.player.view.y, this.enemies)) return false;
+    this.player.cast(this.movement.readAttack() ?? { x: 0, y: -1 }, this.builds.snapshot.build.school);
+    if (this.builds.pendingChoice) this.movement.setEnabled(false);
     this.publish();
     return true;
   }
@@ -197,6 +217,7 @@ export class ArenaScene extends Phaser.Scene {
     this.player.speed = effective.player.speed;
     this.player.health.configure(effective.player.maximum, effective.player.shield);
     this.spell.configure(effective);
+    this.ultimate.configure(effective.school, this.builds.snapshot.build.spellLevel);
   }
 
   private touchAim(): Direction | null {
@@ -217,6 +238,6 @@ export class ArenaScene extends Phaser.Scene {
 
   private publish(): void {
     if (!this.player) return;
-    this.onState({ selectingSchool: this.selectingSchool, x: this.player.view.x, y: this.player.view.y, moving: this.player.moving && !this.paused, paused: this.paused, distance: this.player.distance, attacking: !this.paused && this.movement.readAttack() !== null, casts: this.spell.casts, health: this.player.health.current, maxHealth: this.player.health.maximum, shield: this.player.health.shield, waveRemaining: this.enemies.waves.remaining(this.enemies.waveClock.wave), progression: this.builds.snapshot, dead: this.player.health.dead, enemies: this.enemies.enemies.length, kills: this.enemies.kills, objects: this.children.list.length, projectiles: this.spell.projectileCount, impacts: this.spell.impactCount, enemyPositions: this.enemies.enemies.map(enemy => ({ id: enemy.id, x: enemy.view.x, y: enemy.view.y })), wave: this.enemies.waveClock.wave, nextWaveIn: this.enemies.waveClock.remaining, elapsedTime: this.enemies.waveClock.elapsedTime });
+    this.onState({ ultimateEnergy: this.ultimate.charge.energy, ultimateCasts: this.ultimate.casts, ultimateEffects: this.ultimate.effectCount, selectingSchool: this.selectingSchool, x: this.player.view.x, y: this.player.view.y, moving: this.player.moving && !this.paused, paused: this.paused, distance: this.player.distance, attacking: !this.paused && this.movement.readAttack() !== null, casts: this.spell.casts, health: this.player.health.current, maxHealth: this.player.health.maximum, shield: this.player.health.shield, waveRemaining: this.enemies.waves.remaining(this.enemies.waveClock.wave), progression: this.builds.snapshot, dead: this.player.health.dead, enemies: this.enemies.enemies.length, kills: this.enemies.kills, objects: this.children.list.length, projectiles: this.spell.projectileCount, impacts: this.spell.impactCount, enemyPositions: this.enemies.enemies.map(enemy => ({ id: enemy.id, x: enemy.view.x, y: enemy.view.y })), wave: this.enemies.waveClock.wave, nextWaveIn: this.enemies.waveClock.remaining, elapsedTime: this.enemies.waveClock.elapsedTime });
   }
 }

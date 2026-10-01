@@ -268,3 +268,24 @@ button:disabled { opacity: 0.45; cursor: default; }
   .countdown-a, .countdown-b { animation: none; }
   #health-fill { transition: none; }
 }
+
+.ultimate-button { --ultimate-color: #ffc385; position: absolute; z-index: 3; left: 50%; bottom: var(--edge-bottom); transform: translateX(-50%); width: 220px; display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--ultimate-color); background: #12221de8; border: 1px solid #a3b79966; border-radius: 10px; text-align: left; touch-action: manipulation; }
+.ultimate-button[hidden] { display: none; }
+.ultimate-button:disabled { opacity: 0.75; }
+.ultimate-button[data-school-tone="ice"] { --ultimate-color: #aeeaff; }
+.ultimate-button[data-school-tone="lightning"] { --ultimate-color: #f3e69b; }
+.ultimate-button.ready { border-color: var(--ultimate-color); box-shadow: 0 0 18px #a5ca7826; }
+.ultimate-button.ready:enabled:hover { background: #2b4135; }
+.ultimate-key { display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0; border: 1px solid currentColor; border-radius: 8px; font-size: 21px; font-weight: 700; }
+.ultimate-content { flex: 1; min-width: 0; }
+.ultimate-content strong { display: block; font-size: 15px; }
+.ultimate-content small { display: block; margin-top: 3px; font: 11px ui-monospace, monospace; }
+.ultimate-track { display: block; height: 4px; margin-top: 7px; border-radius: 2px; overflow: hidden; background: #71846a45; }
+#ultimate-fill { display: block; height: 100%; background: var(--ultimate-color); transform: scaleX(0); transform-origin: left; transition: transform 180ms ease-out; }
+@media (max-width: 760px) {
+  .ultimate-button { left: var(--edge-left); transform: none; bottom: calc(var(--edge-bottom) + 128px); width: 152px; gap: 9px; padding: 10px; }
+  .ultimate-key { width: 28px; height: 32px; font-size: 18px; }
+  .ultimate-content strong { font-size: 13px; }
+}
+@media (max-height: 500px) and (min-width: 600px) { .ultimate-button { bottom: calc(var(--edge-bottom) + 96px); } }
+@media (prefers-reduced-motion: reduce) { #ultimate-fill { transition: none; } }

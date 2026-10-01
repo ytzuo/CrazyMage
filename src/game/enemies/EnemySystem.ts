@@ -8,6 +8,7 @@ import { waveDifficulty } from './difficulty';
 import { enemyKind, enemySpec, type EnemyKind, type EnemySpec } from './roster';
 import { SlowStatus } from '../combat/SlowStatus';
 import { EnemyShots } from './EnemyShots';
+import type { DamageSource } from '../ultimates/UltimateCharge';
 import { CombatEffects } from '../effects/CombatEffects';
 import { prepareEnemyTextures, enemyTexture, enemyArtScale } from '../art/CharacterTextures';
 
@@ -27,6 +28,7 @@ export interface Enemy {
   windup: number;
   cooldown: number;
   attackTime: number;
+  frozen: number;
   flash: number;
   knockback: Direction;
 }
@@ -42,7 +44,7 @@ export class EnemySystem {
   private spawnIndex = 0;
   private nextId = 0;
 
-  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number) => void = () => {}) { prepareEnemyTextures(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
+  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number) => void = () => {}, private onKill: (source: DamageSource) => void = () => {}) { prepareEnemyTextures(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
 
   private spawn(player: Player, wave: number, kind: EnemyKind): boolean {
     if (this.enemies.length >= ENEMY.maxCount) return false;
@@ -63,7 +65,7 @@ export class EnemySystem {
       const background = this.scene.add.rectangle(0, -spec.radius - 18, spec.radius * 2, 5, 0x211d26).setStrokeStyle(1, 0x473843);
       const bar = this.scene.add.rectangle(-spec.radius, -spec.radius - 18, spec.radius * 2, 3, 0xe29a9c).setOrigin(0, 0.5);
       view.add([shadow, warning, aimLine, body, background, bar]).setAlpha(0.45);
-      this.enemies.push({ spec, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: ENEMY.spawnWarning, windup: 0, cooldown: 0, attackTime: 0, flash: 0, knockback: { x: 0, y: 0 } });
+      this.enemies.push({ spec, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: ENEMY.spawnWarning, windup: 0, cooldown: 0, attackTime: 0, frozen: 0, flash: 0, knockback: { x: 0, y: 0 } });
       return true;
     }
     return false;
@@ -100,6 +102,10 @@ export class EnemySystem {
         continue;
       }
       enemy.slow.update(delta);
+      if (enemy.frozen > 0) {
+        enemy.frozen = Math.max(0, enemy.frozen - delta);
+        if (enemy.frozen > 0) { enemy.knockback.x = enemy.knockback.y = 0; enemy.body.setTint(0x80dfff); continue; }
+      }
       enemy.flash = Math.max(0, enemy.flash - delta);
       if (enemy.flash === 0) { if(enemy.slow.strength>0) enemy.body.setTint(0x91dafa); else enemy.body.clearTint(); }
       enemy.cooldown = Math.max(0, enemy.cooldown - delta);
@@ -160,11 +166,20 @@ export class EnemySystem {
     body.setFlipX(aim.x < 0);
   }
 
+  freeze(enemy: Enemy, duration: number): void {
+    if (enemy.spawning > 0 || enemy.health.dead || !this.enemies.includes(enemy)) return;
+    enemy.frozen = Math.max(enemy.frozen, Math.min(3000, duration));
+    enemy.windup = enemy.attackTime = 0;
+    enemy.knockback.x = enemy.knockback.y = 0;
+    enemy.warning.setVisible(false); enemy.aimLine.setVisible(false);
+    this.animate(enemy); enemy.body.setTint(0x80dfff);
+  }
+
   slow(enemy: Enemy, strength:number, duration:number): void {
     if(enemy.spawning===0&&!enemy.health.dead&&this.enemies.includes(enemy)) enemy.slow.apply(strength,duration);
   }
 
-  hit(enemy: Enemy, damage: number, direction: Direction): boolean {
+  hit(enemy: Enemy, damage: number, direction: Direction, source: DamageSource = 'spell'): boolean {
     if (enemy.spawning > 0 || enemy.health.dead || !this.enemies.includes(enemy) || !enemy.health.hurt(damage)) return false;
     this.effects.hit(enemy.view.x, enemy.view.y, direction);
     enemy.bar.scaleX = enemy.health.current / enemy.health.maximum;
@@ -180,6 +195,7 @@ export class EnemySystem {
     enemy.aimLine.setVisible(false);
     if (enemy.health.dead) {
       this.kills++;
+      this.onKill(source);
       const color = { chaser:0xd39b96, ranged:0xc4a0ec, brute:0xe6ba78, swift:0xc6dc79 }[enemy.spec.kind];
       this.effects.death(enemy.view.x, enemy.view.y, color, enemy.spec.radius);
       enemy.view.destroy();
