@@ -27,9 +27,11 @@ run.onclick = async () => {
     const pick=()=>doc.querySelector<HTMLButtonElement>(`[data-school="${school.value}"]`)!.click();
     pick();const selectedRun=combat().runId;pick();
     check(combat().school===school.value&&!combat().selectingSchool&&combat().enemies===6&&combat().runId===selectedRun,'school pick did not start once');
+    check(get('battle-notice').textContent!.includes('已就绪'),'school ready feedback missing');
     reports.push({check:'school selection freezes combat, locks one choice and starts six enemies',school:school.value});
     click('build');check(loop()==='false','build did not sleep loop');
     const before=combat().elapsedTime;await delay(300);check(combat().elapsedTime===before,'build advanced time');
+    check(win.getComputedStyle(get('battle-notice')).animationPlayState==='paused','notice did not freeze with combat');
     doc.querySelector<HTMLButtonElement>('[data-close]')!.click();check(loop()==='true','build close did not resume');
     click('pause');click('build');doc.querySelector<HTMLButtonElement>('[data-close]')!.click();check(loop()==='false','closing build lost existing pause');click('resume');
     click('build');win.dispatchEvent(new Event('blur'));doc.querySelector<HTMLButtonElement>('[data-close]')!.click();check(loop()==='false','closing build resumed after blur');click('resume');
@@ -55,6 +57,7 @@ run.onclick = async () => {
         check(combat().revision===oldRevision+1,'choice applied more than once');
         check(get('wave-countdown').textContent==='3s','choice did not preserve three-second clear countdown');
         check(combat().elapsedTime<frozen+500,'rescheduling changed run duration');
+        check(get('battle-notice').textContent!.includes('强化完成'),'upgrade feedback missing');
         choices++;continue;
       }
       const parse=(value:string|null)=>value!.match(/[-\d.]+/g)!.map(Number);

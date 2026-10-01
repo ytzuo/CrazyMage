@@ -4,9 +4,9 @@ export class SchoolPicker {
   private visible:boolean|null=null;
   private abort=new AbortController();
   constructor(private host:HTMLElement,choose:(school:School)=>void) {
-    host.innerHTML=`<section class="build-card school-card"><header><h2>选择流派</h2></header><div class="upgrade-options">${SCHOOLS.map(school=>{
+    host.innerHTML=`<section class="build-card school-card"><header><div><small>本局起始法术</small><h2>选择流派</h2></div></header><div class="upgrade-options">${SCHOOLS.map(school=>{
       const info=SCHOOL_INFO[school];
-      return `<button class="upgrade-option school-${school}" data-school="${school}" aria-label="选择${info.name}流派"><b class="school-symbol" aria-hidden="true">${info.symbol}</b><h3>${info.name}</h3><p>${info.description}</p><span>${info.spell} Lv.1 →</span></button>`;
+      return `<button class="upgrade-option school-${school}" style="--card-index:${SCHOOLS.indexOf(school)}" data-school="${school}" aria-label="选择${info.name}流派"><div class="school-emblem"><i aria-hidden="true"></i><b class="school-symbol" aria-hidden="true">${info.symbol}</b></div><h3>${info.name}</h3><p>${info.description}</p><span>${info.spell} Lv.1 →</span></button>`;
     }).join('')}</div></section>`;
     host.addEventListener('click',event=>{
       const value=(event.target as HTMLElement).closest<HTMLButtonElement>('[data-school]')?.dataset.school;

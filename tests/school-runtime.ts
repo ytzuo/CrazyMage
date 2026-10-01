@@ -48,6 +48,13 @@ document.querySelector<HTMLButtonElement>('#check')!.onclick=()=>{
           check(this.children.list.length===baseline,'school switch or reset leaked objects');
         }
         reports.push({check:'ten cycles through all schools release spells, echoes and enemies',objects:baseline});
+        for(let i=0;i<40;i++)enemies.effects.death(1200,900,0xffffff,20);
+        check(enemies.effects.count===96,'feedback budget not bounded');
+        enemies.effects.update(0);check(enemies.effects.count===96,'zero active time changed effects');
+        enemies.effects.update(650);check(enemies.effects.count===0&&this.children.list.length===baseline,'feedback expiration leaked');
+        enemies.effects.empower(1200,900,'ice');enemies.reset();
+        check(enemies.effects.count===0,'reset retained feedback');
+        reports.push({check:'feedback bounded to 96 images, freezes at zero delta, expires and resets'});
         result.textContent=JSON.stringify({passed:true,reports},null,2);
       }catch(error){result.textContent=JSON.stringify({passed:false,error:String(error),reports},null,2);}
       this.scene.pause();queueMicrotask(()=>{this.game.pause();this.game.loop.sleep();});
@@ -68,7 +75,7 @@ document.querySelector<HTMLButtonElement>('#stress')!.onclick=()=>{
     private frames=0;
     private reportTime=0;
     private baseline=0;
-    private reports:{school:string;frames:number;maxEnemies:number;maxShots:number;maxProjectiles:number;maxEffects:number;maxObjects:number;intervals:number[]}[]=[];
+    private reports:{school:string;frames:number;maxEnemies:number;maxShots:number;maxProjectiles:number;maxEffects:number;maxFeedback:number;maxObjects:number;intervals:number[]}[]=[];
     create(){this.player=new Player(this);this.enemies=new EnemySystem(this);this.runner=new SpellRunner(this,compileBuild(initialBuild(1)));this.prepare(0);this.cameras.main.centerOn(1200,900);}
     private prepare(phase:number){
       this.runner.reset();this.enemies.reset(this.player);this.player.reset();
@@ -78,7 +85,7 @@ document.querySelector<HTMLButtonElement>('#stress')!.onclick=()=>{
       const ids=school==='fire'?['fire.multi','fire.multi','fire.pierce']:school==='ice'?['ice.echo','ice.radius','ice.cold']:['lightning.chain','lightning.chain','lightning.conduction'];
       const build=[...ids,'passive.cooldown','passive.cooldown','passive.cooldown'].reduce(applyUpgrade,initialBuild(phase+1,school));
       this.runner.configure(compileBuild(build));this.enemies.waveClock.wave=40;this.enemies.update(60000,this.player);
-      this.phase=phase;this.reports.push({school,frames:0,maxEnemies:36,maxShots:0,maxProjectiles:0,maxEffects:0,maxObjects:0,intervals:[]});
+      this.phase=phase;this.reports.push({school,frames:0,maxEnemies:36,maxShots:0,maxProjectiles:0,maxEffects:0,maxFeedback:0,maxObjects:0,intervals:[]});
     }
     update(_time:number,delta:number){
       try{
@@ -91,8 +98,8 @@ document.querySelector<HTMLButtonElement>('#stress')!.onclick=()=>{
         for(const enemy of this.enemies.enemies){const dx=enemy.view.x-this.player.view.x,dy=enemy.view.y-this.player.view.y,d=Math.hypot(dx,dy);if(enemy.spawning===0&&d>0&&d<closest){closest=d;aim={x:dx/d,y:dy/d};}}
         this.runner.cast(this.player.view.x,this.player.view.y,aim,this.enemies);
         report.maxEnemies=Math.max(report.maxEnemies,this.enemies.enemies.length);report.maxShots=Math.max(report.maxShots,this.enemies.shots.count);
-        report.maxProjectiles=Math.max(report.maxProjectiles,this.runner.projectileCount);report.maxEffects=Math.max(report.maxEffects,this.runner.impactCount);report.maxObjects=Math.max(report.maxObjects,this.children.list.length);
-        if(report.maxEnemies>36||report.maxShots>32||report.maxProjectiles>64||report.maxEffects>(this.phase===1?8:24))throw Error('object cap exceeded');
+        report.maxProjectiles=Math.max(report.maxProjectiles,this.runner.projectileCount);report.maxEffects=Math.max(report.maxEffects,this.runner.impactCount);report.maxFeedback=Math.max(report.maxFeedback,this.enemies.effects.count);report.maxObjects=Math.max(report.maxObjects,this.children.list.length);
+        if(report.maxFeedback>96||report.maxEnemies>36||report.maxShots>32||report.maxProjectiles>64||report.maxEffects>(this.phase===1?8:24))throw Error('object cap exceeded');
         const seconds=Math.floor(this.elapsed/1000);
         if(seconds!==this.reportTime){this.reportTime=seconds;result.textContent=JSON.stringify({running:true,seconds,school:SCHOOLS[this.phase],frames:this.frames,maxEnemies:report.maxEnemies,maxEffects:report.maxEffects,maxShots:report.maxShots},null,2);}
         if(this.elapsed<180000)return;

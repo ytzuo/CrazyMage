@@ -21,6 +21,10 @@ export class SpellRunner {
     else this.active.configure(effective.lightning);
   }
   update(delta:number,enemies:EnemySystem){this.active.update(delta,enemies);}
-  cast(x:number,y:number,aim:Direction,enemies:EnemySystem){return this.active instanceof FireballSpell?this.active.cast(x,y,aim):this.active.cast(x,y,aim,enemies);}
+  cast(x:number,y:number,aim:Direction,enemies:EnemySystem){
+    const cast=this.active instanceof FireballSpell?this.active.cast(x,y,aim):this.active.cast(x,y,aim,enemies);
+    if(cast)enemies.effects.cast(x,y,this.school,aim);
+    return cast;
+  }
   reset(runId=0){this.active.reset(runId);}
 }

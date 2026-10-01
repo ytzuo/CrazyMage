@@ -6,7 +6,8 @@ import { ArenaScene } from './game/scenes/ArenaScene';
 import { observePerformance } from './game/diagnostics/performance';
 import { BuildPanel, spellSummary } from './ui/BuildPanel';
 import { SchoolPicker } from './ui/SchoolPicker';
-import { SCHOOL_INFO } from './game/upgrades/definitions';
+import { BattleNotice } from './ui/BattleNotice';
+import { SCHOOL_INFO, definition } from './game/upgrades/definitions';
 import type { BuildSnapshot } from './game/upgrades/BuildStore';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
@@ -36,6 +37,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         </g>
       </svg>
     </aside>
+    <div id="battle-notice" class="battle-notice" role="status" aria-live="polite" hidden></div>
     <div id="school-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="选择开局流派" hidden></div>
     <div id="build-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="法术构筑与升级" hidden></div>
     <div id="pause-overlay" class="pause-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
@@ -66,11 +68,17 @@ let lastRunSeconds = -1;
 const minimapPlayer = document.querySelector<SVGGElement>('#minimap-player')!;
 const minimapEnemies = document.querySelector<SVGGElement>('#minimap-enemies')!;
 const enemyMarkers = new Map<number, SVGCircleElement>();
+const notice = new BattleNotice(element('battle-notice'));
+let lastEnemyCount = 0;
 let minimapPosition = minimapPlayer.getAttribute('transform');
 const scene = new ArenaScene(movement, (state: MovementState) => {
   const wasSelecting = selectingSchool;
   selectingSchool = state.selectingSchool;
   picker?.update(selectingSchool);
+  if(selectingSchool) notice.clear();
+  if(!selectingSchool && lastEnemyCount > 0 && state.enemies === 0 && !state.dead && !state.progression.choice) notice.show('场上已清空', '下一波即将到来');
+  lastEnemyCount = state.enemies;
+  document.querySelector('.wave-status')!.classList.toggle('cleared', !selectingSchool && state.enemies === 0);
   element('build').toggleAttribute('disabled', selectingSchool || state.dead);
   element('pause').toggleAttribute('disabled', selectingSchool || state.dead);
   if(wasSelecting !== selectingSchool) queueMicrotask(syncPause);
@@ -82,6 +90,8 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
   if (seconds !== lastWaveSeconds) {
     element('wave-countdown').textContent = `${seconds}s`;
     element('wave-countdown').classList.toggle('soon', seconds <= 5);
+    element('wave-countdown').classList.toggle('countdown-a', seconds <= 3 && seconds % 2 === 0);
+    element('wave-countdown').classList.toggle('countdown-b', seconds <= 3 && seconds % 2 !== 0);
     lastWaveSeconds = seconds;
   }
   const healthKey = `${state.health}/${state.maxHealth}/${state.shield}`;
@@ -101,7 +111,7 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
   if (progressKey !== lastProgression) {
     const { build } = state.progression;
     element('spell-level').textContent = selectingSchool ? '选择流派' : `${SCHOOL_INFO[build.school].spell} Lv.${build.spellLevel}`;
-    element('wave-remaining').textContent = `本波剩余 ${state.waveRemaining}`;
+    element('wave-remaining').textContent = state.enemies === 0 && !selectingSchool ? '场上已清空' : `本波剩余 ${state.waveRemaining}`;
     element('spell-level').title = spellSummary(state.progression.effective);
     lastProgression = progressKey;
   }
@@ -151,10 +161,13 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
 });
 
 panel = new BuildPanel(element('build-overlay'), id => scene.previewUpgrade(id), (batch, id) => {
-  if (scene.chooseUpgrade(batch, id)) syncPause();
+  if (scene.chooseUpgrade(batch, id)) {
+    notice.show('强化完成', definition(id)!.name, latestBuild!.build.school);
+    syncPause();
+  }
 }, inspectBuild);
 
-picker = new SchoolPicker(element('school-overlay'), school => { if(scene.chooseSchool(school)) syncPause(); });
+picker = new SchoolPicker(element('school-overlay'), school => { if(scene.chooseSchool(school)) { notice.show(`${SCHOOL_INFO[school].name}流派`, `${SCHOOL_INFO[school].spell}已就绪`, school); syncPause(); } });
 
 game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -180,6 +193,7 @@ function syncPause(): void {
   if (!game) return;
   const choosing = !!latestBuild?.choice;
   const next = dead || selectingSchool || paused || inspecting || choosing;
+  document.querySelector('.arena')!.classList.toggle('combat-paused', next);
   if (next !== appliedPause) {
     appliedPause = next;
     scene.setPaused(next);
@@ -242,6 +256,7 @@ if (import.meta.hot) {
     movement.destroy();
     panel.destroy();
     picker.destroy();
+    notice.destroy();
     game.destroy(true);
   });
 }

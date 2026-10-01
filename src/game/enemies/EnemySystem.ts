@@ -8,6 +8,7 @@ import { waveDifficulty } from './difficulty';
 import { enemyKind, enemySpec, type EnemyKind, type EnemySpec } from './roster';
 import { SlowStatus } from '../combat/SlowStatus';
 import { EnemyShots } from './EnemyShots';
+import { CombatEffects } from '../effects/CombatEffects';
 
 export interface Enemy {
   id: number;
@@ -35,10 +36,11 @@ export class EnemySystem {
   readonly waveClock = new WaveClock(ENEMY.waveInterval);
   readonly waves = new WaveTracker();
   readonly shots: EnemyShots;
+  readonly effects: CombatEffects;
   private spawnIndex = 0;
   private nextId = 0;
 
-  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number) => void = () => {}) { this.prepareTexture(); this.shots = new EnemyShots(scene); }
+  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number) => void = () => {}) { this.prepareTexture(); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
 
   private prepareTexture(): void {
     for (const kind of ['chaser','ranged','brute','swift'] as EnemyKind[]) {
@@ -99,6 +101,7 @@ export class EnemySystem {
     for (const enemy of this.enemies) enemy.view.destroy();
     this.enemies.length = 0;
     this.shots.reset();
+    this.effects.reset();
     this.kills = this.spawnIndex = this.nextId = 0;
     this.waveClock.reset();
     this.waves.reset();
@@ -112,6 +115,7 @@ export class EnemySystem {
   }
 
   update(delta: number, player: Player): void {
+    this.effects.update(delta);
     const waves = this.waveClock.update(delta);
     for (let i = 0; i < waves; i++) this.spawnWave(player, this.waveClock.wave - waves + i + 1);
     for (const enemy of this.enemies) {
@@ -137,6 +141,7 @@ export class EnemySystem {
           enemy.warning.setVisible(false);
           enemy.cooldown = spec.cooldown;
           enemy.aimLine.setVisible(false);
+          this.effects.attack(enemy.view.x, enemy.view.y, enemy.aim, spec.kind === 'ranged');
           if (spec.kind === 'ranged') {
             this.shots.fire(enemy.view.x, enemy.view.y, enemy.aim, spec.damage);
           } else if (distance <= spec.range && player.hurt(spec.damage, enemy.view.x, enemy.view.y)) {
@@ -172,6 +177,7 @@ export class EnemySystem {
 
   hit(enemy: Enemy, damage: number, direction: Direction): boolean {
     if (enemy.spawning > 0 || enemy.health.dead || !this.enemies.includes(enemy) || !enemy.health.hurt(damage)) return false;
+    this.effects.hit(enemy.view.x, enemy.view.y, direction);
     enemy.bar.scaleX = enemy.health.current / enemy.health.maximum;
     enemy.body.setTintFill(0xffe1b6);
     enemy.flash = 120;
@@ -184,10 +190,12 @@ export class EnemySystem {
     enemy.aimLine.setVisible(false);
     if (enemy.health.dead) {
       this.kills++;
+      const color = { chaser:0xd39b96, ranged:0xc4a0ec, brute:0xe6ba78, swift:0xc6dc79 }[enemy.spec.kind];
+      this.effects.death(enemy.view.x, enemy.view.y, color, enemy.spec.radius);
       enemy.view.destroy();
       this.enemies.splice(this.enemies.indexOf(enemy), 1);
       // Clearing the arena schedules the next wave even when upgrades are exhausted.
-      if (this.enemies.length === 0) { this.waveClock.scheduleNext(ENEMY.clearDelay); this.shots.reset(); }
+      if (this.enemies.length === 0) { this.waveClock.scheduleNext(ENEMY.clearDelay); this.shots.reset(); this.effects.clear(enemy.view.x, enemy.view.y); }
       if (this.waves.defeat(enemy.wave)) this.onWaveClear(enemy.wave);
     }
     return true;

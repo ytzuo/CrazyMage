@@ -41,7 +41,7 @@ export class BuildPanel {
     if (!visible || key === this.key) return;
     this.key = key;
     const details = inspecting;
-    this.host.innerHTML = `<section class="build-card"><header><div><small>${details ? '本局构筑' : `第 ${snapshot.choice?.wave} 波完成`}</small><h2>${details ? '你的法术组合' : '选择一项强化'}</h2></div>${details ? `<button data-close aria-label="${snapshot.choice ? '返回升级' : '关闭构筑'}">${snapshot.choice ? '返回升级' : '关闭'} ×</button>` : '<button data-inspect aria-label="查看已获取升级">查看构筑</button>'}</header>${details ? this.details(snapshot) : this.options(snapshot)}</section>`;
+    this.host.innerHTML = `<section class="build-card"><header><div><small class="wave-clear-label">${details ? '本局构筑' : `✦ 第 ${snapshot.choice?.wave} 波完成`}</small><h2>${details ? '你的法术组合' : '选择一项强化'}</h2></div>${details ? `<button data-close aria-label="${snapshot.choice ? '返回升级' : '关闭构筑'}">${snapshot.choice ? '返回升级' : '关闭'} ×</button>` : '<button data-inspect aria-label="查看已获取升级">查看构筑</button>'}</header>${details ? this.details(snapshot) : `<div class="level-route"><span>${SCHOOL_INFO[snapshot.build.school].symbol} ${SCHOOL_INFO[snapshot.build.school].name}</span><div aria-label="法术等级 ${snapshot.build.spellLevel} / 4">${[1,2,3,4].map(level=>`<i class="${level<=snapshot.build.spellLevel?'filled':''}"></i>`).join('')}</div><b>Lv.${snapshot.build.spellLevel}</b></div>${this.options(snapshot)}`}</section>`;
     this.host.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
   }
   private options(snapshot: BuildSnapshot): string {
@@ -52,7 +52,7 @@ export class BuildPanel {
       const change = card.effect.kind !== 'passive' || card.id === 'passive.cooldown'
         ? `${spellSummary(snapshot.effective)} → ${spellSummary(after)}`
         : `移速 ${number(before.speed)} → ${number(p.speed)} · 生命 ${before.maximum} → ${p.maximum} · 护盾 ${before.shield} → ${p.shield}`;
-      return `<button class="upgrade-option" data-upgrade="${id}" data-batch="${snapshot.choice!.id}"><small>${card.effect.kind !== 'passive' ? `${SCHOOL_INFO[snapshot.build.school].spell} Lv.${snapshot.build.spellLevel} → Lv.${snapshot.build.spellLevel + 1}` : `被动 Lv.${stacks(snapshot.build, card)} → Lv.${stacks(snapshot.build, card) + 1}`}</small><h3>${card.name}</h3><p>${card.description}</p><p class="upgrade-change">${change}</p><span>选择 →</span></button>`;
+      return `<button class="upgrade-option school-${snapshot.build.school}" style="--card-index:${snapshot.choice!.options.indexOf(id)}" data-upgrade="${id}" data-batch="${snapshot.choice!.id}"><b class="upgrade-symbol" aria-hidden="true">${card.effect.kind==='passive'?'◇':SCHOOL_INFO[snapshot.build.school].symbol}</b><small>${card.effect.kind !== 'passive' ? `${SCHOOL_INFO[snapshot.build.school].spell} Lv.${snapshot.build.spellLevel} → Lv.${snapshot.build.spellLevel + 1}` : `被动 Lv.${stacks(snapshot.build, card)} → Lv.${stacks(snapshot.build, card) + 1}`}</small><h3>${card.name}</h3><p>${card.description}</p><p class="upgrade-change">${change}</p><span>选择 →</span></button>`;
     }).join('')}</div>`;
   }
   private details(snapshot: BuildSnapshot): string {

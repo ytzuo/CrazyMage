@@ -174,6 +174,7 @@ export class ArenaScene extends Phaser.Scene {
     this.spell.reset(this.builds.snapshot.build.runId);
     this.enemies.reset(this.player);
     this.selectingSchool = false;
+    this.enemies.effects.empower(this.player.view.x, this.player.view.y, school);
     this.movement.setEnabled(!this.paused);
     this.publish();
     return true;
@@ -185,6 +186,7 @@ export class ArenaScene extends Phaser.Scene {
     if (!this.paused || this.player.health.dead) return false;
     if (!this.builds.choose(batchId, id, this.enemies.waveClock.elapsedTime)) return false;
     this.applyBuild();
+    this.enemies.effects.empower(this.player.view.x, this.player.view.y, this.builds.snapshot.build.school);
     this.publish();
     return true;
   }
