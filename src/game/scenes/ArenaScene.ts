@@ -132,6 +132,7 @@ export class ArenaScene extends Phaser.Scene {
     this.enemies.update(step, this.player);
     if (!this.player.health.dead) {
       if (attack && this.spell.cast(this.player.view.x, this.player.view.y, attack, this.enemies)) {
+        this.player.cast(attack, this.builds.snapshot.build.school);
         this.movement.consumeAttack();
         this.publish();
       }

@@ -1,12 +1,19 @@
 import Phaser from 'phaser';
 import { ARENA, PLAYER, type Direction } from '../config';
 import { Health } from '../combat/Health';
+import { SCHOOL_COLOR } from '../effects/CombatEffects';
+import type { School } from '../upgrades/definitions';
 
 export class Player {
   readonly view: Phaser.GameObjects.Container;
   private figure: Phaser.GameObjects.Container;
   private shadow: Phaser.GameObjects.Ellipse;
   private aura: Phaser.GameObjects.Arc;
+  private wand: Phaser.GameObjects.Container;
+  private wandGlow: Phaser.GameObjects.Arc;
+  private castTime = 0;
+  private castAim = { x: 1, y: 0 };
+  get casting(): boolean { return this.castTime > 0; }
   private facing = 1;
   private walkTime = 0;
   distance = 0;
@@ -32,16 +39,20 @@ export class Player {
     mage.fillStyle(0xa2b7d0).fillTriangle(-15, -17, -3, -44, -7, -17);
     mage.fillStyle(0x52677e).fillRoundedRect(-20, -21, 37, 7, 3);
     mage.fillStyle(0xc7bc88).fillRect(-13, -25, 23, 3);
-    mage.lineStyle(4, 0x6a5041).lineBetween(18, -16, 18, 20);
-    mage.fillStyle(0xd6b58e).fillCircle(17, 5, 4);
-    mage.fillStyle(0xe9c87f).fillCircle(18, -20, 5);
-    const glow = scene.add.circle(18, -20, 9, 0xffd99b, 0.13);
-    this.figure.add([glow, mage]);
+    this.wand = scene.add.container(12, 3);
+    const staff = scene.add.graphics();
+    staff.lineStyle(4, 0x6a5041).lineBetween(6, -19, 6, 17);
+    staff.fillStyle(0xd6b58e).fillCircle(5, 2, 4);
+    staff.fillStyle(0xe9c87f).fillCircle(6, -23, 5);
+    this.wandGlow = scene.add.circle(6, -23, 9, 0xffd99b, 0.2);
+    this.wand.add([this.wandGlow, staff]);
+    this.figure.add([mage, this.wand]);
     this.view.add([this.aura, this.shadow, this.figure]);
   }
 
   update(direction: Direction, delta: number, aim: Direction | null = null): void {
     this.health.update(delta);
+    this.castTime = Math.max(0, this.castTime - delta);
     this.flashTime = Math.max(0, this.flashTime - delta);
     const previousX = this.view.x;
     const previousY = this.view.y;
@@ -55,12 +66,30 @@ export class Player {
     const traveled = Math.hypot(this.view.x - previousX, this.view.y - previousY);
     this.distance += traveled;
     this.moving = traveled > 0.01;
-    const facingX = aim?.x || direction.x;
+    const facingX = this.casting ? this.castAim.x : aim?.x || direction.x;
     if (facingX !== 0) this.facing = Math.sign(facingX);
     if (this.moving) this.walkTime += delta;
+    this.pose();
+  }
+
+  /** Successful casts animate the existing body and hinged staff, never delay damage. */
+  cast(aim: Direction, school: School): void {
+    this.castTime = 280;
+    this.castAim.x = aim.x; this.castAim.y = aim.y;
+    if (Math.abs(aim.x) > 0.01) this.facing = Math.sign(aim.x);
+    this.wandGlow.setFillStyle(SCHOOL_COLOR[school]);
+    this.pose();
+  }
+
+  private pose(): void {
     const bob = this.moving ? Math.sin(this.walkTime * 0.018) * 2 : 0;
-    this.figure.setPosition(0, -7 + bob).setScale(this.facing, 1);
-    this.figure.rotation = this.moving ? Math.sin(this.walkTime * 0.009) * 0.045 : 0;
+    const progress = 1 - this.castTime / 280;
+    const stroke = this.casting ? Math.sin(progress * Math.PI) : 0;
+    const raise = this.casting ? Math.sin(Math.min(1, progress * 3) * Math.PI / 2) * (1 - progress) : 0;
+    this.figure.setPosition(this.castAim.x * stroke * 4, -7 + bob + this.castAim.y * stroke * 3).setScale(this.facing * (1 + stroke * 0.04), 1 - stroke * 0.04);
+    this.figure.rotation = (this.moving ? Math.sin(this.walkTime * 0.009) * 0.045 : 0) + this.facing * this.castAim.x * stroke * 0.1;
+    this.wand.setPosition(12 + stroke * 6, 3 - raise * 10).setRotation(this.casting ? -0.55 * raise + 0.7 * stroke : 0);
+    this.wandGlow.setScale(1 + stroke * 0.8).setAlpha(this.casting ? 0.35 + stroke * 0.6 : 0.2);
     this.shadow.scaleX = 1 + Math.abs(bob) * 0.035;
     this.aura.setAlpha(this.moving ? 0.7 : 1);
     this.figure.setAlpha(this.health.protected && Math.floor(this.flashTime / 75) % 2 === 0 ? 0.4 : 1);
@@ -85,7 +114,8 @@ export class Player {
     this.facing = 1;
     this.health.reset();
     this.knockback.x = this.knockback.y = 0;
-    this.flashTime = 0;
+    this.flashTime = this.castTime = 0;
+    this.wandGlow.setFillStyle(0xffd99b);
     this.update({ x: 0, y: 0 }, 0);
   }
 }

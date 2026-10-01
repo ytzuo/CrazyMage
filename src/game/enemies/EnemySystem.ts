@@ -25,6 +25,7 @@ export interface Enemy {
   spawning: number;
   windup: number;
   cooldown: number;
+  attackTime: number;
   flash: number;
   knockback: Direction;
 }
@@ -91,7 +92,7 @@ export class EnemySystem {
       const background = this.scene.add.rectangle(0, -spec.radius - 18, spec.radius * 2, 5, 0x211d26).setStrokeStyle(1, 0x473843);
       const bar = this.scene.add.rectangle(-spec.radius, -spec.radius - 18, spec.radius * 2, 3, 0xe29a9c).setOrigin(0, 0.5);
       view.add([shadow, warning, aimLine, body, background, bar]).setAlpha(0.45);
-      this.enemies.push({ spec, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: ENEMY.spawnWarning, windup: 0, cooldown: 0, flash: 0, knockback: { x: 0, y: 0 } });
+      this.enemies.push({ spec, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: ENEMY.spawnWarning, windup: 0, cooldown: 0, attackTime: 0, flash: 0, knockback: { x: 0, y: 0 } });
       return true;
     }
     return false;
@@ -131,6 +132,7 @@ export class EnemySystem {
       enemy.flash = Math.max(0, enemy.flash - delta);
       if (enemy.flash === 0) { if(enemy.slow.strength>0) enemy.body.setTint(0x91dafa); else enemy.body.clearTint(); }
       enemy.cooldown = Math.max(0, enemy.cooldown - delta);
+      enemy.attackTime = Math.max(0, enemy.attackTime - delta);
       const dx = player.view.x - enemy.view.x;
       const dy = player.view.y - enemy.view.y;
       const distance = Math.hypot(dx, dy);
@@ -140,12 +142,13 @@ export class EnemySystem {
         if (enemy.windup === 0) {
           enemy.warning.setVisible(false);
           enemy.cooldown = spec.cooldown;
+          enemy.attackTime = 230;
           enemy.aimLine.setVisible(false);
           this.effects.attack(enemy.view.x, enemy.view.y, enemy.aim, spec.kind === 'ranged');
           if (spec.kind === 'ranged') {
             this.shots.fire(enemy.view.x, enemy.view.y, enemy.aim, spec.damage);
           } else if (distance <= spec.range && player.hurt(spec.damage, enemy.view.x, enemy.view.y)) {
-            if (player.health.dead) break;
+            if (player.health.dead) { this.animate(enemy); break; }
           }
         }
       } else if (distance <= spec.range && enemy.cooldown === 0) {
@@ -167,8 +170,23 @@ export class EnemySystem {
       const decay = Math.exp(-delta / 100);
       enemy.knockback.x *= decay;
       enemy.knockback.y *= decay;
+      this.animate(enemy);
     }
     if (!player.health.dead) this.shots.update(delta, player);
+  }
+
+  /** Pose only moves the sprite inside its container; collision and warning stay fixed. */
+  private animate(enemy: Enemy): void {
+    const {spec, body, aim} = enemy;
+    const base = spec.radius / (spec.kind === 'brute' ? 29 : 20);
+    const charge = enemy.windup > 0 ? 1 - enemy.windup / spec.windup : 0;
+    const strike = enemy.attackTime > 0 ? Math.sin((1 - enemy.attackTime / 230) * Math.PI) : 0;
+    const ranged = spec.kind === 'ranged', brute = spec.kind === 'brute';
+    const thrust = (ranged ? -6 : brute ? 18 : 12) * strike - charge * 6;
+    body.setPosition(aim.x * thrust, -3 + aim.y * thrust - charge * (brute ? 12 : 4));
+    body.setScale(base * (1 - charge * 0.12 + strike * 0.12), base * (1 + charge * 0.12 - strike * 0.1));
+    body.setRotation((aim.x < 0 ? -1 : 1) * (-charge * 0.16 + strike * (ranged ? -0.16 : 0.22)));
+    body.setFlipX(aim.x < 0);
   }
 
   slow(enemy: Enemy, strength:number, duration:number): void {
@@ -184,7 +202,8 @@ export class EnemySystem {
     enemy.knockback.x = direction.x * enemy.spec.knockback;
     enemy.knockback.y = direction.y * enemy.spec.knockback;
     // A hit interrupts a pending contact attack, allowing a close-range escape.
-    enemy.windup = 0;
+    enemy.windup = enemy.attackTime = 0;
+    this.animate(enemy);
     enemy.cooldown = Math.max(enemy.cooldown, 250);
     enemy.warning.setVisible(false);
     enemy.aimLine.setVisible(false);
