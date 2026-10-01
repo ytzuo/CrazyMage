@@ -14,7 +14,7 @@ test('different acquisition orders preserve identical combined specs and immutab
   const b = compileBuild(buildWith(...ids.toReversed()));
   assert.deepEqual(a.fireball, b.fireball);
   assert.equal(a.fireball.count, 3); assert.equal(a.fireball.damage, 13);
-  assert.equal(a.fireball.maxTargets, 2); assert.equal(a.fireball.cooldown, 315);
+  assert.equal(a.fireball.maxTargets, 2); assert.equal(a.fireball.cooldown, 495);
   assert.deepEqual(a.fireball.explosion, {radius:80, multiplier:0.35});
   const initial = initialBuild(1), snapshot = compileBuild(initial);
   applyUpgrade(initial, 'fire.multi');
@@ -25,7 +25,7 @@ test('different acquisition orders preserve identical combined specs and immutab
 test('additive damage, repeated multi and cooldown respect defined coefficients', () => {
   const effective = compileBuild(buildWith('fire.damage', 'fire.multi', 'fire.damage', 'passive.cooldown', 'passive.cooldown', 'passive.cooldown'));
   assert.equal(effective.fireball.damage, 20.8);
-  assert.ok(Math.abs(effective.fireball.cooldown - 245) < 1e-9);
+  assert.ok(Math.abs(effective.fireball.cooldown - 385) < 1e-9);
   assert.equal(compileBuild(buildWith('fire.multi','fire.multi')).fireball.count, 5);
   assert.equal(preserveCooldown(175, 350, 245), 122.5);
 });

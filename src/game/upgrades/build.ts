@@ -1,4 +1,4 @@
-import { FIREBALL, PLAYER } from '../config.ts';
+import { FIREBALL, ICE, LIGHTNING, PLAYER } from '../config.ts';
 import { definition, UPGRADES, type School, type SpellModule, type Passive, type UpgradeDefinition } from './definitions.ts';
 export interface BuildState {
   readonly runId: number;
@@ -59,8 +59,8 @@ export function compileBuild(build: BuildState): EffectiveBuild {
     speed: FIREBALL.speed, lifetime: FIREBALL.lifetime,
     explosion: m.explosion ? Object.freeze({ radius: 80, multiplier: 0.35 }) : null,
   });
-  const ice = Object.freeze({damage:24*(1+0.3*(i.damage??0))*(i.echo?0.75:1),cooldown:Math.max(400,850*(1-0.1*(p.cooldown??0))),radius:160*(1+0.25*(i.radius??0)),slow:Math.min(0.75,0.3+0.1*(i.cold??0)),duration:1500+500*(i.cold??0),pulses:i.echo?2:1,echoDelay:180});
-  const lightning = Object.freeze({damage:20*(1+0.3*(l.damage??0)),cooldown:Math.max(300,650*(1-0.1*(p.cooldown??0))),range:440*(1+0.25*(l.range??0)),jumpRange:180*(1+0.25*(l.range??0)),maxTargets:3+2*(l.chain??0),falloff:l.conduction?0.95:0.8});
+  const ice = Object.freeze({damage:24*(1+0.3*(i.damage??0))*(i.echo?0.75:1),cooldown:Math.max(400,ICE.cooldown*(1-0.1*(p.cooldown??0))),radius:160*(1+0.25*(i.radius??0)),slow:Math.min(0.75,0.3+0.1*(i.cold??0)),duration:1500+500*(i.cold??0),pulses:i.echo?2:1,echoDelay:180});
+  const lightning = Object.freeze({damage:20*(1+0.3*(l.damage??0)),cooldown:Math.max(300,LIGHTNING.cooldown*(1-0.1*(p.cooldown??0))),range:440*(1+0.25*(l.range??0)),jumpRange:180*(1+0.25*(l.range??0)),maxTargets:3+2*(l.chain??0),falloff:l.conduction?0.95:0.8});
   return Object.freeze({ revision: build.revision, school:build.school, fireball, ice, lightning,
     player: Object.freeze({ speed: PLAYER.speed * (1 + 0.08 * (p.speed ?? 0)), maximum: PLAYER.health + 20 * (p.health ?? 0), shield: 20 * (p.shield ?? 0) }),
     breakdown: Object.freeze(UPGRADES.filter(card => stacks(build, card) > 0).map(card => `${card.name} ×${stacks(build, card)}：${card.description}`)),

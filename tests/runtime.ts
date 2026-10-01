@@ -129,7 +129,7 @@ stressButton.onclick = () => {
       const spec=compileBuild(['fire.multi','fire.multi','fire.pierce','passive.cooldown','passive.cooldown','passive.cooldown'].reduce(applyUpgrade,initialBuild(1))).fireball;
       this.spell = new FireballSpell(this,spec);
       this.cameras.main.centerOn(1200,900);
-      result.textContent = '持续渲染检查开始：5 枚火球、穿透、245 ms 冷却、36 只混合怪物（含强度上限）、敌方弹丸上限 32。';
+      result.textContent = '持续渲染检查开始：5 枚火球、穿透、385 ms 冷却、36 只混合怪物（含强度上限）、敌方弹丸上限 32。';
     }
     update(_time: number, delta: number): void {
       const step = Math.min(delta,50);

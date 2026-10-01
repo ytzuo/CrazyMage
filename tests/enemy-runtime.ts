@@ -30,11 +30,11 @@ function run(preview:boolean) {
         enemies.update(700,player);
         check(enemies.shots.count===1&&ranged.aim.x===aim.x&&ranged.aim.y===aim.y,'ranged aim followed player or failed to fire');
         enemies.update(1600,player);
-        check(player.health.current===200,'fixed-aim shot could not be dodged');
+        check(player.health.current===player.health.maximum,'fixed-aim shot could not be dodged');
         reports.push({check:'700 ms telegraph, interruption, fixed aim and successful dodge'});
         enemies.shots.reset();player.reset();ranged.view.setPosition(player.view.x+10,player.view.y);
         ranged.cooldown=0;ranged.windup=0;ranged.knockback.x=0;enemies.update(1,player);enemies.update(700,player);
-        check(player.health.current===200-ranged.spec.damage,'point-blank ranged shot skipped player');
+        check(player.health.current===player.health.maximum-ranged.spec.damage,'point-blank ranged shot skipped player');
         reports.push({check:'point-blank ranged attacks hit without spawning beyond player'});
         enemies.shots.reset();player.reset();
         enemies.shots.fire(player.view.x-100,player.view.y,{x:1,y:0},8);

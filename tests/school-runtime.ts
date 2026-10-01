@@ -36,7 +36,7 @@ document.querySelector<HTMLButtonElement>('#check')!.onclick=()=>{
         const targets=enemies.enemies.slice(0,3);
         check(runner.cast(1200,900,{x:1,y:0},enemies),'lightning did not cast');
         check(Math.abs(targets[0].health.current-20)<0.001&&Math.abs(targets[1].health.current-24)<0.001&&Math.abs(targets[2].health.current-27.2)<0.001,'chain damage or target deduplication wrong');
-        runner.update(650,enemies);
+        runner.update(compileBuild(initialBuild(2,'lightning')).lightning.cooldown,enemies);
         for(const e of enemies.enemies)e.view.setPosition(2100,1500);
         const casts=runner.casts;check(!runner.cast(1200,900,{x:1,y:0},enemies)&&runner.casts===casts,'no-target lightning consumed cast');
         reports.push({check:'directional chain, distinct targets, falloff and no-target casts'});

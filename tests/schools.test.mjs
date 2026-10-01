@@ -29,7 +29,7 @@ test('ice modules combine independently of order and echo snapshots remain immut
   const ids=['ice.radius','ice.cold','ice.echo','passive.cooldown'];
   const a=compileBuild(build('ice',...ids)),b=compileBuild(build('ice',...ids.toReversed()));
   assert.deepEqual(a.ice,b.ice);
-  assert.deepEqual(a.ice,{damage:18,cooldown:765,radius:200,slow:0.4,duration:2000,pulses:2,echoDelay:180});
+  assert.deepEqual(a.ice,{damage:18,cooldown:990,radius:200,slow:0.4,duration:2000,pulses:2,echoDelay:180});
   assert.equal(a.school,'ice');assert.ok(Object.isFrozen(a.ice));
   assert.equal(a.breakdown.length,4);assert.equal(a.fireball.damage,20);
 });
@@ -37,7 +37,7 @@ test('lightning modules retain jump counts, distance and stable conduction toget
   const ids=['lightning.chain','lightning.range','lightning.conduction','passive.cooldown'];
   const a=compileBuild(build('lightning',...ids)),b=compileBuild(build('lightning',...ids.toReversed()));
   assert.deepEqual(a.lightning,b.lightning);
-  assert.deepEqual(a.lightning,{damage:20,cooldown:585,range:550,jumpRange:225,maxTargets:5,falloff:0.95});
+  assert.deepEqual(a.lightning,{damage:20,cooldown:810,range:550,jumpRange:225,maxTargets:5,falloff:0.95});
   assert.equal(compileBuild(build('lightning','lightning.chain','lightning.chain')).lightning.maxTargets,7);
   assert.equal(compileBuild(build('ice','ice.cold','ice.cold')).ice.slow,0.5);
 });
