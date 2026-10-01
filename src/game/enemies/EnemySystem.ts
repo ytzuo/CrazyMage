@@ -4,10 +4,13 @@ import { Health } from '../combat/Health';
 import type { Player } from '../entities/Player';
 import { WaveClock } from './WaveClock';
 import { WaveTracker } from './WaveTracker';
+import { waveDifficulty } from './difficulty';
 
 export interface Enemy {
   id: number;
   wave: number;
+  speed: number;
+  damage: number;
   view: Phaser.GameObjects.Container;
   body: Phaser.GameObjects.Image;
   bar: Phaser.GameObjects.Rectangle;
@@ -61,7 +64,8 @@ export class EnemySystem {
       const background = this.scene.add.rectangle(0, -38, 38, 5, 0x211d26).setStrokeStyle(1, 0x473843);
       const bar = this.scene.add.rectangle(-18, -38, 36, 3, 0xe29a9c).setOrigin(0, 0.5);
       view.add([shadow, warning, body, background, bar]).setAlpha(0.45);
-      this.enemies.push({ id: this.nextId++, wave, view, body, bar, warning, health: new Health(ENEMY.health), spawning: ENEMY.spawnWarning, windup: 0, cooldown: 0, flash: 0, knockback: { x: 0, y: 0 } });
+      const difficulty = waveDifficulty(wave);
+      this.enemies.push({ speed: ENEMY.speed * difficulty.speed, damage: Math.round(ENEMY.damage * difficulty.damage), id: this.nextId++, wave, view, body, bar, warning, health: new Health(Math.round(ENEMY.health * difficulty.health)), spawning: ENEMY.spawnWarning, windup: 0, cooldown: 0, flash: 0, knockback: { x: 0, y: 0 } });
       return true;
     }
     return false;
@@ -78,7 +82,7 @@ export class EnemySystem {
 
   private spawnWave(player: Player, wave = this.waveClock.wave): void {
     let spawned = 0;
-    for (let i = 0; i < ENEMY.waveSize && this.enemies.length < ENEMY.maxCount; i++) if (this.spawn(player, wave)) spawned++;
+    for (let i = 0; i < waveDifficulty(wave).count && this.enemies.length < ENEMY.maxCount; i++) if (this.spawn(player, wave)) spawned++;
     this.waves.register(wave, spawned);
   }
 
@@ -105,7 +109,7 @@ export class EnemySystem {
         if (enemy.windup === 0) {
           enemy.warning.setVisible(false);
           enemy.cooldown = ENEMY.attackCooldown;
-          if (distance <= ENEMY.attackRange && player.hurt(ENEMY.damage, enemy.view.x, enemy.view.y)) {
+          if (distance <= ENEMY.attackRange && player.hurt(enemy.damage, enemy.view.x, enemy.view.y)) {
             if (player.health.dead) break;
           }
         }
@@ -113,7 +117,7 @@ export class EnemySystem {
         enemy.windup = ENEMY.attackWindup;
         enemy.warning.setRadius(ENEMY.attackRange).setFillStyle(0xff8058, 0.12).setStrokeStyle(2, 0xffa16b, 0.9).setAlpha(0.55).setVisible(true);
       } else if (distance > ENEMY.radius + 18) {
-        const step = ENEMY.speed * delta / 1000;
+        const step = enemy.speed * delta / 1000;
         enemy.view.x += dx / distance * step;
         enemy.view.y += dy / distance * step;
       }

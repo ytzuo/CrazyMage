@@ -77,7 +77,7 @@ run.onclick = async () => {
     doc.querySelector<HTMLButtonElement>('[data-close]')!.click();
     const waveBefore = combat().wave;
     await delay(3200);
-    check(combat().wave===waveBefore+1&&combat().enemies===6,'next wave did not spawn three seconds after choosing');
+    check(combat().wave===waveBefore+1&&combat().enemies===8,'next wave did not spawn three seconds after choosing');
     reports.push({check:'arena clear resets countdown before choice and spawns next wave after three seconds',wave:combat().wave});
     for(let i=0;i<5;i++){click('pause');check(loop()==='false','pause failed');click('resume');check(loop()==='true','resume failed');}
     const counts: number[]=[];

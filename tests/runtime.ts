@@ -60,14 +60,14 @@ button.onclick = () => {
         enemies.enemies.forEach(enemy=>{enemy.spawning=0;});
         const elapsed=enemies.waveClock.elapsedTime;
         for(const enemy of [...enemies.enemies].filter(enemy=>enemy.wave===1)) enemies.hit(enemy,100,{x:1,y:0});
-        check(enemies.enemies.length===6&&enemies.waveClock.remaining===30000,'partial arena clear reset countdown');
+        check(enemies.enemies.length===8&&enemies.waveClock.remaining===30000,'partial arena clear reset countdown');
         for(const enemy of [...enemies.enemies]) enemies.hit(enemy,100,{x:1,y:0});
         check(!store.pendingChoice&&enemies.waveClock.remaining===3000,'full build clear did not schedule three seconds');
         check(enemies.waveClock.elapsedTime===elapsed,'clear changed run duration');
         enemies.update(2999,player);
         check(enemies.enemies.length===0,'next wave arrived early');
         enemies.update(1,player);
-        check(enemies.enemies.length===6&&enemies.waveClock.wave===3,'next wave did not arrive after three seconds');
+        check(enemies.enemies.length===10&&enemies.waveClock.wave===3,'next wave did not arrive after three seconds');
         reports.push({check:'arena clear schedules three seconds without choices; overlapping waves retain countdown',nextWave:enemies.waveClock.wave});
         spell.reset(); enemies.reset(player);
         const baseCount=this.children.list.length;
