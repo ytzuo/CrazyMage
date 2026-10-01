@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { ARENA, ENEMY, FIREBALL, type Direction } from '../config';
+import { ARENA, FIREBALL, type Direction } from '../config';
 import { segmentCircleHit } from '../combat/collision';
 import { preserveCooldown, resolveProjectileHit, type ProjectileContext } from '../combat/DamageResolver';
 import type { Enemy, EnemySystem } from '../enemies/EnemySystem';
@@ -58,7 +58,7 @@ export class FireballSpell {
       this.hits.length = 0;
       for (const enemy of enemies.enemies) {
         if (enemy.spawning > 0 || enemy.health.dead || projectile.context.directTargets.has(enemy.id)) continue;
-        const t = segmentCircleHit(previousX, previousY, x, y, enemy.view.x, enemy.view.y, ENEMY.radius + FIREBALL.radius);
+        const t = segmentCircleHit(previousX, previousY, x, y, enemy.view.x, enemy.view.y, enemy.spec.radius + FIREBALL.radius);
         if (t !== null) this.hits.push({ enemy, t, x: enemy.view.x, y: enemy.view.y });
       }
       this.hits.sort((a, b) => a.t - b.t);

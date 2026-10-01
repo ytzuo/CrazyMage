@@ -80,7 +80,7 @@ button.onclick = () => {
         const strongest=compileBuild(['fire.multi','fire.multi','fire.pierce','passive.cooldown','passive.cooldown','passive.cooldown'].reduce(applyUpgrade,initialBuild(1))).fireball;
         spell.configure(strongest);
         enemies.update(150000,player);
-        let maxProjectiles=0,maxImpacts=0,maxEnemies=enemies.enemies.length,casts=0;
+        let maxProjectiles=0,maxImpacts=0,maxEnemies=enemies.enemies.length,maxEnemyShots=0,casts=0;
         const started=performance.now();
         // Three minutes of deterministic active game time, including 36-enemy waves.
         for(let i=0;i<10800;i++) {
@@ -88,10 +88,10 @@ button.onclick = () => {
           spell.update(1000/60,enemies);
           if(spell.cast(player.view.x,player.view.y,{x:1,y:0})) casts++;
           maxProjectiles=Math.max(maxProjectiles,spell.projectileCount);maxImpacts=Math.max(maxImpacts,spell.impactCount);
-          maxEnemies=Math.max(maxEnemies,enemies.enemies.length);
+          maxEnemies=Math.max(maxEnemies,enemies.enemies.length);maxEnemyShots=Math.max(maxEnemyShots,enemies.shots.count);
         }
-        check(maxProjectiles<=64&&maxImpacts<=24&&maxEnemies<=36,'object budget exceeded');
-        reports.push({check:'3-minute simulated active-time stress (not rendered-frame or device performance)', cpuMs:Number((performance.now()-started).toFixed(1)),casts,maxProjectiles,maxImpacts,maxEnemies});
+        check(maxProjectiles<=64&&maxImpacts<=24&&maxEnemies<=36&&maxEnemyShots<=32,'object budget exceeded');
+        reports.push({check:'3-minute simulated active-time stress (not rendered-frame or device performance)', cpuMs:Number((performance.now()-started).toFixed(1)),casts,maxProjectiles,maxImpacts,maxEnemies,maxEnemyShots});
         spell.reset();enemies.reset(player);
         check(this.children.list.length===baseCount,'stress cleanup failed');
         result.textContent=JSON.stringify({passed:true,reports},null,2);
@@ -117,18 +117,19 @@ stressButton.onclick = () => {
     private maxProjectiles = 0;
     private maxEnemies = 0;
     private maxObjects = 0;
+    private maxEnemyShots = 0;
     private intervals: number[] = [];
     private displayTime = 0;
     create(): void {
       this.player = new Player(this);
       this.player.view.setPosition(1200,900);
       this.enemies = new EnemySystem(this);
-      this.enemies.reset(this.player); this.enemies.update(150000,this.player);
+      this.enemies.reset(this.player); this.enemies.waveClock.wave=40; this.enemies.update(60000,this.player);
       this.maxEnemies = this.enemies.enemies.length;
       const spec=compileBuild(['fire.multi','fire.multi','fire.pierce','passive.cooldown','passive.cooldown','passive.cooldown'].reduce(applyUpgrade,initialBuild(1))).fireball;
       this.spell = new FireballSpell(this,spec);
       this.cameras.main.centerOn(1200,900);
-      result.textContent = '持续渲染检查开始：5 枚火球、穿透、245 ms 冷却、36 只怪物。';
+      result.textContent = '持续渲染检查开始：5 枚火球、穿透、245 ms 冷却、36 只混合怪物（含强度上限）、敌方弹丸上限 32。';
     }
     update(_time: number, delta: number): void {
       const step = Math.min(delta,50);
@@ -141,15 +142,16 @@ stressButton.onclick = () => {
       this.spell.cast(this.player.view.x,this.player.view.y,{x:Math.cos(angle),y:Math.sin(angle)});
       this.maxProjectiles=Math.max(this.maxProjectiles,this.spell.projectileCount);
       this.maxEnemies=Math.max(this.maxEnemies,this.enemies.enemies.length);
+      this.maxEnemyShots=Math.max(this.maxEnemyShots,this.enemies.shots.count);
       this.maxObjects=Math.max(this.maxObjects,this.children.list.length);
       if(Math.floor(this.elapsed/1000)!==this.displayTime) {
         this.displayTime=Math.floor(this.elapsed/1000);
-        result.textContent=JSON.stringify({running:true,seconds:this.displayTime,frames:this.frames,maxProjectiles:this.maxProjectiles,maxEnemies:this.maxEnemies,maxObjects:this.maxObjects},null,2);
+        result.textContent=JSON.stringify({running:true,seconds:this.displayTime,frames:this.frames,maxProjectiles:this.maxProjectiles,maxEnemies:this.maxEnemies,maxObjects:this.maxObjects,maxEnemyShots:this.maxEnemyShots},null,2);
       }
       if(this.elapsed<180000) return;
       this.spell.reset();this.enemies.reset(this.player);
       const sorted=[...this.intervals].sort((a,b)=>a-b);
-      result.textContent=JSON.stringify({passed:true,check:'3 minutes of rendered active game time',frames:this.frames,maxProjectiles:this.maxProjectiles,maxEnemies:this.maxEnemies,maxObjects:this.maxObjects,objectsAfterReset:this.children.list.length,frameSample:this.intervals.length,meanFrameMs:this.intervals.reduce((sum,n)=>sum+n,0)/this.intervals.length,p95FrameMs:sorted[Math.floor(sorted.length*0.95)],viewport:[640,360],note:'Local test scene; healed player, placeholder graphics, frame sample limited to first 3600. Not whole-game, phone or GPU validation.'},null,2);
+      result.textContent=JSON.stringify({passed:true,check:'3 minutes of rendered active game time',frames:this.frames,maxProjectiles:this.maxProjectiles,maxEnemies:this.maxEnemies,maxObjects:this.maxObjects,maxEnemyShots:this.maxEnemyShots,objectsAfterReset:this.children.list.length,frameSample:this.intervals.length,meanFrameMs:this.intervals.reduce((sum,n)=>sum+n,0)/this.intervals.length,p95FrameMs:sorted[Math.floor(sorted.length*0.95)],viewport:[640,360],note:'Local test scene; healed player, placeholder graphics, frame sample limited to first 3600. Not whole-game, phone or GPU validation.'},null,2);
       button.disabled=stressButton.disabled=false;
       this.scene.pause();queueMicrotask(()=>{game?.pause();game?.loop.sleep();});
     }
