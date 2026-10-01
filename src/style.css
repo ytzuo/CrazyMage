@@ -1,0 +1,165 @@
+:root {
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  color: #e6e8dd;
+  background: #17251f;
+  font-synthesis: none;
+  color-scheme: dark;
+  --edge-top: max(24px, env(safe-area-inset-top));
+  --edge-right: max(24px, env(safe-area-inset-right));
+  --edge-bottom: max(24px, env(safe-area-inset-bottom));
+  --edge-left: max(24px, env(safe-area-inset-left));
+}
+
+* { box-sizing: border-box; }
+html, body, #app { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { font: inherit; cursor: pointer; }
+button:focus-visible, a:focus-visible { outline: 2px solid #bcd292; outline-offset: 4px; }
+a { color: inherit; text-decoration: none; }
+
+.arena {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: #17251f;
+}
+#game { position: absolute; inset: 0; touch-action: none; outline: none; }
+#game canvas { display: block; }
+
+.arena-tools {
+  position: absolute;
+  top: var(--edge-top);
+  right: var(--edge-right);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  z-index: 2;
+}
+.icon-button, .pause-button {
+  height: 36px;
+  border: 1px solid #82926950;
+  border-radius: 6px;
+  background: #142017b3;
+  color: #c7d6b2;
+  backdrop-filter: blur(8px);
+}
+.icon-button { width: 36px; font-size: 22px; }
+.pause-button { padding: 0 14px; font-size: 12px; }
+.pause-button span { margin-left: 6px; }
+button:hover { background: #33412de6; color: #e2edcf; }
+button:disabled { opacity: 0.45; cursor: default; }
+
+.health-hud { position: absolute; top: var(--edge-top); left: var(--edge-left); width: 220px; pointer-events: none; z-index: 2; }
+.health-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 16px; color: #d5dec6; text-shadow: 0 1px 4px #000; }
+#health-value { font: 14px ui-monospace, monospace; }
+.health-track { height: 12px; overflow: hidden; background: #121b18d9; border: 1px solid #90aa7766; border-radius: 5px; }
+#health-fill { width: 100%; height: 100%; background: #afc987; transform-origin: left; }
+.health-track.low #health-fill { background: #e68d7b; }
+.wave-status { position: absolute; top: var(--edge-top); left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 24px; border: 1px solid #82926935; border-radius: 8px; background: #101c16b3; color: #d9e5c8; text-shadow: 0 1px 4px #000; pointer-events: none; z-index: 2; }
+#wave-number { font-size: 24px; font-weight: 600; letter-spacing: 2px; }
+.wave-timer { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #bac8a7; }
+#wave-countdown { display: inline-block; min-width: 66px; color: #e2edcf; font: 600 36px ui-monospace, monospace; }
+#wave-countdown.soon { color: #ffad8f; }
+.run-timer { margin-top: 4px; font-size: 12px; color: #b7c7a5; }
+#run-time { margin-left: 6px; color: #e1e9d3; font: 14px ui-monospace, monospace; }
+#death-duration { color: #c4d1b5; font-size: 14px; }
+
+.joystick-wrap {
+  position: absolute;
+  bottom: var(--edge-bottom);
+  left: var(--edge-left);
+  display: none;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 3;
+}
+/* Detect touch-first devices rather than narrow desktop windows. */
+@media (hover: none) and (pointer: coarse) {
+  .joystick-wrap { display: flex; }
+}
+#joystick {
+  width: 98px;
+  height: 98px;
+  border-radius: 50%;
+  border: 1px solid #96ae7755;
+  background: #14211966;
+  display: grid;
+  place-items: center;
+  position: relative;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+}
+#joystick.active { border-color: #c3d39b99; background: #29382580; cursor: grabbing; }
+.joystick-cross { position: absolute; inset: 0; pointer-events: none; }
+.joystick-cross:before, .joystick-cross:after {
+  content: "";
+  position: absolute;
+  background: #a2b78b26;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.joystick-cross:before { width: 68px; height: 1px; }
+.joystick-cross:after { width: 1px; height: 68px; }
+#joystick-knob { width: 37px; height: 37px; border-radius: 50%; border: 1px solid #b3c59480; background: #8ca4774d; position: relative; pointer-events: none; }
+
+.minimap {
+  position: absolute;
+  right: var(--edge-right);
+  bottom: var(--edge-bottom);
+  width: 240px;
+  aspect-ratio: 4 / 3;
+  border: 1px solid #82926950;
+  border-radius: 8px;
+  background: #101c16d9;
+  box-shadow: 0 4px 18px #0003;
+  pointer-events: none;
+  z-index: 2;
+}
+.minimap svg { display: block; width: 100%; height: 100%; }
+.minimap-boundary { fill: #2c3e304d; stroke: #8b9f7166; stroke-width: 16; }
+.minimap-center { fill: none; stroke: #8b9f714d; stroke-width: 14; }
+.minimap-player-halo { fill: #c0e29b26; }
+.minimap-player-dot { fill: #e2f3bd; stroke: #b6d584; stroke-width: 14; }
+.minimap-enemy-dot { fill: #f07878; stroke: #ffc3ad; stroke-width: 6; }
+
+.pause-overlay { position: absolute; inset: 0; background: #0d1712c9; backdrop-filter: blur(6px); display: grid; place-items: center; z-index: 5; }
+.pause-overlay[hidden] { display: none; }
+.pause-card { text-align: center; padding: 24px; }
+.pause-card h2 { font: 30px "Songti SC", serif; letter-spacing: 3px; margin: 18px 0 12px; }
+.pause-card button { display: block; width: 210px; margin: 28px auto 16px; background: #becf9e; color: #202c20; border: 1px solid #d0deb5; border-radius: 6px; padding: 12px 18px; font-size: 13px; }
+.pause-card button span { margin-left: 20px; }
+
+@media (max-width: 760px) {
+  :root {
+    --edge-top: max(16px, env(safe-area-inset-top));
+    --edge-right: max(16px, env(safe-area-inset-right));
+    --edge-bottom: max(16px, env(safe-area-inset-bottom));
+    --edge-left: max(16px, env(safe-area-inset-left));
+  }
+  .arena-tools { gap: 8px; }
+  .health-hud { width: min(144px, calc(100vw - 176px)); }
+  .health-heading { font-size: 14px; }
+  #health-value { font-size: 12px; }
+  .wave-status { top: calc(var(--edge-top) + 52px); padding: 8px 18px; }
+  #wave-number { font-size: 20px; }
+  #wave-countdown { font-size: 30px; min-width: 56px; }
+  .pause-button { padding: 0 11px; }
+  #joystick { width: 112px; height: 112px; }
+  #joystick-knob { width: 42px; height: 42px; }
+  .minimap { width: min(176px, calc(100vw - 160px)); }
+}
+
+@media (max-height: 500px) {
+  .wave-status { top: var(--edge-top); padding: 6px 18px; }
+  #wave-number { font-size: 18px; }
+  #wave-countdown { font-size: 26px; }
+  #joystick { width: 80px; height: 80px; }
+  #joystick-knob { width: 32px; height: 32px; }
+  .pause-card h2 { margin: 12px 0; }
+  .pause-card button { margin: 18px auto 12px; }
+}
