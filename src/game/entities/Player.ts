@@ -3,6 +3,7 @@ import { ARENA, PLAYER, type Direction } from '../config';
 import { Health } from '../combat/Health';
 import { SCHOOL_COLOR } from '../effects/CombatEffects';
 import type { School } from '../upgrades/definitions';
+import { prepareMageTextures } from '../art/CharacterTextures';
 
 export class Player {
   readonly view: Phaser.GameObjects.Container;
@@ -28,22 +29,10 @@ export class Player {
     this.aura = scene.add.circle(0, 0, 28, 0x94e3ab, 0.025).setStrokeStyle(1, 0x9be3b4, 0.25);
     this.shadow = scene.add.ellipse(0, 9, 40, 16, 0x000000, 0.35);
     this.figure = scene.add.container(0, -7);
-    const mage = scene.add.graphics();
-    // Small, readable apprentice silhouette: boots, robe, face, oversized hat and staff.
-    mage.fillStyle(0x161f25).fillRoundedRect(-10, 15, 8, 9, 2).fillRoundedRect(3, 15, 8, 9, 2);
-    mage.fillStyle(0x637b99).fillTriangle(-14, 19, 0, -12, 14, 19);
-    mage.fillStyle(0x98acc6).fillTriangle(-3, -7, -8, 17, 0, 15);
-    mage.fillStyle(0xd6b58e).fillRoundedRect(-8, -17, 16, 14, 4);
-    mage.fillStyle(0x17232a).fillRect(-5, -12, 3, 3).fillRect(3, -12, 3, 3);
-    mage.fillStyle(0x778ba8).fillTriangle(-15, -17, -3, -44, 11, -17);
-    mage.fillStyle(0xa2b7d0).fillTriangle(-15, -17, -3, -44, -7, -17);
-    mage.fillStyle(0x52677e).fillRoundedRect(-20, -21, 37, 7, 3);
-    mage.fillStyle(0xc7bc88).fillRect(-13, -25, 23, 3);
+    prepareMageTextures(scene);
+    const mage = scene.add.image(0, 0, 'mage-body-detail').setOrigin(0.5, 2 / 3).setScale(0.5);
     this.wand = scene.add.container(12, 3);
-    const staff = scene.add.graphics();
-    staff.lineStyle(4, 0x6a5041).lineBetween(6, -19, 6, 17);
-    staff.fillStyle(0xd6b58e).fillCircle(5, 2, 4);
-    staff.fillStyle(0xe9c87f).fillCircle(6, -23, 5);
+    const staff = scene.add.image(0, 0, 'mage-staff-detail').setScale(0.5);
     this.wandGlow = scene.add.circle(6, -23, 9, 0xffd99b, 0.2);
     this.wand.add([this.wandGlow, staff]);
     this.figure.add([mage, this.wand]);

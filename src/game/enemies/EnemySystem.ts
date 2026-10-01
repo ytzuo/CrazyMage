@@ -9,6 +9,7 @@ import { enemyKind, enemySpec, type EnemyKind, type EnemySpec } from './roster';
 import { SlowStatus } from '../combat/SlowStatus';
 import { EnemyShots } from './EnemyShots';
 import { CombatEffects } from '../effects/CombatEffects';
+import { prepareEnemyTextures, enemyTexture, enemyArtScale } from '../art/CharacterTextures';
 
 export interface Enemy {
   id: number;
@@ -41,37 +42,7 @@ export class EnemySystem {
   private spawnIndex = 0;
   private nextId = 0;
 
-  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number) => void = () => {}) { this.prepareTexture(); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
-
-  private prepareTexture(): void {
-    for (const kind of ['chaser','ranged','brute','swift'] as EnemyKind[]) {
-      const key = `enemy-${kind}`;
-      if (this.scene.textures.exists(key)) continue;
-      const g = this.scene.make.graphics({}, false);
-      if (kind === 'chaser') {
-        g.fillStyle(0x754c63).fillTriangle(11,18,8,2,24,15).fillTriangle(40,15,56,2,53,20);
-        g.fillStyle(0xb77a85).fillRoundedRect(10,14,44,38,14);
-        g.fillStyle(0xd39b96).fillEllipse(32,22,34,19);
-      } else if (kind === 'swift') {
-        g.fillStyle(0x7fa963).fillTriangle(8,48,32,8,56,48);
-        g.fillStyle(0xc6dc79).fillTriangle(20,44,32,19,44,44);
-        g.lineStyle(3,0xb4c78c).lineBetween(8,52,20,49).lineBetween(44,49,56,52);
-      } else if (kind === 'ranged') {
-        g.fillStyle(0x8165b5).fillTriangle(10,52,32,8,54,52);
-        g.fillStyle(0xc4a0ec).fillCircle(32,23,12);
-        g.lineStyle(4,0xd5baff).lineBetween(53,20,53,53);
-        g.fillStyle(0xf0d2ff).fillCircle(53,16,5);
-      } else {
-        g.fillStyle(0x855e39).fillRoundedRect(3,13,58,43,8);
-        g.fillStyle(0xc78f53).fillRoundedRect(12,6,40,33,7);
-        g.fillStyle(0xe6ba78).fillRect(6,39,12,15).fillRect(46,39,12,15);
-        g.fillStyle(0x675140).fillRect(23,46,18,10);
-      }
-      g.fillStyle(0x2b2430).fillCircle(24,29,4).fillCircle(40,29,4);
-      g.fillStyle(0xffe3a0).fillCircle(25,28,2).fillCircle(41,28,2);
-      g.generateTexture(key,64,64);g.destroy();
-    }
-  }
+  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number) => void = () => {}) { prepareEnemyTextures(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
 
   private spawn(player: Player, wave: number, kind: EnemyKind): boolean {
     if (this.enemies.length >= ENEMY.maxCount) return false;
@@ -87,7 +58,7 @@ export class EnemySystem {
       const view = this.scene.add.container(x, y).setDepth(9);
       const shadow = this.scene.add.ellipse(0, 12, spec.radius * 2.2, spec.radius * 0.8, 0x000000, 0.3);
       const warning = this.scene.add.circle(0, 0, spec.radius + 8, 0xeea56e, 0.06).setStrokeStyle(2, 0xefb87d, 0.65);
-      const body = this.scene.add.image(0, -3, `enemy-${kind}`).setScale(spec.radius / (kind === 'brute' ? 29 : 20));
+      const body = this.scene.add.image(0, -3, enemyTexture(kind)).setScale(enemyArtScale(kind, spec.radius));
       const aimLine = this.scene.add.rectangle(0, 0, 1, 3, 0xd9a8ff, 0.85).setOrigin(0, 0.5).setVisible(false);
       const background = this.scene.add.rectangle(0, -spec.radius - 18, spec.radius * 2, 5, 0x211d26).setStrokeStyle(1, 0x473843);
       const bar = this.scene.add.rectangle(-spec.radius, -spec.radius - 18, spec.radius * 2, 3, 0xe29a9c).setOrigin(0, 0.5);
@@ -178,7 +149,7 @@ export class EnemySystem {
   /** Pose only moves the sprite inside its container; collision and warning stay fixed. */
   private animate(enemy: Enemy): void {
     const {spec, body, aim} = enemy;
-    const base = spec.radius / (spec.kind === 'brute' ? 29 : 20);
+    const base = enemyArtScale(spec.kind, spec.radius);
     const charge = enemy.windup > 0 ? 1 - enemy.windup / spec.windup : 0;
     const strike = enemy.attackTime > 0 ? Math.sin((1 - enemy.attackTime / 230) * Math.PI) : 0;
     const ranged = spec.kind === 'ranged', brute = spec.kind === 'brute';
