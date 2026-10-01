@@ -3,9 +3,11 @@ import { ARENA, ENEMY, type Direction } from '../config';
 import { Health } from '../combat/Health';
 import type { Player } from '../entities/Player';
 import { WaveClock } from './WaveClock';
+import { WaveTracker } from './WaveTracker';
 
 export interface Enemy {
   id: number;
+  wave: number;
   view: Phaser.GameObjects.Container;
   body: Phaser.GameObjects.Image;
   bar: Phaser.GameObjects.Rectangle;
@@ -23,10 +25,11 @@ export class EnemySystem {
   readonly enemies: Enemy[] = [];
   kills = 0;
   readonly waveClock = new WaveClock(ENEMY.waveInterval);
+  readonly waves = new WaveTracker();
   private spawnIndex = 0;
   private nextId = 0;
 
-  constructor(private scene: Phaser.Scene) { this.prepareTexture(); }
+  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number) => void = () => {}) { this.prepareTexture(); }
 
   private prepareTexture(): void {
     if (this.scene.textures.exists('enemy-chaser')) return;
@@ -41,8 +44,8 @@ export class EnemySystem {
     g.destroy();
   }
 
-  private spawn(player: Player): void {
-    if (this.enemies.length >= ENEMY.maxCount) return;
+  private spawn(player: Player, wave: number): boolean {
+    if (this.enemies.length >= ENEMY.maxCount) return false;
     // Rotate through the arena's four edges, retaining a safe distance near walls.
     const firstEdge = this.spawnIndex++ % 4;
     for (let attempt = 0; attempt < 8; attempt++) {
@@ -58,9 +61,10 @@ export class EnemySystem {
       const background = this.scene.add.rectangle(0, -38, 38, 5, 0x211d26).setStrokeStyle(1, 0x473843);
       const bar = this.scene.add.rectangle(-18, -38, 36, 3, 0xe29a9c).setOrigin(0, 0.5);
       view.add([shadow, warning, body, background, bar]).setAlpha(0.45);
-      this.enemies.push({ id: this.nextId++, view, body, bar, warning, health: new Health(ENEMY.health), spawning: ENEMY.spawnWarning, windup: 0, cooldown: 0, flash: 0, knockback: { x: 0, y: 0 } });
-      return;
+      this.enemies.push({ id: this.nextId++, wave, view, body, bar, warning, health: new Health(ENEMY.health), spawning: ENEMY.spawnWarning, windup: 0, cooldown: 0, flash: 0, knockback: { x: 0, y: 0 } });
+      return true;
     }
+    return false;
   }
 
   reset(player?: Player): void {
@@ -68,16 +72,19 @@ export class EnemySystem {
     this.enemies.length = 0;
     this.kills = this.spawnIndex = this.nextId = 0;
     this.waveClock.reset();
+    this.waves.reset();
     if (player) this.spawnWave(player);
   }
 
-  private spawnWave(player: Player): void {
-    for (let i = 0; i < ENEMY.waveSize && this.enemies.length < ENEMY.maxCount; i++) this.spawn(player);
+  private spawnWave(player: Player, wave = this.waveClock.wave): void {
+    let spawned = 0;
+    for (let i = 0; i < ENEMY.waveSize && this.enemies.length < ENEMY.maxCount; i++) if (this.spawn(player, wave)) spawned++;
+    this.waves.register(wave, spawned);
   }
 
   update(delta: number, player: Player): void {
     const waves = this.waveClock.update(delta);
-    for (let i = 0; i < waves; i++) this.spawnWave(player);
+    for (let i = 0; i < waves; i++) this.spawnWave(player, this.waveClock.wave - waves + i + 1);
     for (const enemy of this.enemies) {
       if (enemy.health.dead) continue;
       if (enemy.spawning > 0) {
@@ -119,8 +126,8 @@ export class EnemySystem {
     }
   }
 
-  hit(enemy: Enemy, damage: number, direction: Direction): void {
-    if (!enemy.health.hurt(damage)) return;
+  hit(enemy: Enemy, damage: number, direction: Direction): boolean {
+    if (enemy.spawning > 0 || enemy.health.dead || !this.enemies.includes(enemy) || !enemy.health.hurt(damage)) return false;
     enemy.bar.scaleX = enemy.health.current / enemy.health.maximum;
     enemy.body.setTintFill(0xffe1b6);
     enemy.flash = 120;
@@ -134,6 +141,8 @@ export class EnemySystem {
       this.kills++;
       enemy.view.destroy();
       this.enemies.splice(this.enemies.indexOf(enemy), 1);
+      if (this.waves.defeat(enemy.wave)) this.onWaveClear(enemy.wave);
     }
+    return true;
   }
 }

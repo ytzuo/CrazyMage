@@ -24,6 +24,32 @@ test('waves arrive at 30 seconds, preserve remainder, and restart at wave one', 
   assert.equal(clock.elapsedTime, 0);
 });
 
+test('upgrade schedules next wave in three seconds without changing duration or current wave', () => {
+  const clock = new WaveClock(30000);
+  clock.update(12000);
+  clock.scheduleNext(3000);
+  assert.equal(clock.remaining, 3000);
+  assert.equal(clock.elapsedTime, 12000);
+  assert.equal(clock.wave, 1);
+  assert.equal(clock.update(2999), 0);
+  assert.equal(clock.update(1), 1);
+  assert.equal(clock.wave, 2);
+  assert.equal(clock.elapsedTime, 15000);
+  assert.equal(clock.remaining, 30000);
+  clock.update(29000);
+  clock.scheduleNext(3000);
+  assert.equal(clock.remaining, 3000); // Reset even when less than three seconds remained.
+  assert.equal(clock.elapsedTime, 44000);
+  clock.scheduleNext(3000); // Queued choices do not advance active time.
+  assert.equal(clock.elapsedTime, 44000);
+  assert.equal(clock.update(3005), 1);
+  assert.equal(clock.remaining, 29995);
+  clock.reset();
+  assert.equal(clock.remaining, 30000);
+  assert.equal(clock.elapsedTime, 0);
+  assert.equal(clock.wave, 1);
+});
+
 test('simultaneous contacts cause one hit during protection, then expire in game time', () => {
   const health = new Health(100);
   assert.equal(health.hurt(10, 900), true);

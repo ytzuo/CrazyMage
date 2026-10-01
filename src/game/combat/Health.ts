@@ -1,25 +1,32 @@
-/** Game-time health and hit protection; callers stop ticking while paused. */
+/** Active-game-time health, hit protection and shield recovery. */
 export class Health {
-  readonly maximum: number;
+  maximum: number;
   current: number;
+  shield = 0;
+  shieldMaximum = 0;
   private protection = 0;
-
-  constructor(maximum: number) {
-    this.maximum = maximum;
-    this.current = maximum;
-  }
-
+  private sinceHit = 0;
+  constructor(maximum: number) { this.maximum = maximum; this.current = maximum; }
   get dead(): boolean { return this.current <= 0; }
   get protected(): boolean { return this.protection > 0; }
-
-  update(delta: number): void { this.protection = Math.max(0, this.protection - delta); }
-
+  update(delta: number): void {
+    this.protection = Math.max(0, this.protection - delta);
+    this.sinceHit = Math.min(10000, this.sinceHit + delta);
+    if (!this.dead && this.sinceHit >= 10000) this.shield = this.shieldMaximum;
+  }
+  configure(maximum: number, shieldMaximum: number): void {
+    const addedHealth = Math.max(0, maximum - this.maximum);
+    const addedShield = Math.max(0, shieldMaximum - this.shieldMaximum);
+    this.maximum = maximum; this.shieldMaximum = shieldMaximum;
+    if (!this.dead) this.current = Math.min(maximum, this.current + addedHealth);
+    this.shield = Math.min(shieldMaximum, this.shield + addedShield);
+  }
   hurt(damage: number, protection = 0): boolean {
     if (this.dead || this.protected || damage <= 0) return false;
-    this.current = Math.max(0, this.current - damage);
-    this.protection = protection;
+    const absorbed = Math.min(this.shield, damage);
+    this.shield -= absorbed; this.current = Math.max(0, this.current - (damage - absorbed));
+    this.protection = protection; this.sinceHit = 0;
     return true;
   }
-
-  reset(): void { this.current = this.maximum; this.protection = 0; }
+  reset(): void { this.current = this.maximum; this.shield = this.shieldMaximum; this.protection = this.sinceHit = 0; }
 }

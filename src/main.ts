@@ -4,17 +4,22 @@ import { ARENA, PLAYER, type MovementState } from './game/config';
 import { MovementInput } from './game/input/MovementInput';
 import { ArenaScene } from './game/scenes/ArenaScene';
 import { observePerformance } from './game/diagnostics/performance';
+import { BuildPanel, fireSummary } from './ui/BuildPanel';
+import type { BuildSnapshot } from './game/upgrades/BuildStore';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <main class="arena" aria-label="魔法试验场操控原型">
     <div id="game" role="application" tabindex="0" aria-label="WASD 移动，方向键发射火球；左下角摇杆可移动"></div>
     <nav class="arena-tools" aria-label="试验场控制">
+      <button id="build" class="icon-button" title="查看构筑 (U)" aria-label="查看构筑">✦</button>
       <button id="reset" class="icon-button" title="重新开始" aria-label="重新开始">↺</button>
       <button id="pause" class="pause-button">Ⅱ <span>暂停</span></button>
     </nav>
     <aside class="health-hud" aria-label="角色生命值">
       <div class="health-heading"><span>生命</span><span id="health-value">${PLAYER.health} / ${PLAYER.health}</span></div>
       <div id="health-bar" class="health-track" role="progressbar" aria-label="生命值" aria-valuemin="0" aria-valuemax="${PLAYER.health}" aria-valuenow="${PLAYER.health}"><div id="health-fill"></div></div>
+      <div id="shield-value" class="shield-value" hidden></div>
+      <div class="upgrade-heading"><span id="spell-level">火球 Lv.1</span><span id="wave-remaining">本波剩余 6</span></div>
     </aside>
     <aside class="wave-status" aria-label="波次与本局时长"><span id="wave-number">第 1 波</span><div class="wave-timer">下一波 <b id="wave-countdown">30s</b></div><div class="run-timer">本局时长 <time id="run-time">00:00</time></div></aside>
     <div class="joystick-wrap"><div id="joystick" aria-label="虚拟摇杆：按住并拖动以移动角色"><span class="joystick-cross"></span><div id="joystick-knob"></div></div></div>
@@ -29,6 +34,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         </g>
       </svg>
     </aside>
+    <div id="build-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="法术构筑与升级" hidden></div>
     <div id="pause-overlay" class="pause-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
       <div class="pause-card"><h2 id="pause-title">已暂停</h2><p id="death-duration" hidden></p><button id="resume">继续 <span>→</span></button></div>
     </div>
@@ -41,7 +47,13 @@ const listeners = new AbortController();
 const listenerOptions = { signal: listeners.signal };
 let paused = false;
 let dead = false;
-let lastHealth = -1;
+let lastHealth = '';
+let inspecting = false;
+let latestBuild: BuildSnapshot | null = null;
+let lastProgression = '';
+let appliedPause = false;
+let game: Phaser.Game;
+let panel: BuildPanel;
 let lastCombat = '';
 let lastWave = 0;
 let lastWaveSeconds = -1;
@@ -61,16 +73,31 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
     element('wave-countdown').classList.toggle('soon', seconds <= 5);
     lastWaveSeconds = seconds;
   }
-  if (state.health !== lastHealth) {
-    element('health-value').textContent = `${state.health} / ${state.maxHealth}`;
+  const healthKey = `${state.health}/${state.maxHealth}/${state.shield}`;
+  if (healthKey !== lastHealth) {
+    element('health-value').textContent = `${Number(state.health.toFixed(1))} / ${state.maxHealth}`;
     element('health-fill').style.transform = `scaleX(${state.health / state.maxHealth})`;
     element('health-bar').setAttribute('aria-valuenow', String(state.health));
     element('health-bar').setAttribute('aria-valuemax', String(state.maxHealth));
     element('health-bar').classList.toggle('low', state.health <= state.maxHealth * 0.3);
-    lastHealth = state.health;
+    element('shield-value').hidden = state.progression.effective.player.shield === 0;
+    element('shield-value').textContent = `护盾 ${state.shield} / ${state.progression.effective.player.shield}`;
+    lastHealth = healthKey;
   }
+  const previousChoice = latestBuild?.choice?.id;
+  latestBuild = state.progression;
+  const progressKey = `${state.progression.build.runId}/${state.progression.build.revision}/${state.waveRemaining}`;
+  if (progressKey !== lastProgression) {
+    const { build } = state.progression;
+    element('spell-level').textContent = `火球 Lv.${build.fireLevel}`;
+    element('wave-remaining').textContent = `本波剩余 ${state.waveRemaining}`;
+    element('spell-level').title = fireSummary(state.progression.effective);
+    lastProgression = progressKey;
+  }
+  panel?.update(state.progression, inspecting);
+  if (previousChoice !== state.progression.choice?.id) queueMicrotask(syncPause);
   if (import.meta.env.DEV) {
-    const summary = JSON.stringify({ health: state.health, enemies: state.enemies, kills: state.kills, casts: state.casts, dead: state.dead, objects: state.objects, projectiles: state.projectiles, impacts: state.impacts });
+    const summary = JSON.stringify({ health: state.health, enemies: state.enemies, kills: state.kills, casts: state.casts, dead: state.dead, objects: state.objects, projectiles: state.projectiles, impacts: state.impacts, waveRemaining: state.waveRemaining, wave: state.wave, nextWaveIn: state.nextWaveIn, elapsedTime: state.elapsedTime, runId: state.progression.build.runId, revision: state.progression.build.revision, completedWaves: state.progression.completedWaves, choice: state.progression.choice?.id ?? null });
     if (summary !== lastCombat) { element('game').dataset.combat = summary; lastCombat = summary; }
   }
   if (dead !== state.dead) {
@@ -80,14 +107,9 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
     element('death-duration').hidden = !dead;
     if (dead) element('death-duration').textContent = `本局时长 ${duration}`;
     element('resume').innerHTML = dead ? '重新开始 <span>↺</span>' : '继续 <span>→</span>';
+    if (dead) { inspecting = false; panel?.update(state.progression, false); }
     element('pause-overlay').hidden = !dead && !paused;
-    if (dead) queueMicrotask(() => {
-      if (!dead) return;
-      game.pause();
-      game.loop.sleep();
-      if (import.meta.env.DEV) game.canvas.dataset.loopRunning = 'false';
-      element('resume').focus({ preventScroll: true });
-    });
+    queueMicrotask(() => { syncPause(); if (dead) element('resume').focus({ preventScroll: true }); });
   }
   // Reuse the scene's throttled HUD updates; only move the marker when needed.
   const x = Math.round(Math.max(0, Math.min(ARENA.width, state.x)) / 10) * 10;
@@ -117,7 +139,11 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
   }
 });
 
-const game = new Phaser.Game({
+panel = new BuildPanel(element('build-overlay'), id => scene.previewUpgrade(id), (batch, id) => {
+  if (scene.chooseUpgrade(batch, id)) syncPause();
+}, inspectBuild);
+
+game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
   backgroundColor: '#17251f',
@@ -129,10 +155,7 @@ const game = new Phaser.Game({
     postBoot: (instance) => {
       instance.canvas.setAttribute('aria-label', '魔法试验场');
       queueMicrotask(() => {
-        if (paused) {
-          instance.pause();
-          instance.loop.sleep();
-        }
+        syncPause();
         if (import.meta.env.DEV) instance.canvas.dataset.loopRunning = String(instance.loop.running);
       });
     },
@@ -140,40 +163,54 @@ const game = new Phaser.Game({
 });
 if (import.meta.env.DEV) observePerformance(game, 'cached-textures');
 
+function syncPause(): void {
+  if (!game) return;
+  const choosing = !!latestBuild?.choice;
+  const next = dead || paused || inspecting || choosing;
+  if (next !== appliedPause) {
+    appliedPause = next;
+    scene.setPaused(next);
+    if (next) { game.pause(); game.loop.sleep(); }
+    else { game.resume(); game.loop.wake(); }
+  }
+  if (import.meta.env.DEV && game.canvas) game.canvas.dataset.loopRunning = String(game.loop.running);
+  element('pause-overlay').hidden = !dead && (!paused || inspecting || choosing);
+  element('pause').innerHTML = paused ? '▶ <span>继续</span>' : 'Ⅱ <span>暂停</span>';
+  element('pause').setAttribute('aria-pressed', String(paused));
+  if (dead) element('build-overlay').hidden = true;
+  if (!next) element('game').focus({ preventScroll: true });
+}
 function setPaused(next: boolean): void {
   if (dead) return;
   paused = next;
-  scene.setPaused(next);
-  if (next) {
-    game.pause();
-    game.loop.sleep();
-  } else {
-    game.resume();
-    game.loop.wake();
-  }
-  if (import.meta.env.DEV && game.canvas) game.canvas.dataset.loopRunning = String(game.loop.running);
-  element('pause-overlay').hidden = !next;
-  element('pause').innerHTML = next ? '▶ <span>继续</span>' : 'Ⅱ <span>暂停</span>';
-  element('pause').setAttribute('aria-pressed', String(next));
-  if (next) element('resume').focus({ preventScroll: true });
-  else element('game').focus({ preventScroll: true });
+  syncPause();
+  if (next && !inspecting && !latestBuild?.choice) element('resume').focus({ preventScroll: true });
 }
-
+function inspectBuild(): void {
+  if (dead || !latestBuild) return;
+  inspecting = !inspecting;
+  syncPause();
+  panel.update(latestBuild, inspecting);
+  if (!inspecting && paused && !latestBuild.choice) element('resume').focus({ preventScroll: true });
+}
+element('build').addEventListener('click', inspectBuild, listenerOptions);
 element('pause').addEventListener('click', () => setPaused(!paused), listenerOptions);
 function restart(): void {
+  inspecting = paused = false;
   scene.resetPosition();
-  setPaused(false);
+  syncPause();
 }
 element('resume').addEventListener('click', () => dead ? restart() : setPaused(false), listenerOptions);
 element('reset').addEventListener('click', restart, listenerOptions);
 window.addEventListener('keydown', (event) => {
-  if (!['Escape', 'Space'].includes(event.code) || event.repeat) return;
+  if (!['Escape', 'Space', 'KeyU'].includes(event.code) || event.repeat) return;
   if (event.target instanceof HTMLElement) {
     if (['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName) || event.target.isContentEditable) return;
     if (event.code === 'Space' && ['BUTTON', 'A'].includes(event.target.tagName)) return;
   }
   event.preventDefault();
-  setPaused(!paused);
+  if (event.code === 'KeyU' || (event.code === 'Escape' && inspecting)) inspectBuild();
+  else if (!latestBuild?.choice) setPaused(!paused);
 }, listenerOptions);
 window.addEventListener('blur', () => setPaused(true), listenerOptions);
 document.addEventListener('visibilitychange', () => { if (document.hidden) setPaused(true); }, listenerOptions);
@@ -189,6 +226,7 @@ if (import.meta.hot) {
     listeners.abort();
     resizeObserver.disconnect();
     movement.destroy();
+    panel.destroy();
     game.destroy(true);
   });
 }

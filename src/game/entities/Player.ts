@@ -14,6 +14,7 @@ export class Player {
   readonly health = new Health(PLAYER.health);
   private knockback = { x: 0, y: 0 };
   private flashTime = 0;
+  speed: number = PLAYER.speed;
 
   constructor(scene: Phaser.Scene) {
     this.view = scene.add.container(ARENA.width / 2, ARENA.height / 2).setDepth(10);
@@ -44,7 +45,7 @@ export class Player {
     this.flashTime = Math.max(0, this.flashTime - delta);
     const previousX = this.view.x;
     const previousY = this.view.y;
-    const step = PLAYER.speed * delta / 1000;
+    const step = this.speed * delta / 1000;
     const minimum = ARENA.inset + PLAYER.radius;
     this.view.x = Phaser.Math.Clamp(previousX + direction.x * step + this.knockback.x * delta / 1000, minimum, ARENA.width - minimum);
     this.view.y = Phaser.Math.Clamp(previousY + direction.y * step + this.knockback.y * delta / 1000, minimum, ARENA.height - minimum);
@@ -63,7 +64,7 @@ export class Player {
     this.shadow.scaleX = 1 + Math.abs(bob) * 0.035;
     this.aura.setAlpha(this.moving ? 0.7 : 1);
     this.figure.setAlpha(this.health.protected && Math.floor(this.flashTime / 75) % 2 === 0 ? 0.4 : 1);
-    this.aura.setStrokeStyle(this.health.protected ? 2 : 1, this.health.protected ? 0xffa18b : 0x9be3b4, this.health.protected ? 0.85 : 0.25);
+    this.aura.setStrokeStyle(this.health.protected ? 2 : 1, this.health.protected ? 0xffa18b : this.health.shield > 0 ? 0x82caf5 : 0x9be3b4, this.health.protected ? 0.85 : 0.25);
   }
 
   hurt(damage: number, sourceX: number, sourceY: number): boolean {
