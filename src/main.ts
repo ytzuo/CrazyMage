@@ -89,7 +89,7 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
   const progressKey = `${state.progression.build.runId}/${state.progression.build.revision}/${state.waveRemaining}`;
   if (progressKey !== lastProgression) {
     const { build } = state.progression;
-    element('spell-level').textContent = `火球 Lv.${build.fireLevel}`;
+    element('spell-level').textContent = `火球 Lv.${build.spellLevel}`;
     element('wave-remaining').textContent = `本波剩余 ${state.waveRemaining}`;
     element('spell-level').title = fireSummary(state.progression.effective);
     lastProgression = progressKey;

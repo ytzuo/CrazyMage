@@ -18,7 +18,7 @@ test('different acquisition orders preserve identical combined specs and immutab
   assert.deepEqual(a.fireball.explosion, {radius:80, multiplier:0.35});
   const initial = initialBuild(1), snapshot = compileBuild(initial);
   applyUpgrade(initial, 'fire.multi');
-  assert.equal(snapshot.fireball.count, 1); assert.equal(initial.fireLevel, 1);
+  assert.equal(snapshot.fireball.count, 1); assert.equal(initial.spellLevel, 1);
   assert.ok(Object.isFrozen(a.fireball));
 });
 
@@ -32,7 +32,7 @@ test('additive damage, repeated multi and cooldown respect defined coefficients'
 
 test('spell levels, module caps and three passive slots are enforced', () => {
   const full = buildWith('fire.multi','fire.pierce','fire.explosion');
-  assert.equal(full.fireLevel, 4); assert.throws(() => applyUpgrade(full, 'fire.damage'));
+  assert.equal(full.spellLevel, 4); assert.throws(() => applyUpgrade(full, 'fire.damage'));
   assert.throws(() => applyUpgrade(buildWith('fire.multi', 'fire.multi'), 'fire.multi'));
   const slots = buildWith('passive.speed', 'passive.health', 'passive.shield');
   assert.equal(canAcquire(slots, definition('passive.cooldown')), false);

@@ -44,13 +44,13 @@ export class BuildPanel {
       const change = card.effect.kind === 'fire' || card.id === 'passive.cooldown'
         ? `${fireSummary(snapshot.effective)} → ${fireSummary(after)}`
         : `移速 ${number(before.speed)} → ${number(p.speed)} · 生命 ${before.maximum} → ${p.maximum} · 护盾 ${before.shield} → ${p.shield}`;
-      return `<button class="upgrade-option" data-upgrade="${id}" data-batch="${snapshot.choice!.id}"><small>${card.effect.kind === 'fire' ? `火球 Lv.${snapshot.build.fireLevel} → Lv.${snapshot.build.fireLevel + 1}` : `被动 Lv.${stacks(snapshot.build, card)} → Lv.${stacks(snapshot.build, card) + 1}`}</small><h3>${card.name}</h3><p>${card.description}</p><p class="upgrade-change">${change}</p><span>选择 →</span></button>`;
+      return `<button class="upgrade-option" data-upgrade="${id}" data-batch="${snapshot.choice!.id}"><small>${card.effect.kind === 'fire' ? `火球 Lv.${snapshot.build.spellLevel} → Lv.${snapshot.build.spellLevel + 1}` : `被动 Lv.${stacks(snapshot.build, card)} → Lv.${stacks(snapshot.build, card) + 1}`}</small><h3>${card.name}</h3><p>${card.description}</p><p class="upgrade-change">${change}</p><span>选择 →</span></button>`;
     }).join('')}</div>`;
   }
   private details(snapshot: BuildSnapshot): string {
     const p = snapshot.effective.player;
     const history = snapshot.history.map(entry => `<li><time>${Math.floor(entry.elapsed / 60000)}:${String(Math.floor(entry.elapsed / 1000) % 60).padStart(2, '0')}</time> · 第 ${entry.wave} 波 · ${definition(entry.id)!.name} · Lv.${entry.level}</li>`).join('');
-    return `<div class="build-details"><h3>火球 Lv.${snapshot.build.fireLevel} / 4</h3><p>${fireSummary(snapshot.effective)}</p><p class="combination">${snapshot.effective.fireball.maxTargets > 1 ? "每枚火球独立保留穿透。" : ""}${snapshot.effective.fireball.explosion ? "首次命中爆炸，同次施法溅射不重复。" : ""}</p><h3>被动 ${Object.keys(snapshot.build.passives).length} / 3</h3><p>移速 ${number(p.speed)} · 生命上限 ${p.maximum} · 护盾容量 ${p.shield}</p><ul>${snapshot.effective.breakdown.map(text => `<li>${text}</li>`).join('') || '<li>尚未选择强化</li>'}</ul><h3>获取记录</h3><ol><li>开局 · 火球 Lv.1（初始能力）</li>${history}</ol></div>`;
+    return `<div class="build-details"><h3>火球 Lv.${snapshot.build.spellLevel} / 4</h3><p>${fireSummary(snapshot.effective)}</p><p class="combination">${snapshot.effective.fireball.maxTargets > 1 ? "每枚火球独立保留穿透。" : ""}${snapshot.effective.fireball.explosion ? "首次命中爆炸，同次施法溅射不重复。" : ""}</p><h3>被动 ${Object.keys(snapshot.build.passives).length} / 3</h3><p>移速 ${number(p.speed)} · 生命上限 ${p.maximum} · 护盾容量 ${p.shield}</p><ul>${snapshot.effective.breakdown.map(text => `<li>${text}</li>`).join('') || '<li>尚未选择强化</li>'}</ul><h3>获取记录</h3><ol><li>开局 · 火球 Lv.1（初始能力）</li>${history}</ol></div>`;
   }
   destroy(): void { this.abort.abort(); }
 }

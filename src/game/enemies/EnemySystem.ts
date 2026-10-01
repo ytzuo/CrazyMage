@@ -6,6 +6,7 @@ import { WaveClock } from './WaveClock';
 import { WaveTracker } from './WaveTracker';
 import { waveDifficulty } from './difficulty';
 import { enemyKind, enemySpec, type EnemyKind, type EnemySpec } from './roster';
+import { SlowStatus } from '../combat/SlowStatus';
 import { EnemyShots } from './EnemyShots';
 
 export interface Enemy {
@@ -19,6 +20,7 @@ export interface Enemy {
   bar: Phaser.GameObjects.Rectangle;
   warning: Phaser.GameObjects.Arc;
   health: Health;
+  slow: SlowStatus;
   spawning: number;
   windup: number;
   cooldown: number;
@@ -87,7 +89,7 @@ export class EnemySystem {
       const background = this.scene.add.rectangle(0, -spec.radius - 18, spec.radius * 2, 5, 0x211d26).setStrokeStyle(1, 0x473843);
       const bar = this.scene.add.rectangle(-spec.radius, -spec.radius - 18, spec.radius * 2, 3, 0xe29a9c).setOrigin(0, 0.5);
       view.add([shadow, warning, aimLine, body, background, bar]).setAlpha(0.45);
-      this.enemies.push({ spec, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), spawning: ENEMY.spawnWarning, windup: 0, cooldown: 0, flash: 0, knockback: { x: 0, y: 0 } });
+      this.enemies.push({ spec, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: ENEMY.spawnWarning, windup: 0, cooldown: 0, flash: 0, knockback: { x: 0, y: 0 } });
       return true;
     }
     return false;
@@ -121,8 +123,9 @@ export class EnemySystem {
         if (enemy.spawning === 0) enemy.warning.setVisible(false);
         continue;
       }
+      enemy.slow.update(delta);
       enemy.flash = Math.max(0, enemy.flash - delta);
-      if (enemy.flash === 0) enemy.body.clearTint();
+      if (enemy.flash === 0) { if(enemy.slow.strength>0) enemy.body.setTint(0x91dafa); else enemy.body.clearTint(); }
       enemy.cooldown = Math.max(0, enemy.cooldown - delta);
       const dx = player.view.x - enemy.view.x;
       const dy = player.view.y - enemy.view.y;
@@ -149,7 +152,7 @@ export class EnemySystem {
         if (ranged) enemy.aimLine.setDisplaySize(spec.range,3).setRotation(Math.atan2(dy,dx)).setVisible(true);
       } else if (distance > 0) {
         const movement = spec.kind === 'ranged' ? (distance < 180 ? -1 : distance > 320 ? 1 : 0) : Number(distance > spec.radius + 18);
-        const step = spec.speed * delta / 1000 * movement;
+        const step = spec.speed * (1 - enemy.slow.strength) * delta / 1000 * movement;
         enemy.view.x += dx / distance * step;
         enemy.view.y += dy / distance * step;
       }
@@ -161,6 +164,10 @@ export class EnemySystem {
       enemy.knockback.y *= decay;
     }
     if (!player.health.dead) this.shots.update(delta, player);
+  }
+
+  slow(enemy: Enemy, strength:number, duration:number): void {
+    if(enemy.spawning===0&&!enemy.health.dead&&this.enemies.includes(enemy)) enemy.slow.apply(strength,duration);
   }
 
   hit(enemy: Enemy, damage: number, direction: Direction): boolean {
