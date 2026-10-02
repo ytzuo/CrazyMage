@@ -260,6 +260,8 @@ button:disabled { opacity: 0.45; cursor: default; }
   .school-emblem { width: 44px; height: 44px; margin-bottom: 0; }
   .upgrade-symbol { font-size: 20px; margin-bottom: 8px; }
   .level-route { margin-bottom: 14px; }
+  .level-route div { gap: 4px; }
+  .level-route i { width: 12px; }
   .battle-notice { top: calc(var(--edge-top) + 234px); padding: 10px 20px; }
 }
 @media (max-height: 500px) and (min-width: 600px) { .battle-notice { top: calc(var(--edge-top) + 118px); } .school-emblem { width: 44px; height: 44px; } }

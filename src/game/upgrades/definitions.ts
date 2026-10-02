@@ -14,6 +14,7 @@ export type Passive = 'speed' | 'health' | 'shield' | 'cooldown';
 export type SkillModule = 'power' | 'reach' | 'tempo';
 export type UltimateModule = 'power' | 'reach' | 'mastery';
 export type UpgradeEffect = { kind:'skill'; school:School; module:SkillModule } | { kind: 'ultimate'; school: School; module: UltimateModule } | { kind: 'fire'; module: FireModule } | { kind: 'ice'; module: IceModule } | { kind: 'lightning'; module: LightningModule } | { kind: 'passive'; stat: Passive };
+export const SPELL_MAX_LEVEL = 8;
 export interface UpgradeDefinition { id: string; name: string; description: string; maxStacks: number; effect: UpgradeEffect }
 export const UPGRADES: readonly UpgradeDefinition[] = [
   {id:'skill.fire.power',name:'烈焰凝聚',description:'提升焰爆的威力。',maxStacks:3,effect:{kind:'skill',school:'fire',module:'power'}},

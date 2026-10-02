@@ -1,7 +1,7 @@
 import { skillSpec, type SkillSpec } from '../spells/skillDefinitions.ts';
 import { ultimateSpec, type UltimateSpec } from '../ultimates/definitions.ts';
 import { FIREBALL, ICE, LIGHTNING, PLAYER } from '../config.ts';
-import { definition, UPGRADES, ULTIMATE_UPGRADES, type SkillModule, type UltimateModule, type School, type SpellModule, type Passive, type UpgradeDefinition } from './definitions.ts';
+import { definition, SPELL_MAX_LEVEL, UPGRADES, ULTIMATE_UPGRADES, type SkillModule, type UltimateModule, type School, type SpellModule, type Passive, type UpgradeDefinition } from './definitions.ts';
 export interface BuildState {
   readonly runId: number;
   readonly revision: number;
@@ -46,7 +46,7 @@ export function stacks(build: BuildState, card: UpgradeDefinition): number {
 export function canAcquire(build: BuildState, card: UpgradeDefinition): boolean {
   if (stacks(build, card) >= card.maxStacks) return false;
   if (card.effect.kind === 'ultimate' || card.effect.kind === 'skill') return card.effect.school === build.school;
-  if (card.effect.kind !== 'passive') return card.effect.kind === build.school && build.spellLevel < 4;
+  if (card.effect.kind !== 'passive') return card.effect.kind === build.school && build.spellLevel < SPELL_MAX_LEVEL;
   return !!build.passives[card.effect.stat] || Object.keys(build.passives).length < 3;
 }
 export function applyUpgrade(build: BuildState, id: string): BuildState {

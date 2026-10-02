@@ -2,7 +2,7 @@ import type { BuildSnapshot } from '../game/upgrades/BuildStore';
 import { stacks, type EffectiveBuild } from '../game/upgrades/build';
 import { SCHOOL_SKILLS } from '../game/spells/SchoolSkill';
 import { UPGRADE_PRESENTATION } from './UpgradePresentation';
-import { definition, SCHOOL_INFO } from '../game/upgrades/definitions';
+import { definition, SCHOOL_INFO, SPELL_MAX_LEVEL } from '../game/upgrades/definitions';
 export const number = (value: number): string => Number(value.toFixed(2)).toString();
 export function spellSummary(effective: EffectiveBuild): string {
   if(effective.school === 'ice') {
@@ -73,7 +73,7 @@ export class BuildPanel {
     }
     const details = inspecting;
     const ultimateReward = snapshot.choice?.kind === 'ultimate';
-    this.host.innerHTML = `<section class="build-card"><header><div><small class="wave-clear-label">${details ? '本局构筑' : `${snapshot.choice?.kind === 'ultimate' ? '♛ BOSS 战利品' : '✦'} 第 ${snapshot.choice?.wave} 波完成`}</small><h2>${details ? '你的法术组合' : snapshot.choice?.kind === 'ultimate' ? `选择一项${snapshot.effective.ultimate.name}强化` : '选择一项强化'}</h2></div>${details ? `<button data-close aria-label="${snapshot.choice ? '返回升级' : '关闭构筑'}">${snapshot.choice ? '返回升级' : '关闭'} ×</button>` : '<button data-inspect aria-label="查看已获取升级">查看构筑</button>'}</header>${details ? this.details(snapshot) : `<div class="level-route"><span>${SCHOOL_INFO[snapshot.build.school].symbol} ${SCHOOL_INFO[snapshot.build.school].name}</span>${ultimateReward ? `<b>${snapshot.effective.ultimate.name} · Q</b>` : `<div aria-label="法术等级 ${snapshot.build.spellLevel} / 4">${[1,2,3,4].map(level=>`<i class="${level<=snapshot.build.spellLevel?'filled':''}"></i>`).join('')}</div><b>Lv.${snapshot.build.spellLevel}</b>`}</div>${this.options(snapshot)}`}</section>`;
+    this.host.innerHTML = `<section class="build-card"><header><div><small class="wave-clear-label">${details ? '本局构筑' : `${snapshot.choice?.kind === 'ultimate' ? '♛ BOSS 战利品' : '✦'} 第 ${snapshot.choice?.wave} 波完成`}</small><h2>${details ? '你的法术组合' : snapshot.choice?.kind === 'ultimate' ? `选择一项${snapshot.effective.ultimate.name}强化` : '选择一项强化'}</h2></div>${details ? `<button data-close aria-label="${snapshot.choice ? '返回升级' : '关闭构筑'}">${snapshot.choice ? '返回升级' : '关闭'} ×</button>` : '<button data-inspect aria-label="查看已获取升级">查看构筑</button>'}</header>${details ? this.details(snapshot) : `<div class="level-route"><span>${SCHOOL_INFO[snapshot.build.school].symbol} ${SCHOOL_INFO[snapshot.build.school].name}</span>${ultimateReward ? `<b>${snapshot.effective.ultimate.name} · Q</b>` : `<div aria-label="法术等级 ${snapshot.build.spellLevel} / ${SPELL_MAX_LEVEL}">${Array.from({length:SPELL_MAX_LEVEL},(_,i)=>i+1).map(level=>`<i class="${level<=snapshot.build.spellLevel?'filled':''}"></i>`).join('')}</div><b>Lv.${snapshot.build.spellLevel}</b>`}</div>${this.options(snapshot)}`}</section>`;
     (this.host.querySelector<HTMLButtonElement>('[data-upgrade]') ?? this.host.querySelector<HTMLButtonElement>('button'))?.focus({ preventScroll: true });
   }
   private ritual(snapshot: BuildSnapshot): string {
