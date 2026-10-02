@@ -2,12 +2,12 @@ export type School = 'fire' | 'ice' | 'lightning';
 export const SCHOOLS: readonly School[] = ['fire', 'ice', 'lightning'];
 export const SCHOOL_INFO = {
   fire: {name:'火焰', spell:'火球', symbol:'✹', description:'定向火球，组合多发、穿透、爆炸、灼烧、火区与回旋。'},
-  ice: {name:'冰霜', spell:'冰矛', symbol:'❄', description:'远程穿透冰矛，组合贯穿、追袭、驻留冰棘、碎冰与冻结。'},
+  ice: {name:'冰霜', spell:'冰矛', symbol:'❄', description:'远程冰矛自带穿透与寒霜积累，组合追袭、驻留冰棘和碎冰。'},
   lightning: {name:'闪电', spell:'连锁闪电', symbol:'ϟ', description:'定向电击在怪群中跳跃，强化连锁、距离与传导。'},
 } as const;
 export const isSchool = (value:string): value is School => SCHOOLS.includes(value as School);
 export type FireModule = 'damage' | 'multi' | 'pierce' | 'explosion' | 'burn' | 'rebound';
-export type IceModule = 'damage' | 'radius' | 'cold' | 'echo' | 'shards' | 'frost' | 'ground';
+export type IceModule = 'damage' | 'radius' | 'cold' | 'echo' | 'shards' | 'ground';
 export type LightningModule = 'damage' | 'chain' | 'range' | 'conduction';
 export type SpellModule = FireModule | IceModule | LightningModule;
 export type Passive = 'speed' | 'health' | 'shield' | 'cooldown';
@@ -34,7 +34,6 @@ export const UPGRADES: readonly UpgradeDefinition[] = [
   { id: 'fire.explosion', name: '冲击爆炸', description: '每枚首次命中产生范围溅射，之后仍可继续穿透；同次施法每个目标最多受到一次溅射。', maxStacks: 1, effect: { kind: 'fire', module: 'explosion' } },
   {id:'ice.ground',name:'落地冰棘',description:'冰矛到达射程末端后驻留地面，持续伤害并减速附近敌人。',maxStacks:2,effect:{kind:'ice',module:'ground'}},
   {id:'ice.shards',name:'碎冰迸射',description:'寒霜中的敌人死亡时迸出冰片，打击并减速附近敌人。',maxStacks:2,effect:{kind:'ice',module:'shards'}},
-  {id:'ice.frost',name:'寒霜积压',description:'连续冰矛命中积累寒霜，最终短暂冻结敌人；强化积累效率与冻结时间。',maxStacks:2,effect:{kind:'ice',module:'frost'}},
   { id: 'ice.damage', name: '凛冬冲击', description: '提高冰矛伤害，保留穿透、寒意与追袭。', maxStacks: 2, effect: { kind: 'ice', module: 'damage' } },
   { id: 'ice.radius', name: '贯穿冰矛', description: '冰矛额外贯穿两个敌人，追加冰矛同样生效。', maxStacks: 2, effect: { kind: 'ice', module: 'radius' } },
   { id: 'ice.cold', name: '深度寒霜', description: '减速增加 10 个百分点，持续时间增加 0.5 秒；重复命中刷新，不无限叠加。', maxStacks: 2, effect: { kind: 'ice', module: 'cold' } },

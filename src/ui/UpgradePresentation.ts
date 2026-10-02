@@ -28,7 +28,6 @@ export const UPGRADE_PRESENTATION: Record<string, { symbol: string; summary: str
   'fire.explosion': { symbol:'✺', summary:'首次命中引发爆炸，波及周围敌人。' },
   'ice.ground': {symbol:'♜',summary:'冰矛在射程末端落地驻留，持续伤害并减速；强化驻留威力、范围与时间。'},
   'ice.shards': {symbol:'❈',summary:'寒霜中的敌人死亡时迸出冰片，打击并减速附近敌人；强化冰片数量与威力。'},
-  'ice.frost': {symbol:'❅',summary:'连续冰矛命中积累寒霜，最终短暂冻结；强化积累效率与冻结时间。'},
   'ice.damage': { symbol:'❄', summary:'寒潮冲击更强，保留已有控场效果。' },
   'ice.radius': { symbol:'◎', summary:'冰矛贯穿更多敌人，追袭也同样生效。' },
   'ice.cold': { symbol:'❅', summary:'敌人减速更明显，寒意持续更久。' },

@@ -16,7 +16,7 @@ export class IceZone {
   private cleared:number;
   constructor(scene:Phaser.Scene,private enemies:EnemySystem,private x:number,private y:number,private aim:Direction,private spec:ZoneSpec) {
     this.cleared=enemies.waves.cleared;
-    this.views.push(scene.add.image(x,y,spec.fan?'ice-fan-ground':'ice-frost-detail').setDepth(5)
+    this.views.push(scene.add.image(x,y,spec.fan?'ice-fan-ground':'ice-domain-detail').setDepth(5)
       .setDisplaySize(spec.radius*2,spec.radius*2).setRotation(spec.fan?Math.atan2(aim.y,aim.x):0));
     if(spec.fan)for(let row=0;row<3;row++)for(let column=0;column<5;column++) {
       const angle=Math.atan2(aim.y,aim.x)+(column-2)*Math.PI/9;
@@ -31,7 +31,13 @@ export class IceZone {
     if(this.elapsed>=this.spec.duration || this.enemies.waves.cleared!==this.cleared){this.reset();return false;}
     if(origin&&!this.spec.fan){this.x=origin.x;this.y=origin.y;this.views[0].setPosition(this.x,this.y);}
     const alpha=Math.min(1,this.elapsed/180, (this.spec.duration-this.elapsed)/300);
-    for(const view of this.views)view.setAlpha(alpha*(this.spec.fan?0.9:0.75+0.12*Math.sin(this.elapsed/180)));
+    for(let i=0;i<this.views.length;i++){
+      const view=this.views[i];view.setAlpha(alpha*(this.spec.fan?0.9:0.75+0.12*Math.sin(this.elapsed/180)));
+      if(this.spec.fan&&i>0){
+        const row=Math.floor((i-1)/5),rise=Math.min(1,this.elapsed/220);
+        view.setDisplaySize(28+row*8,(52+row*18)*(0.2+0.8*rise));
+      }
+    }
     this.wait-=delta;
     if(this.wait>0)return true;
     this.wait+=this.spec.interval;

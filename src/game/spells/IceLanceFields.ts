@@ -11,7 +11,7 @@ export class IceLanceFields {
   add(x:number,y:number,spec:IceSpec):void {
     if(!spec.ground)return;
     if(this.fields.length>=12)for(const view of this.fields.shift()!.views)view.destroy();
-    const views=[this.scene.add.image(x,y,'ice-frost-detail').setDepth(5).setDisplaySize(spec.ground.radius*2,spec.ground.radius*2),
+    const views=[this.scene.add.image(x,y,'ice-domain-detail').setDepth(5).setDisplaySize(spec.ground.radius*2,spec.ground.radius*2),
       this.scene.add.image(x,y,'ice-ground-spike').setOrigin(0.5,0.9).setDepth(7).setDisplaySize(36,72)];
     this.fields.push({x,y,spec,remaining:spec.ground.duration,views});
   }

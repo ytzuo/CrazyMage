@@ -210,8 +210,10 @@ src/game/combat/DamageResolver.ts 伤害、派生事件、死亡与奖励结算
 
 ## 冰霜新增模块
 
-shards 与 frost 使用普通强化链路，compileBuild 生成 IceEffectsSpec，冰矛与回响保存快照。敌人命中后保存碎冰来源与寒霜积累，死亡统一触发碎冰；派生冰片不递归触发。普通冰矛与大招寒域共享寒霜积累入口和控制冰块，当前技能均不启用处决。详见 [冰霜组合路线](ice-routes.md)。
+shards 使用普通强化链路，frost 改为冰矛固定基础能力，不再进入普通候选池，compileBuild 生成 IceEffectsSpec，冰矛与回响保存快照。敌人命中后保存碎冰来源与寒霜积累，死亡统一触发碎冰；派生冰片不递归触发。普通冰矛与大招寒域共享寒霜积累入口和控制冰块，当前技能均不启用处决。详见 [冰霜组合路线](ice-routes.md)。
 
 IceZone 统一执行 E 冰刺扇阵与 Q 随身寒域，冻结由 EnemySystem.accumulateFrost 管理。最终参数由 compileBuild 生成；区域保留伤害、时长、范围快照，Q 每帧只传入玩家位置，伤害与积累按共享周期结算，完成波次后立即终止。
 
 IceSpec 统一编译冰矛射程、速度、穿透和 ground 配置，IceSpell 在发射时保存快照，延迟追袭也保留原点与方向；IceLanceFields 负责末端驻留区域，共用周期且取最强重叠伤害。原 radius 模块映射为贯穿目标数量，echo 映射为追袭；选择卡、构筑与流派预览同步更名。E 通过可选 initialDamage 增强首段，Q 未提供该参数，继续沿用已有周期伤害。
+
+冰矛 frost 配置始终由 compileBuild 提供（gain=1、threshold=3、duration=1000），已移除 frost 模块与卡牌。命中半径也读取 IceSpec.hitRadius，手机瞄准和构筑详情使用统一缩短后的射程。Boss 冻结沿用非处决入口，不绕过生命值结算。

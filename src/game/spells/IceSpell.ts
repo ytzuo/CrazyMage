@@ -26,9 +26,9 @@ export class IceSpell {
     if(!aim.x&&!aim.y)aim.x=1;
     x=Math.max(ARENA.inset,Math.min(ARENA.width-ARENA.inset,x));
     y=Math.max(ARENA.inset,Math.min(ARENA.height-ARENA.inset,y));
-    const end=skillEndpoint(x,y,aim,this.spec.reach??700),reach=Math.hypot(end.x-x,end.y-y);
+    const end=skillEndpoint(x,y,aim,this.spec.reach??560),reach=Math.hypot(end.x-x,end.y-y);
     for(let i=0;i<count;i++){
-      const view=this.scene.add.image(x,y,'ice-lance-detail').setDepth(12).setRotation(Math.atan2(aim.y,aim.x)).setDisplaySize(82,22).setVisible(i===0);
+      const view=this.scene.add.image(x,y,'ice-lance-detail').setDepth(12).setRotation(Math.atan2(aim.y,aim.x)).setDisplaySize(88,28).setVisible(i===0);
       this.lances.push({view,aim,spec:this.spec,distance:0,reach,delay:i*this.spec.echoDelay,hits:new Set<number>()});
     }
     this.cleared=enemies.waves.cleared;this.casts++;this.cooldown=this.spec.cooldown;return true;
@@ -45,7 +45,7 @@ export class IceSpell {
       const limit=lance.spec.maxTargets??3;
       if(lance.hits.size<limit){
         const hits=enemies.enemies.filter(e=>e.spawning===0&&!e.health.dead&&!lance.hits.has(e.id))
-          .map(enemy=>({enemy,t:segmentCircleHit(px,py,x,y,enemy.view.x,enemy.view.y,enemy.spec.radius+8)}))
+          .map(enemy=>({enemy,t:segmentCircleHit(px,py,x,y,enemy.view.x,enemy.view.y,enemy.spec.radius+(lance.spec.hitRadius??16))}))
           .filter((hit):hit is {enemy:typeof hit.enemy;t:number}=>hit.t!==null).sort((a,b)=>a.t-b.t);
         for(const {enemy} of hits){
           if(lance.hits.size>=limit)break;

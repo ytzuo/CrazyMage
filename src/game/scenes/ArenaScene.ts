@@ -302,14 +302,14 @@ export class ArenaScene extends Phaser.Scene {
   private touchAim(): Direction | null {
     if (!this.movement.touchDevice) return null;
     const effective = this.builds.effectiveBuild;
-    let closest = effective.school === 'ice' ? (effective.ice.reach ?? 700) : effective.school === 'lightning' ? effective.lightning.range : FIREBALL.speed * FIREBALL.lifetime / 1000;
+    let closest = effective.school === 'ice' ? (effective.ice.reach ?? 560) : effective.school === 'lightning' ? effective.lightning.range : FIREBALL.speed * FIREBALL.lifetime / 1000;
     let aim: Direction | null = null;
     for (const enemy of this.enemies.enemies) {
       if (enemy.spawning > 0 || enemy.health.dead) continue;
       const x = enemy.view.x - this.player.view.x;
       const y = enemy.view.y - (this.player.view.y - (effective.school === 'fire' ? 12 : 0));
       const distance = Math.hypot(x, y);
-      if(effective.school === 'ice' && distance > (effective.ice.reach ?? 700) + enemy.spec.radius) continue;
+      if(effective.school === 'ice' && distance > (effective.ice.reach ?? 560) + enemy.spec.radius) continue;
       if (distance > 0 && distance < closest) { closest = distance; aim = { x: x / distance, y: y / distance }; }
     }
     return aim;
