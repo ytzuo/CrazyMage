@@ -1,0 +1,349 @@
+{
+  "baselineCommit": "04becbf",
+  "initializationBefore": [
+    {
+      "passed": true,
+      "forms": 14,
+      "sourceSize": [
+        128,
+        128
+      ],
+      "prepareMs": 8.400000095367432,
+      "cachedKeys": 14,
+      "cacheReused": true
+    },
+    {
+      "passed": true,
+      "forms": 14,
+      "sourceSize": [
+        128,
+        128
+      ],
+      "prepareMs": 5.399999618530273,
+      "cachedKeys": 14,
+      "cacheReused": true
+    },
+    {
+      "passed": true,
+      "forms": 14,
+      "sourceSize": [
+        128,
+        128
+      ],
+      "prepareMs": 5.599999904632568,
+      "cachedKeys": 14,
+      "cacheReused": true
+    }
+  ],
+  "initializationAfter": [
+    {
+      "passed": true,
+      "forms": 14,
+      "sourceSize": [
+        128,
+        128
+      ],
+      "prepareMs": 5,
+      "cachedKeys": 14,
+      "cacheReused": true
+    },
+    {
+      "passed": true,
+      "forms": 14,
+      "sourceSize": [
+        128,
+        128
+      ],
+      "prepareMs": 5.400000095367432,
+      "cachedKeys": 14,
+      "cacheReused": true
+    },
+    {
+      "passed": true,
+      "forms": 14,
+      "sourceSize": [
+        128,
+        128
+      ],
+      "prepareMs": 5.299999713897705,
+      "cachedKeys": 14,
+      "cacheReused": true
+    }
+  ],
+  "framesBefore": {
+    "passed": true,
+    "viewport": [
+      900,
+      540
+    ],
+    "dpr": 2,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "rows": [
+      {
+        "trial": 1,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.1458333373069763,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.084033613445378,
+          "p95": 9.300000190734863,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.7066666682561239,
+          "p95": 1.0999999046325684,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.301680669063279,
+          "p95": 9.300000190734863,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.6624999801317851,
+          "p95": 0.9000000953674316,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.258823527007543,
+          "p95": 9.200000286102295,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.26500000556310016,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.07815125809998,
+          "p95": 9.300000190734863,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.42916667461395264,
+          "p95": 0.7000002861022949,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.271428573031386,
+          "p95": 9.200000286102295,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.5941666603088379,
+          "p95": 0.8000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.260504201680673,
+          "p95": 9,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.2566666603088379,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.25882353101458,
+          "p95": 9.100000381469727,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.6291666666666667,
+          "p95": 0.8000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.220168065624076,
+          "p95": 9.200000286102295,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.5150000095367432,
+          "p95": 0.7999997138977051,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.263025211686848,
+          "p95": 8.899999618530273,
+          "over25": 0
+        }
+      }
+    ],
+    "note": "120 rendered frames per trial; CPU includes update and render submission, excludes GPU completion. Local fixed roster, no arena/HUD; not cold navigation or device certification."
+  },
+  "framesAfter": {
+    "passed": true,
+    "viewport": [
+      900,
+      540
+    ],
+    "dpr": 2,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "rows": [
+      {
+        "trial": 1,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.2166666825612386,
+          "p95": 0.5,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.264705882352942,
+          "p95": 8.800000190734863,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.7825000127156575,
+          "p95": 1.1999998092651367,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.3109243697479,
+          "p95": 9.299999713897705,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.7708333253860473,
+          "p95": 1.1000003814697266,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.323529411764707,
+          "p95": 9.199999809265137,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.2824999968210856,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.33025210244315,
+          "p95": 9.099999904632568,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.5483333547910054,
+          "p95": 0.8000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.330252098436116,
+          "p95": 9.099999904632568,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.5383333444595337,
+          "p95": 0.8000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.327731092436975,
+          "p95": 9.099999904632568,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.26500000556310016,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.333613443775338,
+          "p95": 9.200000286102295,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.5741666873296102,
+          "p95": 0.7999997138977051,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.33697478911456,
+          "p95": 9.099999904632568,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.6066666642824808,
+          "p95": 0.8000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.330252098436116,
+          "p95": 9.200000286102295,
+          "over25": 0
+        }
+      }
+    ],
+    "note": "120 rendered frames per trial; CPU includes update and render submission, excludes GPU completion. Local fixed roster, no arena/HUD; not cold navigation or device certification."
+  }
+}

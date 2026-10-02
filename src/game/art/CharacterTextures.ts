@@ -1,3 +1,4 @@
+import { paintEnemyDetails, paintVariantDetails } from './EnemyModelDetails';
 import { prepareSpecialEnemyTextures } from './SpecialEnemyTextures';
 import Phaser from 'phaser';
 import type { EnemyKind } from '../enemies/roster';
@@ -184,6 +185,7 @@ export function prepareEnemyTextures(scene: Phaser.Scene): void {
         shape(g,[60,85,69,85,73,92,65,99,57,92],0x9ed6d7,0xd0e6d3);
         for(const [x,y] of [[21,42],[108,43],[20,83],[108,84]])g.fillStyle(0xedd19d).fillCircle(x,y,2);
       }
+      paintEnemyDetails(g,kind);
     });
   }
   texture(scene, enemyTexture('artillery'), 128, 128, g => {
@@ -199,25 +201,9 @@ export function prepareEnemyTextures(scene: Phaser.Scene): void {
     g.fillStyle(0x7f78a5).fillEllipse(28,71,17,26).fillEllipse(101,71,17,26);
     for(const x of [28,101])g.lineStyle(2,0xd2b8f1).strokeCircle(x,66,10);
     g.lineStyle(2,0xb8abe1).lineBetween(50,74,64,85).lineBetween(64,85,80,74);
+    paintEnemyDetails(g,'artillery');
   });
-  texture(scene, enemyTexture('boss'), 128, 128, g => {
-    // Floating obsidian sentinel: crown, detached arms and a molten core.
-    g.fillStyle(0x241b32).fillTriangle(64,4,112,91,16,91);
-    for (const x of [17,91]) {
-      g.fillStyle(0x43334d).fillRoundedRect(x,42,20,48,6);
-      g.lineStyle(2,0xff805a).strokeRoundedRect(x,42,20,48,6);
-      g.fillStyle(0xf9b66c).fillCircle(x+10,55,4);
-    }
-    g.fillStyle(0x55425e).fillTriangle(64,22,96,94,32,94);
-    g.fillStyle(0x352a43).fillTriangle(64,34,86,91,42,91);
-    g.lineStyle(3,0xc98c6a).lineBetween(36,40,23,15).lineBetween(92,40,105,15).lineBetween(64,25,64,5);
-    g.fillStyle(0xff9862,0.2).fillCircle(64,70,24);
-    g.fillStyle(0xff774d).fillTriangle(64,49,77,70,64,91).fillTriangle(64,49,51,70,64,91);
-    g.fillStyle(0xffe3a7).fillTriangle(64,57,69,70,64,82);
-    g.lineStyle(3,0xffd7a2).lineBetween(48,40,58,44).lineBetween(70,44,80,40);
-    g.lineStyle(2,0xa788a7).lineBetween(33,95,52,110).lineBetween(95,95,76,110);
-    g.fillStyle(0xffb470).fillCircle(64,116,4);
-  });
+  texture(scene, enemyTexture('boss'), 128, 128, g => paintEnemyDetails(g,'boss'));
   // Distinct silhouettes and insignia remain visible through hit/ice tinting.
   const variants: [EnemyKind, EnemyVariant][] = [['chaser','splitter'],['swift','dasher'],['ranged','volley'],['brute','guardian']];
   for (const [kind, variant] of variants) {
@@ -243,6 +229,7 @@ export function prepareEnemyTextures(scene: Phaser.Scene): void {
       ctx.strokeStyle='#d9f3ff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(29,63);ctx.lineTo(34,88);ctx.lineTo(23,84);ctx.lineTo(32,101);ctx.stroke();
       ctx.fillStyle='#b5dcea';ctx.fillRect(49,13,31,5);
     }
+    paintVariantDetails(ctx,variant);
     art.refresh();
   }
 }
