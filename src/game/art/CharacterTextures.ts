@@ -1,3 +1,4 @@
+import { prepareSpecialEnemyTextures } from './SpecialEnemyTextures';
 import Phaser from 'phaser';
 import type { EnemyKind } from '../enemies/roster';
 import { SCHOOLS, type School } from '../upgrades/definitions';
@@ -115,6 +116,7 @@ export const enemyTexture = (kind: EnemyKind, variant: EnemyVariant = 'normal'):
 /** Double-resolution source art keeps the original logical size and hit radius. */
 export const enemyArtScale = (kind: EnemyKind, radius: number): number => radius / (kind === 'brute' ? 58 : 40);
 export function prepareEnemyTextures(scene: Phaser.Scene): void {
+  prepareSpecialEnemyTextures(scene);
   for (const kind of ['chaser','swift','ranged','brute'] as EnemyKind[]) {
     texture(scene, enemyTexture(kind), 128, 128, g => {
       if(kind==='chaser') {

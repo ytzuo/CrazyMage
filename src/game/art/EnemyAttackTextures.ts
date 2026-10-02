@@ -1,3 +1,4 @@
+import { SPECIAL_ENEMIES } from '../enemies/specialConfig';
 import type Phaser from 'phaser';
 
 /** Shared raster materials; prepare at scene creation, never in attack/update paths. */
@@ -29,6 +30,27 @@ export function prepareEnemyAttackTextures(scene: Phaser.Scene): void {
       }
     });
   }
+  for(const impact of [false,true])paint(impact?'enemy-bomb-ring-impact':'enemy-bomb-ring',256,256,ctx=>{
+    const inner=128*SPECIAL_ENEMIES.bomber.ringInner/SPECIAL_ENEMIES.bomber.ringOuter;
+    const glow=ctx.createRadialGradient(128,128,inner,128,128,128);
+    glow.addColorStop(0,impact?'#ffdb8aaa':'#ffb56b55');glow.addColorStop(0.5,impact?'#ffb66a99':'#ffb56b18');glow.addColorStop(1,'#ffb56b44');
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(128,128,128,0,Math.PI*2);ctx.arc(128,128,inner,0,Math.PI*2,true);ctx.fill();
+    ctx.strokeStyle=impact?'#ffe4a9':'#ffb56b';ctx.lineWidth=3;
+    for(const radius of [inner,126]){ctx.beginPath();ctx.arc(128,128,radius,0,Math.PI*2);ctx.stroke();}
+    for(let i=0;i<12;i++){const a=i*Math.PI/6;ctx.beginPath();ctx.moveTo(128+Math.cos(a)*(inner+12),128+Math.sin(a)*(inner+12));ctx.lineTo(128+Math.cos(a)*111,128+Math.sin(a)*111);ctx.stroke();}
+  });
+  paint('enemy-priest-shield',128,128,ctx=>{
+    ctx.strokeStyle='#b7f9dc';ctx.lineWidth=3;
+    for(const radius of [48,58]){ctx.beginPath();for(let i=0;i<=6;i++){const a=i*Math.PI/3;const x=64+Math.cos(a)*radius,y=64+Math.sin(a)*radius;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();}
+    ctx.strokeStyle='#e6d9a3';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(103,25);ctx.lineTo(98,40);ctx.lineTo(105,46);ctx.lineTo(99,59);ctx.stroke();
+  });
+  paint('enemy-priest-ward',256,256,ctx=>{
+    const fog=ctx.createRadialGradient(128,128,10,128,128,128);fog.addColorStop(0,'#87dfc512');fog.addColorStop(0.9,'#87dfc530');fog.addColorStop(1,'#87dfc580');ctx.fillStyle=fog;ctx.beginPath();ctx.arc(128,128,128,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#a8eed2';ctx.lineWidth=3;ctx.beginPath();ctx.arc(128,128,126,0,Math.PI*2);ctx.stroke();
+    ctx.strokeStyle='#ecdc9b';ctx.lineWidth=2;ctx.beginPath();
+    for(let i=0;i<=3;i++){const a=-Math.PI/2+i*Math.PI*2/3;const x=128+Math.cos(a)*113,y=128+Math.sin(a)*113;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();
+    for(let i=0;i<3;i++){const a=-Math.PI/2+i*Math.PI*2/3;const x=128+Math.cos(a)*113,y=128+Math.sin(a)*113;ctx.fillStyle='#d3ffe7';ctx.beginPath();ctx.arc(x,y,9,0,Math.PI*2);ctx.fill();}
+  });
   paint('enemy-aim-detail',256,32,ctx=>{
     const glow=ctx.createLinearGradient(0,0,0,32);
     glow.addColorStop(0,'#ffffff00');glow.addColorStop(0.5,'#ffffff60');glow.addColorStop(1,'#ffffff00');

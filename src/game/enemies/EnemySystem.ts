@@ -1,5 +1,7 @@
 import { IceShards } from '../effects/IceShards';
 import type { IceEffectsSpec, IceShardSpec } from '../combat/IceEffectsSpec';
+import { SpecialEnemyCombat } from './SpecialEnemyCombat';
+import { SPECIAL_ENEMIES } from './specialConfig';
 import { FireFields } from '../spells/FireFields';
 import type { BurnSpec } from '../combat/BurnSpec';
 import { RACE_WAVES, type GameMode } from '../modes';
@@ -66,6 +68,8 @@ export class EnemySystem {
   readonly waves = new WaveTracker();
   readonly shots: EnemyShots;
   readonly effects: CombatEffects;
+  readonly special: SpecialEnemyCombat;
+  get combatStopped(): boolean { return this.clearedDuringUpdate; }
   private bosses: BossCombat;
   private areaAttacks: AreaAttacks;
   private fireFields: FireFields;
@@ -79,10 +83,12 @@ export class EnemySystem {
   private nextId = 0;
   private clearedDuringUpdate = false;
 
-  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareFireTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.bosses = new BossCombat(scene); this.areaAttacks = new AreaAttacks(scene); this.fireFields=new FireFields(scene); this.iceShards=new IceShards(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
+  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareFireTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.special = new SpecialEnemyCombat(scene); this.bosses = new BossCombat(scene); this.areaAttacks = new AreaAttacks(scene); this.fireFields=new FireFields(scene); this.iceShards=new IceShards(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
 
   private spawn(player: Player, wave: number, kind: EnemyKind): boolean {
     if (this.enemies.length >= this.capacity - Number(kind !== 'boss')) return false;
+    // A capped special slot becomes a chaser, retaining the registered wave size.
+    if ((kind === 'bomber' || kind === 'priest') && this.enemies.filter(enemy => enemy.spec.kind === kind).length >= SPECIAL_ENEMIES[kind].maximum) kind = 'chaser';
     const spec = enemySpec(kind, wave, this.mode);
     const variant = kind === 'boss' || kind === 'artillery' ? 'normal' : rollVariant(kind, this.random, wave);
     // Rotate through the arena's four edges, retaining a safe distance near walls.
@@ -130,6 +136,7 @@ export class EnemySystem {
   }
 
   reset(player?: Player): void {
+    this.special.reset();
     for (const enemy of this.enemies) enemy.view.destroy();
     this.enemies.length = 0;
     this.shots.reset();
@@ -139,6 +146,7 @@ export class EnemySystem {
     this.effects.reset();
     this.kills = this.spawnIndex = this.nextId = 0;
     this.pendingSpawns = null;
+    this.clearedDuringUpdate = false;
     this.waveClock.reset();
     this.waves.reset();
     if (player) this.spawnWave(player);
@@ -172,6 +180,8 @@ export class EnemySystem {
     if(this.fireFields.update(delta,this))return;
     this.updateBurns(delta);
     if(this.clearedDuringUpdate) return;
+    this.special.update(delta, player, this);
+    if (this.clearedDuringUpdate || player.health.dead) return;
     this.replenish(player);
     const canAdvance = !this.pendingSpawns && this.enemies.length < enemyCapacity(this.waveClock.wave+1)-1 && (this.mode==='endless' || this.waveClock.wave<RACE_WAVES);
     // One advance per update prevents a large delta from replacing a pending batch.
@@ -179,7 +189,8 @@ export class EnemySystem {
     for (let i = 0; i < waves; i++) this.spawnWave(player, this.waveClock.wave - waves + i + 1);
     this.areaAttacks.update(delta, player);
     if (player.health.dead) return;
-    for (const enemy of this.enemies) {
+    for (let index = this.enemies.length - 1; index >= 0; index--) {
+      const enemy = this.enemies[index];
       const spec = enemy.spec;
       if (enemy.health.dead) continue;
       if (enemy.spawning > 0) {
@@ -188,12 +199,14 @@ export class EnemySystem {
         if (enemy.spawning === 0) enemy.warning.setVisible(false);
         continue;
       }
+      let actionDelta = delta;
       enemy.slow.update(delta);
       enemy.frostProtection=Math.max(0,enemy.frostProtection-delta);
       enemy.frostRemaining=Math.max(0,enemy.frostRemaining-delta);
       if(!enemy.frostRemaining)enemy.frostStacks=0;
       if(enemy.iceShard){enemy.iceShard.remaining-=delta;if(enemy.iceShard.remaining<=0)enemy.iceShard=null;}
       if (enemy.frozen > 0) {
+        actionDelta = Math.max(0, delta - enemy.frozen);
         enemy.frozen = Math.max(0, enemy.frozen - delta);
         if (enemy.frozen === 0) { enemy.frozenExecution=false; enemy.icePrison?.destroy(); enemy.icePrison = null; }
         if (enemy.frozen > 0) { enemy.icePrison?.setAlpha(Math.min(1,enemy.frozen/250)); enemy.knockback.x = enemy.knockback.y = 0; enemy.body.setTint(0x80dfff); continue; }
@@ -215,7 +228,11 @@ export class EnemySystem {
         if (player.health.dead) break;
         continue;
       }
-      if (enemy.dashTime > 0) {
+      if (this.special.updateEnemy(enemy, actionDelta, player, this)) {
+        if (this.clearedDuringUpdate || player.health.dead) return;
+        // Self-detonation removes the actor; reverse traversal retains the next enemy.
+        if (enemy.health.dead) continue;
+      } else if (enemy.dashTime > 0) {
         const step = VARIANTS.dashSpeed * (1 - enemy.slow.strength) * Math.min(delta, enemy.dashTime) / 1000;
         const margin = ARENA.inset + spec.radius, x = enemy.view.x, y = enemy.view.y;
         const nx = Phaser.Math.Clamp(x + enemy.aim.x * step, margin, ARENA.width - margin);
@@ -284,7 +301,8 @@ export class EnemySystem {
       enemy.knockback.y *= decay;
       this.animate(enemy);
     }
-    if (!player.health.dead) this.shots.update(delta, player);
+    this.special.flushFriendly(this);
+    if (!player.health.dead && !this.clearedDuringUpdate) this.shots.update(delta, player);
   }
 
   /** Pose only moves the sprite inside its container; collision and warning stay fixed. */
@@ -293,7 +311,12 @@ export class EnemySystem {
     const base = enemyArtScale(spec.kind, spec.radius);
     const charge = enemy.windup > 0 ? 1 - enemy.windup / this.attackWindup(enemy) : 0;
     const strike = enemy.attackTime > 0 ? Math.sin((1 - enemy.attackTime / 230) * Math.PI) : 0;
-    const ranged = spec.kind === 'ranged' || spec.kind === 'artillery', brute = spec.kind === 'brute';
+    if (spec.kind === 'bomber') {
+      const pulse = charge > 0 ? Math.sin(enemy.windup / 55) * 0.035 * charge : 0;
+      body.setPosition(0, -3).setScale(base * (1 + charge * 0.2 + pulse)).setRotation(0);
+      return;
+    }
+    const ranged = spec.kind === 'ranged' || spec.kind === 'artillery' || spec.kind === 'priest', brute = spec.kind === 'brute';
     const thrust = (ranged ? -6 : brute ? 18 : 12) * strike - charge * 6;
     body.setPosition(aim.x * thrust, -3 + aim.y * thrust - charge * (brute ? 12 : 4));
     body.setScale(base * (1 - charge * 0.12 + strike * 0.12), base * (1 + charge * 0.12 - strike * 0.1));
@@ -311,7 +334,9 @@ export class EnemySystem {
       enemy.view.add(enemy.icePrison);enemy.view.bringToTop(enemy.bar);
     }
     enemy.icePrison?.setTint(enemy.frozenExecution?0xffffff:0xa8efff);
-    enemy.windup = enemy.attackTime = enemy.dashTime = enemy.burstRemaining = enemy.burstWait = 0;
+    this.special.frozen(enemy);
+    if (enemy.spec.kind !== 'bomber') enemy.windup = 0;
+    enemy.attackTime = enemy.dashTime = enemy.burstRemaining = enemy.burstWait = 0;
     enemy.knockback.x = enemy.knockback.y = 0;
     enemy.warning.setVisible(false); enemy.aimLine.setVisible(false);
     this.animate(enemy); enemy.body.setTint(0x80dfff);
@@ -320,11 +345,15 @@ export class EnemySystem {
   private applyIce(enemy:Enemy, effects:IceEffectsSpec):void {
     if(effects.shards)enemy.iceShard={spec:effects.shards,remaining:effects.shards.duration};
     const frost=effects.frost;
-    if(!frost || enemy.frozen>0 || enemy.frostProtection>0)return;
-    enemy.frostStacks+=frost.gain;enemy.frostRemaining=4000;
-    if(enemy.frostStacks>=frost.threshold){
+    if(frost)this.accumulateFrost(enemy,frost.gain,frost.duration);
+  }
+
+  accumulateFrost(enemy:Enemy,gain:number,freeze:number):void {
+    if(enemy.health.dead||enemy.spawning>0||!this.enemies.includes(enemy)||enemy.frozen>0||enemy.frostProtection>0)return;
+    enemy.frostStacks+=gain;enemy.frostRemaining=4000;
+    if(enemy.frostStacks>=3){
       enemy.frostStacks=0;enemy.frostRemaining=0;
-      const duration=frost.duration*(enemy.spec.kind==='boss'?0.35:1);
+      const duration=freeze*(enemy.spec.kind==='boss'?0.35:1);
       enemy.frostProtection=duration+2500;
       this.freeze(enemy,duration,false);
     }
@@ -388,7 +417,9 @@ export class EnemySystem {
     if(burn) this.ignite(enemy,burn,true);
     const shatter=enemy.frozen>0 && enemy.frozenExecution;
     if(shatter)this.effects.shatter(enemy.view.x,enemy.view.y,enemy.spec.radius);
-    if (!enemy.health.hurt(shatter?enemy.health.current+enemy.health.shield:damage)) return false;
+    const protectedDamage = shatter ? enemy.health.current + enemy.health.shield : this.special.protect(enemy, damage);
+    if (protectedDamage > 0 && !enemy.health.hurt(protectedDamage)) return false;
+    if (protectedDamage === 0) this.effects.block(enemy.view.x, enemy.view.y, enemy.spec.radius);
     if(!periodic) this.effects.hit(enemy.view.x, enemy.view.y, direction);
     enemy.bar.scaleX = enemy.health.current / enemy.health.maximum;
     if(!periodic) {
@@ -398,34 +429,43 @@ export class EnemySystem {
     enemy.knockback.y = direction.y * enemy.spec.knockback;
     this.areaAttacks.cancel(enemy.id);
     // A hit interrupts a pending contact attack, allowing a close-range escape.
-    if (enemy.spec.kind !== 'boss') enemy.windup = enemy.attackTime = enemy.dashTime = enemy.burstRemaining = enemy.burstWait = 0;
+    if (enemy.spec.kind !== 'boss' && enemy.spec.kind !== 'bomber') enemy.windup = enemy.attackTime = enemy.dashTime = enemy.burstRemaining = enemy.burstWait = 0;
     this.animate(enemy);
     if (enemy.spec.kind !== 'boss') enemy.cooldown = Math.max(enemy.cooldown, 250);
-    enemy.warning.setVisible(false);
+    if (enemy.spec.kind !== 'bomber') enemy.warning.setVisible(false);
     enemy.aimLine.setVisible(false);
     }
-    if (enemy.health.dead) {
-      if(enemy.burn?.spec.field) this.fireFields.add(enemy.view.x,enemy.view.y,enemy.burn.spec.field);
-      this.spreadBurn(enemy);
-      this.kills++;
-      this.onKill(source, enemy.spec.kind === 'boss');
-      this.bosses.cancel(enemy.id); this.areaAttacks.cancel(enemy.id);
-      const color = enemy.variant === 'splitter' ? 0x76dac6 : { artillery:0xac91de, boss:0xff9568, chaser:0xd39b96, ranged:0xc4a0ec, brute:0xe6ba78, swift:0xc6dc79 }[enemy.spec.kind];
-      this.effects.death(enemy.view.x, enemy.view.y, color, enemy.spec.radius);
-      const x = enemy.view.x, y = enemy.view.y;
-      enemy.view.destroy();
-      this.enemies.splice(this.enemies.indexOf(enemy), 1);
-      this.split(enemy, x, y);
-      if(!shard && enemy.iceShard && (enemy.slow.strength>0 || enemy.frozen>0 || !!ice?.shards))
-        this.iceShards.burst(x,y,enemy.iceShard.spec,this);
-      // Clearing the arena schedules the next wave even when upgrades are exhausted.
-      if (this.enemies.length === 0) { this.waveClock.scheduleNext(ENEMY.clearDelay); this.shots.reset(); this.areaAttacks.reset(); this.effects.clear(x, y); }
-      if (this.waves.defeat(enemy.wave)) {
-        const bossDefeated = this.bossWaves.delete(enemy.wave);
-        this.clearedDuringUpdate=true;
-        this.onWaveClear(enemy.wave, bossDefeated);
-      }
-    }
+    if (enemy.health.dead) this.defeat(enemy, source, ice, shard);
     return true;
+  }
+
+  /** Self-detonation settles its wave exactly once without granting spell kill energy. */
+  selfDestruct(enemy: Enemy): void {
+    if (enemy.spec.kind !== 'bomber' || enemy.health.dead || !this.enemies.includes(enemy)) return;
+    enemy.health.hurt(enemy.health.current + enemy.health.shield);
+    this.defeat(enemy, null);
+  }
+
+  private defeat(enemy: Enemy, source: DamageSource | null, ice?: IceEffectsSpec | null, shard=false): void {
+    if(source && enemy.burn?.spec.field) this.fireFields.add(enemy.view.x,enemy.view.y,enemy.burn.spec.field);
+    if (source) this.spreadBurn(enemy);
+    if (source) { this.kills++; this.onKill(source, enemy.spec.kind === 'boss'); }
+    this.special.onDeath(enemy, source);
+    this.bosses.cancel(enemy.id); this.areaAttacks.cancel(enemy.id);
+    const color = enemy.variant === 'splitter' ? 0x76dac6 : { bomber:0xffa56a, priest:0x87e4c5, artillery:0xac91de, boss:0xff9568, chaser:0xd39b96, ranged:0xc4a0ec, brute:0xe6ba78, swift:0xc6dc79 }[enemy.spec.kind];
+    this.effects.death(enemy.view.x, enemy.view.y, color, enemy.spec.radius);
+    const x = enemy.view.x, y = enemy.view.y;
+    enemy.view.destroy();
+    this.enemies.splice(this.enemies.indexOf(enemy), 1);
+    this.split(enemy, x, y);
+    if(source && !shard && enemy.iceShard && (enemy.slow.strength>0 || enemy.frozen>0 || !!ice?.shards))
+      this.iceShards.burst(x,y,enemy.iceShard.spec,this);
+    // Clearing the arena schedules the next wave even when upgrades are exhausted.
+    if (this.enemies.length === 0) { this.waveClock.scheduleNext(ENEMY.clearDelay); this.shots.reset(); this.areaAttacks.reset(); this.special.reset(); this.effects.clear(x, y); }
+    if (this.waves.defeat(enemy.wave)) {
+      const bossDefeated = this.bossWaves.delete(enemy.wave);
+      this.clearedDuringUpdate=true;
+      this.onWaveClear(enemy.wave, bossDefeated);
+    }
   }
 }
