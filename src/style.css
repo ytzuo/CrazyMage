@@ -427,3 +427,11 @@ button:disabled { opacity: 0.45; cursor: default; }
   .wave-ritual * { animation: none; }
   .ritual-progress i { transform: scaleX(1); }
 }
+
+/* Match selection demos to the layered fire/electric combat art; no filter animation. */
+.preview-fireball { width: 23px; height: 16px; background: radial-gradient(ellipse at 75% 45%, #fffce7 0 14%, #ffe0a0 15% 30%, #ffae45 32% 55%, #e8622a 58% 75%, transparent 78%); }
+.preview-fireball::before { content: ''; position: absolute; inset: -4px 5px -4px -11px; background: #ff7e394d; clip-path: polygon(0 20%, 45% 40%, 20% 0, 100% 40%, 95% 70%, 30% 100%, 46% 65%, 0 80%, 20% 50%); z-index: -1; }
+.preview-fireball::after { content: ''; position: absolute; left: -9px; top: 0; width: 2px; height: 2px; background: #ffd184; box-shadow: -5px 11px #ffb16c, 2px -4px #ffd184; }
+.preview-lightning .preview-electric-glow { stroke: #aaa0ed; stroke-width: 9; opacity: .25; }
+.preview-lightning .preview-electric-core { stroke: #fff8d8; stroke-width: 1; }
+.preview-lightning .preview-electric-branch { fill: none; stroke: #b9d7ff; stroke-width: 1.3; }

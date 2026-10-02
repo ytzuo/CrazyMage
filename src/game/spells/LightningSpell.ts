@@ -1,3 +1,4 @@
+import { prepareLightningTextures } from '../art/SpellTextures';
 import Phaser from 'phaser';
 import type { Direction } from '../config';
 import type { EnemySystem } from '../enemies/EnemySystem';
@@ -13,11 +14,7 @@ export class LightningSpell {
   get projectileCount():number{return 0;}
   get impactCount():number{return this.arcs.length;}
   constructor(private scene:Phaser.Scene,private spec:LightningSpec) {
-    if(scene.textures.exists('lightning-arc'))return;
-    const g=scene.make.graphics({},false);
-    g.lineStyle(6,0xa5a5ff,0.25).beginPath().moveTo(0,12).lineTo(28,6).lineTo(54,18).lineTo(82,5).lineTo(106,16).lineTo(128,12).strokePath();
-    g.lineStyle(2,0xf3f0c7,0.95).beginPath().moveTo(0,12).lineTo(28,6).lineTo(54,18).lineTo(82,5).lineTo(106,16).lineTo(128,12).strokePath();
-    g.generateTexture('lightning-arc',128,24);g.destroy();
+    prepareLightningTextures(scene);
   }
   configure(spec:LightningSpec):void{this.cooldown=preserveCooldown(this.cooldown,this.spec.cooldown,spec.cooldown);this.spec=spec;}
   update(delta:number,_enemies:EnemySystem):void {
@@ -25,7 +22,7 @@ export class LightningSpell {
     for(let i=this.arcs.length-1;i>=0;i--) {
       const arc=this.arcs[i];arc.age+=delta;
       if(arc.age>=180){arc.view.destroy();this.arcs.splice(i,1);}
-      else arc.view.setAlpha(1-arc.age/180);
+      else arc.view.setAlpha((1-arc.age/180)*(0.75+0.25*Math.cos(arc.age*0.09)**2));
     }
   }
   cast(x:number,y:number,aim:Direction,enemies:EnemySystem):boolean {
@@ -36,9 +33,9 @@ export class LightningSpell {
     for(let hop=0;hop<targets.length;hop++) {
       const target=targets[hop],enemy=enemies.enemies.find(e=>e.id===target.id);
       const dx=target.x-x,dy=target.y-y,d=Math.hypot(dx,dy)||1;
-      if(enemy)enemies.hit(enemy,this.spec.damage*this.spec.falloff**hop,{x:dx/d,y:dy/d});
+      if(enemy && enemies.hit(enemy,this.spec.damage*this.spec.falloff**hop,{x:dx/d,y:dy/d})) enemies.effects.spellHit(target.x,target.y,'lightning',{x:dx/d,y:dy/d});
       if(this.arcs.length>=24)this.arcs.shift()!.view.destroy();
-      const view=this.scene.add.image(x,y,'lightning-arc').setOrigin(0,0.5).setDisplaySize(d,24).setRotation(Math.atan2(dy,dx)).setDepth(12);
+      const view=this.scene.add.image(x,y,`lightning-arc-detail-${(this.casts+hop)%3}`).setOrigin(0,0.5).setDisplaySize(d,36).setBlendMode(Phaser.BlendModes.ADD).setRotation(Math.atan2(dy,dx)).setDepth(12);
       this.arcs.push({view,age:0});x=target.x;y=target.y;
     }
     return true;

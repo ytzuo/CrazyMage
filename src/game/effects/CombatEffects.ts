@@ -14,11 +14,15 @@ export class CombatEffects {
     g.fillStyle(0xffffff).fillTriangle(16,1,21,16,16,31).fillTriangle(16,1,11,16,16,31);
     g.generateTexture('feedback-spark',32,32);g.clear();
     g.lineStyle(2,0xffffff,0.8).strokeCircle(32,32,28);
-    g.generateTexture('feedback-ring',64,64);g.destroy();
+    g.generateTexture('feedback-ring',64,64);g.clear();
+    g.fillStyle(0xffffff).beginPath().moveTo(16,1).lineTo(22,12).lineTo(25,22).lineTo(20,29).lineTo(10,29).lineTo(6,21).lineTo(12,14).lineTo(10,8).closePath().fillPath();
+    g.generateTexture('feedback-ember',32,32);g.clear();
+    g.lineStyle(2,0xffffff).beginPath().moveTo(22,1).lineTo(9,16).lineTo(19,13).lineTo(8,31).strokePath();
+    g.generateTexture('feedback-zap',32,32);g.destroy();
   }
-  private add(x:number,y:number,color:number,size:number,life:number,vx=0,vy=0,grow=0,ring=false):void{
+  private add(x:number,y:number,color:number,size:number,life:number,vx=0,vy=0,grow=0,ring=false,texture?:string):void{
     if(this.motes.length>=CombatEffects.limit)this.motes.shift()!.view.destroy();
-    const view=this.scene.add.image(x,y,ring?'feedback-ring':'feedback-spark').setTint(color).setDepth(13).setDisplaySize(size,size);
+    const view=this.scene.add.image(x,y,texture ?? (ring?'feedback-ring':'feedback-spark')).setTint(color).setDepth(13).setDisplaySize(size,size);
     if(!ring)view.setRotation(Math.atan2(vy,vx)+Math.PI/2);
     this.motes.push({view,age:0,life,vx,vy,size,grow,spin:ring?0:2});
   }
@@ -32,6 +36,14 @@ export class CombatEffects {
     for(let i=0;i<3;i++){
       const angle=Math.atan2(direction.y,direction.x)+(i-1)*0.65;
       this.add(x,y,0xffe2ba,9,240,Math.cos(angle)*110,Math.sin(angle)*110,-0.6);
+    }
+  }
+  spellHit(x:number,y:number,school:School,direction:Direction):void{
+    const fire=school==='fire', color=fire?0xffb557:school==='lightning'?0xb8caff:SCHOOL_COLOR.ice;
+    this.add(x,y,color,fire?28:36,260,0,0,0.8,true);
+    for(let i=0;i<4;i++){
+      const angle=Math.atan2(direction.y,direction.x)+Math.PI/4+i*Math.PI/2;
+      this.add(x,y,i%2?color:0xfff1c6,fire?10:15,280+(i%2)*80,Math.cos(angle)*105,Math.sin(angle)*105,-0.65,false,fire?'feedback-ember':'feedback-zap');
     }
   }
   block(x:number,y:number,radius:number):void{
@@ -49,7 +61,7 @@ export class CombatEffects {
   cast(x:number,y:number,school:School,aim:Direction):void{
     const color=SCHOOL_COLOR[school];
     this.add(x,y-8,color,34,220,0,0,0.65,true);
-    for(let i=-1;i<=1;i++)this.add(x+aim.x*24,y-8+aim.y*24,color,8,200,aim.x*100-aim.y*i*50,aim.y*100+aim.x*i*50,-0.6);
+    for(let i=-1;i<=1;i++)this.add(x+aim.x*24,y-8+aim.y*24,color,school==='lightning'?13:9,200,aim.x*100-aim.y*i*50,aim.y*100+aim.x*i*50,-0.6,false,school==='fire'?'feedback-ember':school==='lightning'?'feedback-zap':undefined);
   }
   empower(x:number,y:number,school:School):void{
     this.burst(x,y-8,SCHOOL_COLOR[school],12,12,100);

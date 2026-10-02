@@ -1,3 +1,4 @@
+import { prepareFireTextures, prepareLightningTextures } from '../art/SpellTextures';
 import Phaser from 'phaser';
 import type { EnemySystem } from '../enemies/EnemySystem';
 import type { School } from '../upgrades/definitions';
@@ -13,6 +14,7 @@ export class UltimateSpell {
   casts=0;
   get effectCount():number{return this.visuals.length;}
   constructor(private scene:Phaser.Scene){
+    prepareFireTextures(scene);prepareLightningTextures(scene);
     if(scene.textures.exists('ultimate-ring'))return;
     const g=scene.make.graphics({},false);
     g.fillStyle(0xffffff,0.035).fillCircle(128,128,122);
@@ -22,16 +24,13 @@ export class UltimateSpell {
       const a=i*Math.PI/8,c=Math.cos(a),s=Math.sin(a);
       g.lineStyle(3,0xffffff,0.8).lineBetween(128+c*94,128+s*94,128+c*116,128+s*116);
     }
-    g.generateTexture('ultimate-ring',256,256);g.clear();
-    g.lineStyle(10,0xffffff,0.2).beginPath().moveTo(29,0).lineTo(14,54).lineTo(36,49).lineTo(17,110).lineTo(31,100).lineTo(22,160).strokePath();
-    g.lineStyle(3,0xffffff,1).beginPath().moveTo(29,0).lineTo(14,54).lineTo(36,49).lineTo(17,110).lineTo(31,100).lineTo(22,160).strokePath();
-    g.generateTexture('ultimate-bolt',48,160);g.destroy();
+    g.generateTexture('ultimate-ring',256,256);g.destroy();
   }
   configure(school:School,level:number):void{this.spec=ultimateSpec(school,level);}
-  private visual(x:number,y:number,size:number,ring:boolean,life=800):void {
+  private visual(x:number,y:number,size:number,ring:boolean,life=800,texture?:string):void {
     if(this.visuals.length>=40)this.visuals.shift()!.view.destroy();
-    const view=this.scene.add.image(x,y,ring?'ultimate-ring':'ultimate-bolt').setTint(SCHOOL_COLOR[this.spec.school]).setDepth(ring?8:14);
-    if(ring)view.setDisplaySize(size,size);else view.setOrigin(0.5,1).setDisplaySize(48,size);
+    const view=this.scene.add.image(x,y,texture ?? (ring?(this.spec.school==='fire'?'fire-nova-detail':'ultimate-ring'):'lightning-bolt-detail')).setTint(this.spec.school==='ice'?SCHOOL_COLOR.ice:this.spec.school==='lightning'&&ring?0xb8caff:0xffffff).setDepth(ring?8:14);
+    if(ring)view.setDisplaySize(size,size);else view.setOrigin(0.5,1).setDisplaySize(64,size).setBlendMode(Phaser.BlendModes.ADD);
     this.visuals.push({view,age:0,life,size,ring});
   }
   cast(x:number,y:number,enemies:EnemySystem):boolean {
@@ -45,12 +44,12 @@ export class UltimateSpell {
       const dx=enemy.view.x-x,dy=enemy.view.y-y,d=Math.hypot(dx,dy)||1;
       const tx=enemy.view.x,ty=enemy.view.y;
       if(enemies.hit(enemy,spec.damage,{x:dx/d,y:dy/d},'ultimate')&&spec.freeze)enemies.freeze(enemy,spec.freeze);
-      if(spec.school==='lightning'){this.visual(tx,ty,180,false,450);this.visual(tx,ty,70,true,450);}
+      if(spec.school==='lightning'){this.visual(tx,ty,220,false,450);this.visual(tx,ty,70,true,450);enemies.effects.spellHit(tx,ty,'lightning',{x:dx/d,y:dy/d});}
     }
     if(spec.school!=='lightning'){
       this.visual(x,y,spec.radius*2,true);
       this.visual(x,y,spec.radius*1.3,true,650);
-      if(spec.school==='fire')for(let i=0;i<8;i++){const a=i*Math.PI/4;this.visual(x+Math.cos(a)*spec.radius*0.6,y+Math.sin(a)*spec.radius*0.6,120,true,550);}
+      if(spec.school==='fire')for(let i=0;i<8;i++){const a=i*Math.PI/4;this.visual(x+Math.cos(a)*spec.radius*0.6,y+Math.sin(a)*spec.radius*0.6,120,true,550,'fire-impact-detail');}
     }
     enemies.effects.empower(x,y,spec.school);
     return true;
@@ -59,7 +58,7 @@ export class UltimateSpell {
     for(let i=this.visuals.length-1;i>=0;i--){
       const v=this.visuals[i];v.age+=delta;
       if(v.age>=v.life){v.view.destroy();this.visuals.splice(i,1);continue;}
-      const t=v.age/v.life;v.view.setAlpha(1-t);
+      const t=v.age/v.life;v.view.setAlpha((1-t)*(v.ring?1:0.75+0.25*Math.cos(v.age*0.07)**2));
       if(v.ring)v.view.setDisplaySize(v.size*(0.8+0.2*t),v.size*(0.8+0.2*t));
     }
   }
