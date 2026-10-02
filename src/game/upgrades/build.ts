@@ -25,7 +25,7 @@ export interface FireballSpec {
   readonly explosion: Readonly<{ radius: number; multiplier: number }> | null;
 }
 export interface IceSpec {
-  readonly reach?:number; readonly speed?:number; readonly maxTargets?:number; readonly hitRadius?:number;
+  readonly reach?:number; readonly speed?:number; readonly hitRadius?:number;
   readonly ground?: Readonly<{damage:number;radius:number;duration:number}> | null;
   readonly effects?: IceEffectsSpec | null;
   readonly damage:number; readonly cooldown:number; readonly radius:number;
@@ -89,11 +89,12 @@ export function compileBuild(build: BuildState): EffectiveBuild {
     speed: FIREBALL.speed, lifetime: FIREBALL.lifetime,
     explosion: m.explosion ? Object.freeze({ radius: Math.min(600,80*(1+0.15*((m.explosion??1)-1))), multiplier: 0.35*(1+0.2*((m.explosion??1)-1)) }) : null,
   });
-  const iceDamage=growth*32*(1+0.3*(i.damage??0))*(i.echo?0.75:1)*(1+0.2*Math.max(0,(i.echo??0)-1));
-  const ice = Object.freeze({reach:560,speed:620,hitRadius:16,maxTargets:Math.min(36,3+2*(i.radius??0)),ground:i.ground?Object.freeze({damage:iceDamage*0.2*(1+0.3*((i.ground??1)-1)),radius:Math.min(240,90+15*((i.ground??1)-1)),duration:Math.min(5000,3000+400*((i.ground??1)-1))}):null,effects:Object.freeze({
+  const iceDamage=growth*32*(1+0.3*(i.damage??0))*(i.echo?0.75:1)*(1+0.2*Math.max(0,(i.echo??0)-2));
+  const ice = Object.freeze({reach:560,speed:620,hitRadius:16,ground:i.ground?Object.freeze({damage:iceDamage*0.2*(1+0.3*((i.ground??1)-1)),radius:Math.min(240,90+15*((i.ground??1)-1))*(i.radius?1.5:1),duration:Math.min(5000,3000+400*((i.ground??1)-1))}):null,effects:Object.freeze({
+    hitShards:i.radius?Object.freeze({damage:iceDamage*0.35*(1+0.3*((i.radius??1)-1)),targets:Math.min(8,3+(i.radius??1)-1),radius:Math.min(300,180+20*((i.radius??1)-1)),slow:Math.min(0.75,0.3+0.1*(i.cold??0)),duration:1500}):null,
     shards:i.shards?Object.freeze({damage:iceDamage*0.6*(1+0.3*((i.shards??1)-1)),targets:Math.min(8,3+(i.shards??1)-1),radius:Math.min(600,240*(1+0.1*((i.shards??1)-1))),slow:Math.min(0.75,0.3+0.1*(i.cold??0)),duration:Math.min(6000,1500+500*(i.cold??0))}):null,
     frost:Object.freeze({gain:1,threshold:3,duration:1000}),
-  }),damage:iceDamage,cooldown:Math.max(400,ICE.cooldown*(endless?1/(1+0.15*(p.cooldown??0)):1-0.1*(p.cooldown??0))),radius:Math.min(900,160*(1+0.25*(i.radius??0))),slow:Math.min(0.75,0.3+0.1*(i.cold??0)),duration:1500+500*(i.cold??0),pulses:i.echo?2:1,echoDelay:180});
+  }),damage:iceDamage,cooldown:Math.max(400,ICE.cooldown*(endless?1/(1+0.15*(p.cooldown??0)):1-0.1*(p.cooldown??0))),radius:Math.min(900,160*(1+0.25*(i.radius??0))),slow:Math.min(0.75,0.3+0.1*(i.cold??0)),duration:1500+500*(i.cold??0),pulses:Math.min(3,1+(i.echo??0)),echoDelay:180});
   const lightning = Object.freeze({damage:growth*20*(1+0.3*(l.damage??0))*(1+0.2*Math.max(0,(l.conduction??0)-1)+0.1*Math.max(0,(l.chain??0)-17)),cooldown:Math.max(300,LIGHTNING.cooldown*(endless?1/(1+0.15*(p.cooldown??0)):1-0.1*(p.cooldown??0))),range:Math.min(3000,440*(1+0.25*(l.range??0))),jumpRange:Math.min(2400,180*(1+0.25*(l.range??0))),maxTargets:Math.min(36,3+2*(l.chain??0)),falloff:l.conduction?0.95:0.8});
   return Object.freeze({ revision: build.revision, school:build.school, fireball, ice, lightning, skill:compileSkill(build), ultimate: compileUltimate(build,growth),
     player: Object.freeze({ speed: PLAYER.speed * (1 + (endless ? 0.8*(p.speed??0)/(10+(p.speed??0)) : 0.08*(p.speed??0))), maximum: PLAYER.health + 20 * (p.health ?? 0), shield: 20 * (p.shield ?? 0) }),

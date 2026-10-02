@@ -214,6 +214,8 @@ shards 使用普通强化链路，frost 改为冰矛固定基础能力，不再�
 
 IceZone 统一执行 E 冰刺扇阵与 Q 随身寒域，冻结由 EnemySystem.accumulateFrost 管理。最终参数由 compileBuild 生成；区域保留伤害、时长、范围快照，Q 每帧只传入玩家位置，伤害与积累按共享周期结算，完成波次后立即终止。
 
-IceSpec 统一编译冰矛射程、速度、穿透和 ground 配置，IceSpell 在发射时保存快照，延迟追袭也保留原点与方向；IceLanceFields 负责末端驻留区域，共用周期且取最强重叠伤害。原 radius 模块映射为贯穿目标数量，echo 映射为追袭；选择卡、构筑与流派预览同步更名。E 通过可选 initialDamage 增强首段，Q 未提供该参数，继续沿用已有周期伤害。
+IceSpec 统一编译冰矛射程、速度、穿透和 ground 配置，IceSpell 在发射时保存快照，延迟追袭也保留原点与方向；IceLanceFields 负责末端驻留区域，共用周期且取最强重叠伤害。原 radius 模块映射为命中冰片与一次性落地半径倍率 1.5，保留模块 ID 兼容既有构筑；echo 映射为最多三根、射程为 100%/75%/50% 的追袭；选择卡、构筑与流派预览同步更名。E 通过可选 initialDamage 增强首段，Q 未提供该参数，继续沿用已有周期伤害。
 
 冰矛 frost 配置始终由 compileBuild 提供（gain=1、threshold=3、duration=1000），已移除 frost 模块与卡牌。命中半径也读取 IceSpec.hitRadius，手机瞄准和构筑详情使用统一缩短后的射程。Boss 冻结沿用非处决入口，不绕过生命值结算。
+
+冰片迸发由 IceEffectsSpec.hitShards 保存施法快照，与死亡触发的 shards 分开；冰矛命中调用 EnemySystem.burstIceOnHit，排除当前直接目标，复用非递归冰片结算。IceSpell 不再按 maxTargets 截断贯穿；每根独立记录仍在场的已命中 ID，防止重复命中并限制集合大小。落地冰棘读取同一编译结果中的半径，不在渲染时计算强化倍率。

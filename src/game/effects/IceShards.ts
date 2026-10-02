@@ -3,12 +3,12 @@ import { prepareIceTextures } from '../art/SpellTextures';
 import type { IceShardSpec } from '../combat/IceEffectsSpec';
 import type { EnemySystem } from '../enemies/EnemySystem';
 interface Shard { view: Phaser.GameObjects.Image; x: number; y: number; dx: number; dy: number; age: number; arrived:boolean }
-/** Damage settles once on death; flight is cosmetic and cannot recursively burst. */
+/** Damage settles once per burst; flight is cosmetic and cannot recursively burst. */
 export class IceShards {
   private visuals: Shard[] = [];
   constructor(private scene: Phaser.Scene) { prepareIceTextures(scene); }
-  burst(x: number, y: number, spec: IceShardSpec, enemies: EnemySystem): void {
-    const targets = enemies.enemies.filter(e => !e.health.dead && e.spawning === 0 &&
+  burst(x: number, y: number, spec: IceShardSpec, enemies: EnemySystem, excludeId?:number): void {
+    const targets = enemies.enemies.filter(e => e.id!==excludeId && !e.health.dead && e.spawning === 0 &&
       (e.view.x-x)**2+(e.view.y-y)**2 <= spec.radius**2)
       .sort((a,b) => (a.view.x-x)**2+(a.view.y-y)**2-((b.view.x-x)**2+(b.view.y-y)**2))
       .slice(0,spec.targets);

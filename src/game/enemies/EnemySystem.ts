@@ -372,6 +372,10 @@ export class EnemySystem {
     }
   }
 
+  burstIceOnHit(x:number,y:number,spec:IceShardSpec,excludeId:number):void {
+    this.iceShards.burst(x,y,spec,this,excludeId);
+  }
+
   slow(enemy: Enemy, strength:number, duration:number): void {
     if(enemy.spawning===0&&!enemy.health.dead&&this.enemies.includes(enemy)) enemy.slow.apply(strength,duration);
   }

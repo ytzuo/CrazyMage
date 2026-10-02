@@ -7,7 +7,7 @@ export const number = (value: number): string => Number(value.toFixed(2)).toStri
 export function spellSummary(effective: EffectiveBuild): string {
   if(effective.school === 'ice') {
     const i=effective.ice;
-    return `${i.pulses} 枚冰矛 · 每次 ${number(i.damage)} 伤害 · ${number(i.cooldown)} ms · 射程 ${number(i.reach??560)} · 贯穿 ${i.maxTargets??3} 个目标 · 减速 ${number(i.slow*100)}% / ${number(i.duration/1000)}s`;
+    return `${i.pulses} 枚冰矛 · 每次 ${number(i.damage)} 伤害 · ${number(i.cooldown)} ms · 射程 ${number(i.reach??560)} · 无限贯穿 · 减速 ${number(i.slow*100)}% / ${number(i.duration/1000)}s`;
   }
   if(effective.school === 'lightning') {
     const l=effective.lightning;
