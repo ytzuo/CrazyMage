@@ -55,16 +55,23 @@ export function prepareMageTextures(scene: Phaser.Scene): void {
       shape(g, [42,112,62,123,84,112,78,104,48,104], 0xb5c6d0);
       shape(g, [49,112,63,119,56,128], palette.light);
       if(gender==='female') {
-        // Long side locks and a braid remain readable below the shared school hat.
-        shape(g,[43,91,55,88,51,116,44,135,36,133,39,110],0x503741);
-        shape(g,[75,89,86,95,90,123,82,140,77,129,79,108],0x503741);
-        g.lineStyle(3,0x976553).lineBetween(42,106,39,126).lineBetween(83,110,85,124);
-        g.fillStyle(palette.trim).fillRoundedRect(77,130,9,4,1);
+        // Golden cascading curls are baked into the shared body texture.
+        shape(g,[42,91,55,88,51,116,47,134,43,150,32,147,35,129,32,112,37,99],0xdbaa4b);
+        shape(g,[75,89,86,94,94,109,90,125,96,139,88,153,78,147,81,130,77,112],0xdbaa4b);
+        for(let i=0;i<4;i++) {
+          const y=103+i*14;
+          for(const x of [i%2?38:42,i%2?89:85]) {
+            g.fillStyle(0x9c6b2f).fillCircle(x,y,8);
+            g.fillStyle(0xe9bb5e).fillCircle(x,y-1,6.5);
+            g.fillStyle(0xffe499,0.85).fillEllipse(x-2,y-2,3,8);
+            g.lineStyle(1.5,0xb77d36).strokeEllipse(x+1,y+1,7,8);
+          }
+        }
       }
       g.fillStyle(0xab785b).fillRoundedRect(46,91,36,26,8);
       g.fillStyle(0xe6bf94).fillRoundedRect(47,89,32,24,8);
       g.fillStyle(0xf8d9ad).fillEllipse(57,97,17,13);
-      g.fillStyle(0x674d40).fillTriangle(45,88,58,88,45,103).fillTriangle(79,88,70,89,80,103);
+      g.fillStyle(gender==='female'?0xe9bb5e:0x674d40).fillTriangle(45,88,58,88,45,103).fillTriangle(79,88,70,89,80,103);
       g.fillStyle(ink).fillRoundedRect(53,98,5,8,2).fillRoundedRect(69,98,5,8,2);
       g.fillStyle(0xffffff).fillRect(54,98,2,2).fillRect(70,98,2,2);
       g.lineStyle(1,0x9f6958).lineBetween(61,110,66,110);
