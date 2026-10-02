@@ -141,6 +141,7 @@ export class ArenaScene extends Phaser.Scene {
     const attack = this.movement.readAttack() ?? this.touchAim();
     this.player.update(this.movement.read(), step, attack);
     this.skill.update(step);
+    if (this.builds.pendingChoice) { this.movement.setEnabled(false); this.publish(); return; }
     this.ultimate.update(step);
     if (this.builds.pendingChoice) { this.movement.setEnabled(false); this.publish(); return; }
     if (this.movement.consumeUltimate()) {
@@ -209,9 +210,30 @@ export class ArenaScene extends Phaser.Scene {
     return true;
   }
 
+  private skillAim(): Direction {
+    const school = this.builds.snapshot.build.school;
+    const input = this.movement.readAttack();
+    const fallback = input ?? this.player.aimDirection;
+    if (school === 'ice') return input ?? this.touchAim() ?? fallback;
+    const automatic = this.movement.touchDevice && !input;
+    const reach = school === 'fire' ? 300 : 560;
+    let best = Infinity, result = fallback;
+    for (const enemy of this.enemies.enemies) {
+      if (enemy.spawning > 0 || enemy.health.dead) continue;
+      const dx = enemy.view.x - this.player.view.x, dy = enemy.view.y - this.player.view.y;
+      const distance = Math.hypot(dx,dy);
+      if (!distance || distance > reach + enemy.spec.radius) continue;
+      const alignment = (dx*fallback.x + dy*fallback.y)/distance;
+      if (!automatic && alignment < Math.cos(Math.PI/12)) continue;
+      const score = automatic ? distance : (1-alignment)*1000 + distance*0.05;
+      if (score < best) { best=score; result={x:dx/distance,y:dy/distance}; }
+    }
+    return result;
+  }
+
   castSkill(): boolean {
     if (!this.player || this.paused || this.selectingSchool || this.player.health.dead || this.builds.pendingChoice) return false;
-    const aim = this.movement.readAttack() ?? this.touchAim() ?? this.player.aimDirection;
+    const aim = this.skillAim();
     if (!this.skill.cast(this.player.view.x, this.player.view.y, aim, this.enemies)) return false;
     this.player.cast(aim, this.builds.snapshot.build.school);
     if (this.builds.pendingChoice) this.movement.setEnabled(false);
