@@ -6,6 +6,7 @@ import { ArenaScene } from './game/scenes/ArenaScene';
 import { observePerformance } from './game/diagnostics/performance';
 import { BuildPanel, spellSummary } from './ui/BuildPanel';
 import { SchoolPicker } from './ui/SchoolPicker';
+import { SCHOOL_SKILLS } from './game/spells/SchoolSkill';
 import { ultimateSummary } from './game/ultimates/definitions';
 import { BattleNotice } from './ui/BattleNotice';
 import { SCHOOL_INFO, definition } from './game/upgrades/definitions';
@@ -38,6 +39,9 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         </g>
       </svg>
     </aside>
+    <button id="skill" class="ultimate-button skill-button" type="button" disabled hidden>
+      <span class="ultimate-key" aria-hidden="true">E</span><span class="ultimate-content"><strong id="skill-name"></strong><small id="skill-charge"></small><span class="ultimate-track" aria-hidden="true"><span id="skill-fill"></span></span></span>
+    </button>
     <button id="ultimate" class="ultimate-button" type="button" disabled hidden>
       <span class="ultimate-key" aria-hidden="true">Q</span><span class="ultimate-content"><strong id="ultimate-name"></strong><small id="ultimate-charge">0 / 100</small><span class="ultimate-track" aria-hidden="true"><span id="ultimate-fill"></span></span></span>
     </button>
@@ -67,6 +71,7 @@ let picker: SchoolPicker;
 let selectingSchool = true;
 let lastCombat = '';
 let lastUltimate = '';
+let lastSkill = '';
 let ultimateEnergy = 0;
 let ultimateCasts = 0;
 let ultimateRun = -1;
@@ -84,6 +89,21 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
   selectingSchool = state.selectingSchool;
   picker?.update(selectingSchool);
   const school = state.progression.build.school;
+  const skillKey = `${school}/${state.skillEnergy}/${Math.ceil(state.skillRemaining/1000)}/${state.paused}/${selectingSchool}/${state.dead}/${state.progression.choice?.id}`;
+  if (skillKey !== lastSkill) {
+    const spec = SCHOOL_SKILLS[school], ready = state.skillRemaining === 0;
+    const button = element<HTMLButtonElement>('skill');
+    button.hidden = selectingSchool;
+    button.disabled = !ready || state.paused || selectingSchool || state.dead || !!state.progression.choice;
+    button.dataset.schoolTone = school;
+    button.classList.toggle('ready', ready);
+    button.title = spec.description;
+    button.setAttribute('aria-label', `${spec.name}，${ready ? '已就绪，按 E 或点击释放' : '充能中'}`);
+    element('skill-name').textContent = spec.name;
+    element('skill-charge').textContent = ready ? '已就绪' : `${Math.ceil(state.skillRemaining/1000)}s`;
+    element('skill-fill').style.transform = `scaleX(${state.skillEnergy/100})`;
+    lastSkill = skillKey;
+  }
   const ultimateKey = `${school}/${state.progression.build.revision}/${state.ultimateEnergy}/${state.paused}/${selectingSchool}/${state.dead}/${state.progression.choice?.id}`;
   if (ultimateKey !== lastUltimate) {
     const spec = state.progression.effective.ultimate;
@@ -251,6 +271,7 @@ function inspectBuild(): void {
   panel.update(latestBuild, inspecting);
   if (!inspecting && paused && !latestBuild.choice) element('resume').focus({ preventScroll: true });
 }
+element('skill').addEventListener('click', () => { if(scene.castSkill()) syncPause(); }, listenerOptions);
 element('ultimate').addEventListener('click', () => { if(scene.castUltimate()) syncPause(); }, listenerOptions);
 element('build').addEventListener('click', inspectBuild, listenerOptions);
 element('pause').addEventListener('click', () => setPaused(!paused), listenerOptions);

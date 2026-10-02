@@ -9,6 +9,8 @@ export interface Direction { x: number; y: number }
 
 export interface MovementState {
   selectingSchool: boolean;
+  skillEnergy: number;
+  skillRemaining: number;
   ultimateEnergy: number;
   ultimateCasts: number;
   ultimateEffects: number;

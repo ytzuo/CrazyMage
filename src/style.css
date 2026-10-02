@@ -453,3 +453,7 @@ button:disabled { opacity: 0.45; cursor: default; }
 .reward-card.reward-ultimate .reward-front, .owned-card.owned-ultimate { border-color: #e6bf74aa; box-shadow: inset 0 0 0 5px #edca7410; }
 .reward-card.reward-ultimate .reward-category, .owned-ultimate .owned-kind { color: #f3d697; }
 .level-route > b { margin-left: auto; }
+
+.skill-button { bottom: calc(var(--edge-bottom) + 88px); }
+@media (max-width: 760px) { .skill-button { bottom: calc(var(--edge-bottom) + 204px); } }
+@media (max-height: 500px) and (min-width: 600px) { .skill-button { bottom: calc(var(--edge-bottom) + 172px); } }

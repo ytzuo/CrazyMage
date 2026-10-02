@@ -1,5 +1,6 @@
 import type { BuildSnapshot } from '../game/upgrades/BuildStore';
 import { stacks, type EffectiveBuild } from '../game/upgrades/build';
+import { SCHOOL_SKILLS } from '../game/spells/SchoolSkill';
 import { UPGRADE_PRESENTATION } from './UpgradePresentation';
 import { definition, SCHOOL_INFO } from '../game/upgrades/definitions';
 export const number = (value: number): string => Number(value.toFixed(2)).toString();
@@ -101,7 +102,7 @@ export class BuildPanel {
       const passive=card.effect.kind==='passive', art=UPGRADE_PRESENTATION[id];
       return `<article class="owned-card school-${snapshot.build.school}${passive?' owned-passive':card.effect.kind==='ultimate'?' owned-ultimate':''}"><span class="owned-kind">${card.effect.kind==='ultimate'?'大招强化':passive?'被动':'法术强化'}<b>×${entries.length}</b></span><span class="owned-symbol" aria-hidden="true">${art?.symbol ?? '✦'}</span><h4>${card.name}</h4><p>${art?.summary ?? '增强战斗能力。'}</p></article>`;
     }).join('');
-    return `<div class="build-details"><h3>${school.name} · ${school.spell}</h3><p>${school.description}</p><h3>${ultimate.name} · Q</h3><p>${ultimate.description}</p><p>普通击杀充能，击杀 Boss 立即充满；满能量后释放。</p><h3>获取的强化</h3><div class="owned-cards">${collection || '<p class="owned-empty">尚未获取强化</p>'}</div></div>`;
+    return `<div class="build-details"><h3>${school.name} · ${school.spell}</h3><p>${school.description}</p><h3>${SCHOOL_SKILLS[snapshot.build.school].name} · E</h3><p>${SCHOOL_SKILLS[snapshot.build.school].description}</p><h3>${ultimate.name} · Q</h3><p>${ultimate.description}</p><p>普通击杀充能，击杀 Boss 立即充满；满能量后释放。</p><h3>获取的强化</h3><div class="owned-cards">${collection || '<p class="owned-empty">尚未获取强化</p>'}</div></div>`;
   }
   destroy(): void { this.abort.abort(); }
 }

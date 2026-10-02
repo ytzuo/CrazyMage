@@ -7,6 +7,7 @@ const ATTACK_KEYS = new Set(['ArrowUp', 'ArrowLeft', 'ArrowDown', 'ArrowRight'])
 export class MovementInput {
   private keys = new Set<string>();
   private ultimatePress = false;
+  private skillPress = false;
   private attackPress: Direction | null = null;
   private stick = { x: 0, y: 0 };
   private pointerId: number | null = null;
@@ -33,12 +34,13 @@ export class MovementInput {
   }
 
   private onKeyDown = (event: KeyboardEvent): void => {
-    if ((!MOVE_KEYS.has(event.code) && !ATTACK_KEYS.has(event.code) && event.code !== 'KeyQ') || this.isEditing(event)) return;
+    if ((!MOVE_KEYS.has(event.code) && !ATTACK_KEYS.has(event.code) && event.code !== 'KeyQ' && event.code !== 'KeyE') || this.isEditing(event)) return;
     event.preventDefault();
     // A held key must be released and pressed again after pause or focus loss.
     if (event.repeat && !this.keys.has(event.code)) return;
     if (this.enabled) {
       if (event.code === 'KeyQ' && !event.repeat && !this.keys.has(event.code)) this.ultimatePress = true;
+      if (event.code === 'KeyE' && !event.repeat && !this.keys.has(event.code)) this.skillPress = true;
       this.keys.add(event.code);
       if (ATTACK_KEYS.has(event.code) && !event.repeat) this.attackPress = this.heldAttackDirection();
     }
@@ -91,6 +93,7 @@ export class MovementInput {
     this.keys.clear();
     this.attackPress = null;
     this.ultimatePress = false;
+    this.skillPress = false;
     this.resetStick();
   };
 
@@ -130,6 +133,12 @@ export class MovementInput {
   consumeUltimate(): boolean {
     const pressed = this.enabled && this.ultimatePress;
     this.ultimatePress = false;
+    return pressed;
+  }
+
+  consumeSkill(): boolean {
+    const pressed = this.enabled && this.skillPress;
+    this.skillPress = false;
     return pressed;
   }
 
