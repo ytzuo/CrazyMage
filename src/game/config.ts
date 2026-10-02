@@ -1,3 +1,4 @@
+import type { GameMode } from './modes';
 import type { BuildSnapshot } from './upgrades/BuildStore';
 export const ARENA = { width: 2400, height: 1800, inset: 96, tile: 80 } as const;
 export const PLAYER = { speed: 300, radius: 18, health: 120, waveHealing: 15, invulnerability: 900 } as const;
@@ -8,6 +9,9 @@ export const ENEMY = { waveInterval: 30000, bossWaveInterval: 45000, clearDelay:
 export interface Direction { x: number; y: number }
 
 export interface MovementState {
+  mode: GameMode;
+  won: boolean;
+  clearedWaves: number;
   selectingSchool: boolean;
   skillEnergy: number;
   skillRemaining: number;

@@ -1,3 +1,4 @@
+import type { GameMode } from '../modes';
 import { applyUpgrade, canAcquire, compileBuild, initialBuild, stacks, type BuildState, type EffectiveBuild } from './build.ts';
 import { UPGRADES, ULTIMATE_UPGRADES, definition, type School } from './definitions.ts';
 export interface HistoryEntry { readonly sequence: number; readonly id: string; readonly wave: number; readonly elapsed: number; readonly level: number }
@@ -12,22 +13,25 @@ export class BuildStore {
   private history: readonly HistoryEntry[] = Object.freeze([]);
   private choice: ChoiceBatch | null = null;
   private rewardedWaves = new Set<number>();
+  private completedBefore = 0;
+  private clearedCount = 0;
   private rewards: { wave: number; kind: 'normal' | 'ultimate' }[] = [];
   private random: () => number;
   constructor(random: () => number = Math.random) { this.random = random; }
   get effectiveBuild(): EffectiveBuild { return this.effective; }
   get pendingChoice(): ChoiceBatch | null { return this.choice; }
-  get snapshot(): BuildSnapshot { return { build: this.build, effective: this.effective, history: this.history, choice: this.choice, completedWaves: this.rewardedWaves.size, pendingRewards: this.rewards.length, exhausted: !UPGRADES.some(card => canAcquire(this.build, card)) }; }
-  reset(school: School = 'fire'): void {
-    this.build = initialBuild(++this.runId, school); this.effective = compileBuild(this.build);
-    this.history = Object.freeze([]); this.choice = null; this.rewards = []; this.rewardedWaves.clear(); this.batchId = 0;
+  get snapshot(): BuildSnapshot { return { build: this.build, effective: this.effective, history: this.history, choice: this.choice, completedWaves: this.clearedCount, pendingRewards: this.rewards.length, exhausted: !UPGRADES.some(card => canAcquire(this.build, card)) }; }
+  reset(school: School = 'fire', mode: GameMode = 'race'): void {
+    this.build = initialBuild(++this.runId, school, mode); this.effective = compileBuild(this.build);
+    this.history = Object.freeze([]); this.choice = null; this.rewards = []; this.rewardedWaves.clear(); this.completedBefore=this.clearedCount=0; this.batchId = 0;
   }
   completeWave(wave: number, bossDefeated = false): void {
-    if (!Number.isInteger(wave) || wave < 1 || this.rewardedWaves.has(wave)) return;
+    if (!Number.isInteger(wave) || wave <= this.completedBefore || this.rewardedWaves.has(wave)) return;
+    this.rewardedWaves.add(wave); this.clearedCount++;
+    while(this.rewardedWaves.delete(this.completedBefore+1)) this.completedBefore++;
     const normalAvailable = !this.snapshot.exhausted;
     const ultimateAvailable = bossDefeated && ULTIMATE_UPGRADES.some(card => canAcquire(this.build, card));
     if (!normalAvailable && !ultimateAvailable) return;
-    this.rewardedWaves.add(wave);
     if (normalAvailable) this.rewards.push({wave, kind:'normal'});
     if (ultimateAvailable) this.rewards.push({wave, kind:'ultimate'});
     this.offer();
@@ -42,7 +46,7 @@ export class BuildStore {
     if (!card || !canAcquire(this.build, card)) return false;
     const next = applyUpgrade(this.build, id);
     const effective = compileBuild(next);
-    const history = Object.freeze([...this.history, Object.freeze({ sequence: this.history.length + 1, id, wave: this.choice.wave, elapsed, level: card.effect.kind !== 'passive' && card.effect.kind !== 'ultimate' && card.effect.kind !== 'skill' ? next.spellLevel : stacks(next, card) })]);
+    const history = Object.freeze([...this.history.slice(-199), Object.freeze({ sequence: this.build.revision + 1, id, wave: this.choice.wave, elapsed, level: card.effect.kind !== 'passive' && card.effect.kind !== 'ultimate' && card.effect.kind !== 'skill' ? next.spellLevel : stacks(next, card) })]);
     this.rewards.shift();
     this.build = next; this.effective = effective; this.history = history; this.choice = null;
     this.offer();

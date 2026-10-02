@@ -1,3 +1,4 @@
+import { RACE_WAVES, type GameMode } from '../modes';
 import Phaser from 'phaser';
 import { ARENA, ENEMY, PLAYER, type Direction } from '../config';
 import { Health } from '../combat/Health';
@@ -57,6 +58,8 @@ export class EnemySystem {
   private bosses: BossCombat;
   private areaAttacks: AreaAttacks;
   private bossWaves = new Set<number>();
+  mode: GameMode = 'race';
+  private pendingSpawns: {wave:number; index:number; remaining:number} | null = null;
   private spawnIndex = 0;
   private nextId = 0;
 
@@ -64,7 +67,7 @@ export class EnemySystem {
 
   private spawn(player: Player, wave: number, kind: EnemyKind): boolean {
     if (this.enemies.length >= ENEMY.maxCount - Number(kind !== 'boss')) return false;
-    const spec = enemySpec(kind, wave);
+    const spec = enemySpec(kind, wave, this.mode);
     const variant = kind === 'boss' || kind === 'artillery' ? 'normal' : rollVariant(kind, this.random);
     // Rotate through the arena's four edges, retaining a safe distance near walls.
     const firstEdge = this.spawnIndex++ % 4;
@@ -117,21 +120,38 @@ export class EnemySystem {
     this.bosses.reset(); this.areaAttacks.reset(); this.bossWaves.clear();
     this.effects.reset();
     this.kills = this.spawnIndex = this.nextId = 0;
+    this.pendingSpawns = null;
     this.waveClock.reset();
     this.waves.reset();
     if (player) this.spawnWave(player);
   }
 
   private spawnWave(player: Player, wave = this.waveClock.wave): void {
-    let spawned = 0;
-    if (wave % 5 === 0 && this.spawn(player, wave, 'boss')) { spawned++; this.bossWaves.add(wave); }
-    for (let i = 0; i < waveDifficulty(wave).count && this.enemies.length < ENEMY.maxCount; i++) if (this.spawn(player, wave, enemyKind(wave, i))) spawned++;
-    this.waves.register(wave, spawned);
+    const boss = wave % 5 === 0 && this.spawn(player, wave, 'boss');
+    if(boss) this.bossWaves.add(wave);
+    const count = waveDifficulty(wave,this.mode).count;
+    // Register the whole wave before replenishing; its final reserved spawn must also die.
+    this.waves.register(wave, count + Number(boss));
+    this.pendingSpawns = {wave,index:0,remaining:count};
+    this.replenish(player);
+  }
+
+  private replenish(player: Player): void {
+    const pending=this.pendingSpawns;
+    if(!pending) return;
+    while(pending.remaining > 0 && this.enemies.length < ENEMY.maxCount-1) {
+      if(!this.spawn(player,pending.wave,enemyKind(pending.wave,pending.index))) break;
+      pending.index++; pending.remaining--;
+    }
+    if(pending.remaining===0) this.pendingSpawns=null;
   }
 
   update(delta: number, player: Player): void {
     this.effects.update(delta);
-    const waves = this.waveClock.update(delta, (this.waveClock.wave + 1) % 5 !== 0 || this.enemies.length < ENEMY.maxCount);
+    this.replenish(player);
+    const canAdvance = !this.pendingSpawns && this.enemies.length < ENEMY.maxCount-1 && (this.mode==='endless' || this.waveClock.wave<RACE_WAVES);
+    // One advance per update prevents a large delta from replacing a pending batch.
+    const waves = this.waveClock.update(delta, canAdvance);
     for (let i = 0; i < waves; i++) this.spawnWave(player, this.waveClock.wave - waves + i + 1);
     this.areaAttacks.update(delta, player);
     if (player.health.dead) return;

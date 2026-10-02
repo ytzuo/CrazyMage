@@ -1,3 +1,4 @@
+import type { GameMode } from '../modes';
 import { waveDifficulty } from './difficulty.ts';
 export type EnemyKind = 'chaser' | 'ranged' | 'brute' | 'swift' | 'boss' | 'artillery';
 export interface EnemySpec {
@@ -27,8 +28,8 @@ export function enemyKind(wave: number, index: number): EnemyKind {
   if(wave>=2&&index%3===2) return 'swift';
   return 'chaser';
 }
-export function enemySpec(kind: EnemyKind, wave: number): EnemySpec {
-  const base=ENEMY_TYPES[kind], growth=waveDifficulty(wave);
+export function enemySpec(kind: EnemyKind, wave: number, mode: GameMode = 'race'): EnemySpec {
+  const base=ENEMY_TYPES[kind], growth=waveDifficulty(wave,mode);
   return Object.freeze({...base, health:Math.round(base.health*growth.health),damage:Math.round(base.damage*growth.damage),speed:base.speed*growth.speed});
 }
 export const ENEMY_SHOTS = {maximum:32, speed:210, radius:7, lifetime:3200} as const;

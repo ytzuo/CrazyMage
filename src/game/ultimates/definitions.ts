@@ -4,17 +4,20 @@ const DEFINITIONS = {
   ice: { name:'冰封处决', radius:500, damage:25, targets:36, freeze:1800, pulses:1, interval:0, description:'将周围敌人封入冰块，短暂冻结；期间再次受到攻击会直接碎冰消灭。' },
   lightning: { name:'雷暴追猎', radius:650, damage:95, targets:4, freeze:0, pulses:3, interval:220, description:'连续多轮锁定近敌，每轮最多四次落雷，可重复打击幸存目标。' },
 } as const;
-export function ultimateSpec(school: School, level: number, modules: Readonly<Partial<Record<UltimateModule, number>>> = {}) {
+export function ultimateSpec(school: School, level: number, modules: Readonly<Partial<Record<UltimateModule, number>>> = {}, endless = false) {
   const bonus=15*(Math.max(1,Math.min(4,level))-1), base=DEFINITIONS[school];
-  const power = Math.min(3, Math.max(0, modules.power ?? 0));
-  const reach = Math.min(3, Math.max(0, modules.reach ?? 0));
-  const mastery = Math.min(3, Math.max(0, modules.mastery ?? 0));
-  return Object.freeze({...base, school, damage:(base.damage+bonus)*(1+0.3*power), radius:base.radius*(1+0.15*reach),
-    pulses:base.pulses+(school==='ice'?0:mastery), freeze:base.freeze+(school==='ice'?600*mastery:0)});
+  const power = Math.min(endless ? Infinity : 3, Math.max(0, modules.power ?? 0));
+  const reach = Math.min(endless ? Infinity : 3, Math.max(0, modules.reach ?? 0));
+  const mastery = Math.min(endless ? Infinity : 3, Math.max(0, modules.mastery ?? 0));
+  return Object.freeze({...base, school, damage:(base.damage+bonus)*(1+0.3*power)*(1+0.15*Math.max(0,mastery-3)), radius:Math.min(1500,base.radius*(1+0.15*reach)),
+    pulses:base.pulses+(school==='ice'?0:Math.min(3,mastery)), freeze:base.freeze+(school==='ice'?600*Math.min(6,mastery):0)});
 }
 export type UltimateSpec = ReturnType<typeof ultimateSpec>;
 export function ultimateSummary(school: School, level: number, modules: Readonly<Partial<Record<UltimateModule, number>>> = {}): string {
-  const s=ultimateSpec(school,level,modules);
+  return describeUltimate(ultimateSpec(school,level,modules));
+}
+export function describeUltimate(s: UltimateSpec): string {
+  const school=s.school;
   if(school==='fire')return `${s.name} · ${s.pulses} 轮向前扇形火墙，每轮 ${s.damage} 伤害 · 半径 ${s.radius}`;
   if(school==='ice')return `${s.name} · ${s.damage} 伤害 · 冰封 ${s.freeze/1000} 秒，期间再次受击直接消灭 · 半径 ${s.radius}`;
   return `${s.name} · ${s.pulses} 轮落雷，每轮最多 ${s.targets} 个目标 · 每击 ${s.damage} 伤害 · 半径 ${s.radius}`;

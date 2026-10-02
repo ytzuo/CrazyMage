@@ -1,3 +1,4 @@
+import { RACE_WAVES, MODE_NAMES, saveRecord, readRecords, formatTime } from './game/modes';
 import Phaser from 'phaser';
 import './style.css';
 import { ARENA, PLAYER, type MovementState } from './game/config';
@@ -7,7 +8,7 @@ import { observePerformance } from './game/diagnostics/performance';
 import { BuildPanel, spellSummary } from './ui/BuildPanel';
 import { SchoolPicker } from './ui/SchoolPicker';
 import { SCHOOL_SKILLS } from './game/spells/SchoolSkill';
-import { ultimateSummary } from './game/ultimates/definitions';
+import { describeUltimate } from './game/ultimates/definitions';
 import { BattleNotice } from './ui/BattleNotice';
 import { SCHOOL_INFO, definition } from './game/upgrades/definitions';
 import type { BuildSnapshot } from './game/upgrades/BuildStore';
@@ -62,6 +63,7 @@ const listeners = new AbortController();
 const listenerOptions = { signal: listeners.signal };
 let paused = false;
 let dead = false;
+let recordKey = '';
 let lastHealth = '';
 let inspecting = false;
 let latestBuild: BuildSnapshot | null = null;
@@ -77,7 +79,7 @@ let lastSkill = '';
 let ultimateEnergy = 0;
 let ultimateCasts = 0;
 let ultimateRun = -1;
-let lastWave = 0;
+let lastWave = ''; 
 let lastWaveSeconds = -1;
 let lastRunSeconds = -1;
 const minimapPlayer = document.querySelector<SVGGElement>('#minimap-player')!;
@@ -91,12 +93,12 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
   selectingSchool = state.selectingSchool;
   picker?.update(selectingSchool);
   const school = state.progression.build.school;
-  const skillKey = `${school}/${state.skillEnergy}/${Math.ceil(state.skillRemaining/1000)}/${state.paused}/${selectingSchool}/${state.dead}/${state.progression.choice?.id}`;
+  const skillKey = `${school}/${state.skillEnergy}/${Math.ceil(state.skillRemaining/1000)}/${state.paused}/${selectingSchool}/${state.dead}/${state.won}/${state.progression.choice?.id}`;
   if (skillKey !== lastSkill) {
     const spec = SCHOOL_SKILLS[school], ready = state.skillRemaining === 0;
     const button = element<HTMLButtonElement>('skill');
     button.hidden = selectingSchool;
-    button.disabled = !ready || state.paused || selectingSchool || state.dead || !!state.progression.choice;
+    button.disabled = !ready || state.paused || selectingSchool || state.dead || state.won || !!state.progression.choice;
     button.dataset.schoolTone = school;
     button.classList.toggle('ready', ready);
     button.title = spec.description;
@@ -109,16 +111,16 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
     element('skill-fill').style.transform = `scaleX(${state.skillEnergy/100})`;
     lastSkill = skillKey;
   }
-  const ultimateKey = `${school}/${state.progression.build.revision}/${state.ultimateEnergy}/${state.paused}/${selectingSchool}/${state.dead}/${state.progression.choice?.id}`;
+  const ultimateKey = `${school}/${state.progression.build.revision}/${state.ultimateEnergy}/${state.paused}/${selectingSchool}/${state.dead}/${state.won}/${state.progression.choice?.id}`;
   if (ultimateKey !== lastUltimate) {
     const spec = state.progression.effective.ultimate;
     const ready = state.ultimateEnergy === 100;
     const button = element<HTMLButtonElement>('ultimate');
     button.hidden = selectingSchool;
-    button.disabled = !ready || state.paused || selectingSchool || state.dead || !!state.progression.choice;
+    button.disabled = !ready || state.paused || selectingSchool || state.dead || state.won || !!state.progression.choice;
     button.dataset.schoolTone = school;
     button.classList.toggle('ready', ready);
-    button.title = `${ultimateSummary(school, state.progression.build.spellLevel, state.progression.build.ultimateModules)}。普通击杀 +10 能量，大招击杀不回充；击杀 Boss 立即充满。范围内无目标时不消耗。`;
+    button.title = `${describeUltimate(spec)}。普通击杀 +10 能量，大招击杀不回充；击杀 Boss 立即充满。范围内无目标时不消耗。`;
     button.setAttribute('aria-label', `${spec.name}，${ready ? '已就绪，按 Q 或点击释放' : `充能 ${state.ultimateEnergy}%`}`);
     element('ultimate-name').textContent = spec.name;
     element('ultimate-kind').textContent = school === 'fire' ? '➶' : '◎';
@@ -135,19 +137,19 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
   ultimateRun = state.progression.build.runId;
   ultimateEnergy = state.ultimateEnergy; ultimateCasts = state.ultimateCasts;
   if(selectingSchool) notice.clear();
-  if(!selectingSchool && lastEnemyCount > 0 && state.enemies === 0 && !state.dead && !state.progression.choice) notice.show('场上已清空', '下一波即将到来');
+  if(!selectingSchool && lastEnemyCount > 0 && state.enemies === 0 && !state.dead && !state.won && !state.progression.choice) notice.show('场上已清空', '下一波即将到来');
   lastEnemyCount = state.enemies;
   document.querySelector('.wave-status')!.classList.toggle('cleared', !selectingSchool && state.enemies === 0);
-  element('build').toggleAttribute('disabled', selectingSchool || state.dead);
-  element('pause').toggleAttribute('disabled', selectingSchool || state.dead);
+  element('build').toggleAttribute('disabled', selectingSchool || state.dead || state.won);
+  element('pause').toggleAttribute('disabled', selectingSchool || state.dead || state.won);
   if(wasSelecting !== selectingSchool) queueMicrotask(syncPause);
   const runSeconds = Math.floor(state.elapsedTime / 1000);
   const duration = `${String(Math.floor(runSeconds / 60)).padStart(2, '0')}:${String(runSeconds % 60).padStart(2, '0')}`;
   if (runSeconds !== lastRunSeconds) { element('run-time').textContent = duration; lastRunSeconds = runSeconds; }
   const seconds = Math.ceil(state.nextWaveIn / 1000);
-  if (state.wave !== lastWave) { element('wave-number').textContent = `第 ${state.wave} 波`; lastWave = state.wave; }
+  if (`${state.mode}/${state.wave}` !== lastWave) { element('wave-number').textContent = `${MODE_NAMES[state.mode]} · ${state.wave}${state.mode==='race'?` / ${RACE_WAVES}`:''} 波`; lastWave = `${state.mode}/${state.wave}`; }
   if (seconds !== lastWaveSeconds) {
-    element('wave-countdown').textContent = `${seconds}s`;
+    element('wave-countdown').textContent = state.mode==='race' && state.wave===RACE_WAVES ? '最终波' : `${seconds}s`;
     element('wave-countdown').classList.toggle('soon', seconds <= 5);
     element('wave-countdown').classList.toggle('countdown-a', seconds <= 3 && seconds % 2 === 0);
     element('wave-countdown').classList.toggle('countdown-b', seconds <= 3 && seconds % 2 !== 0);
@@ -180,12 +182,23 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
     const summary = JSON.stringify({ ultimateEnergy: state.ultimateEnergy, ultimateCasts: state.ultimateCasts, ultimateEffects: state.ultimateEffects, school: state.progression.build.school, selectingSchool, health: state.health, enemies: state.enemies, kills: state.kills, casts: state.casts, dead: state.dead, objects: state.objects, projectiles: state.projectiles, impacts: state.impacts, waveRemaining: state.waveRemaining, wave: state.wave, nextWaveIn: state.nextWaveIn, elapsedTime: state.elapsedTime, runId: state.progression.build.runId, revision: state.progression.build.revision, completedWaves: state.progression.completedWaves, choice: state.progression.choice?.id ?? null });
     if (summary !== lastCombat) { element('game').dataset.combat = summary; lastCombat = summary; }
   }
-  if (dead !== state.dead) {
-    dead = state.dead;
+  const scoreKey=`${state.progression.build.runId}/${state.mode}/${state.clearedWaves}/${state.won}`;
+  if(!selectingSchool && scoreKey!==recordKey) {
+    recordKey=scoreKey;
+    if(state.mode==='endless') saveRecord('endless',state.progression.build.school,state.clearedWaves);
+    else if(state.won) saveRecord('race',state.progression.build.school,state.elapsedTime);
+  }
+  if (dead !== (state.dead || state.won)) {
+    dead = state.dead || state.won;
     element('pause').toggleAttribute('disabled', dead || selectingSchool);
-    element('pause-title').textContent = dead ? '你倒下了' : '已暂停';
+    element('pause-title').textContent = state.won ? '20 波挑战完成' : dead ? '你倒下了' : '已暂停';
     element('death-duration').hidden = !dead;
-    if (dead) element('death-duration').textContent = `本局时长 ${duration}`;
+    if (dead) {
+      const record=readRecords()[state.progression.build.school];
+      element('death-duration').textContent = state.mode==='race'
+        ? `${state.won?'通关':'本局'} ${formatTime(state.elapsedTime)} · 已清 ${state.clearedWaves} / 20 波 · 最快 ${record?.fastestMs?formatTime(record.fastestMs):'—'}`
+        : `完成 ${state.clearedWaves} 波 · 最高 ${record?.mostWaves??0} 波 · 时长 ${duration}`;
+    }
     element('resume').innerHTML = dead ? '重新开始 <span>↺</span>' : '继续 <span>→</span>';
     if (dead) { inspecting = false; panel?.update(state.progression, false); }
     element('pause-overlay').hidden = !dead && !paused;
@@ -229,7 +242,7 @@ panel = new BuildPanel(element('build-overlay'), (batch, id) => {
   }
 }, inspectBuild);
 
-picker = new SchoolPicker(element('school-overlay'), school => { if(scene.chooseSchool(school)) { notice.show(`${SCHOOL_INFO[school].name}流派`, `${SCHOOL_INFO[school].spell}已就绪`, school); syncPause(); } }, () => scene.schoolArtwork());
+picker = new SchoolPicker(element('school-overlay'), (school,mode) => { if(scene.chooseSchool(school,mode)) { notice.show(`${SCHOOL_INFO[school].name}流派`, `${SCHOOL_INFO[school].spell}已就绪`, school); syncPause(); } }, () => scene.schoolArtwork());
 
 game = new Phaser.Game({
   type: Phaser.AUTO,

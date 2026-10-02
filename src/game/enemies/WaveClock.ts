@@ -20,12 +20,9 @@ export class WaveClock {
     this.countdown -= step;
     if (this.countdown > 0) return 0;
     if (!allowAdvance) { this.countdown = 0; return 0; }
-    let waves = 0;
-    while (this.countdown <= 0) {
-      this.wave++; waves++;
-      this.countdown += this.durationForWave(this.wave);
-    }
-    return waves;
+    this.wave++;
+    this.countdown = this.durationForWave(this.wave);
+    return 1;
   }
 
   reset(): void { this.wave = 1; this.total = 0; this.countdown = this.durationForWave(this.wave); }
