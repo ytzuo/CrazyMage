@@ -76,6 +76,26 @@ function frozenGround(ctx:CanvasRenderingContext2D,fan:boolean):void {
   ctx.restore();
 }
 export function prepareIceTextures(scene:Phaser.Scene):void {
+  cached(scene,'ice-shard-flight',96,48,g=>{
+    g.fillStyle(0x8cecff,.08).fillEllipse(57,24,76,38);
+    polygon(g,[0,24,49,13,76,24,49,35],0x75ddff,.25);
+    polygon(g,[9,24,54,20,77,24,54,28],0xcaffff,.65);
+    polygon(g,[39,24,65,6,94,24,65,42],0x3988bd,.95);
+    polygon(g,[39,24,65,6,94,24],0xc9faff);
+    polygon(g,[65,6,65,42,94,24],0x81daf4);
+    polygon(g,[54,24,69,15,94,24,69,29],0xf4ffff);
+    g.lineStyle(2,0xf0ffff,.95).lineBetween(39,24,65,6).lineBetween(65,6,94,24);
+    g.lineStyle(1,0xb9faff,.8).lineBetween(12,16,37,18).lineBetween(7,33,33,30);
+  });
+  cached(scene,'ice-shard-impact',64,64,g=>{
+    g.fillStyle(0x92eaff,.12).fillCircle(32,32,30);
+    g.fillStyle(0xd6ffff,.3).fillCircle(32,32,15);
+    for(let i=0;i<8;i++){
+      const a=i*Math.PI/4,c=Math.cos(a),s=Math.sin(a);
+      polygon(g,[32+c*8-s*3,32+s*8+c*3,32+c*29,32+s*29,32+c*8+s*3,32+s*8-c*3],i%2?0x9be3ff:0xeaffff,.95);
+    }
+    g.fillStyle(0xffffff,.95).fillCircle(32,32,5);
+  });
   material(scene,'ice-domain-detail',ctx=>frozenGround(ctx,false));
   cached(scene,'ice-lance-detail',96,24,g=>{
     polygon(g,[0,12,35,5,66,8,94,12,66,16,35,19],0x78cee9,.35);
