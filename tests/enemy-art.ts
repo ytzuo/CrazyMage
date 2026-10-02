@@ -7,6 +7,7 @@ const entries:[EnemyKind,EnemyVariant,string][]=[
   ['chaser','splitter','分裂怪'],['swift','dasher','突刺怪'],['ranged','volley','连射怪'],['brute','guardian','盾甲怪'],
   ['artillery','normal','咒印投手'],['boss','normal','魔核守卫'],['bomber','normal','爆核傀儡'],['bomber','chain','连爆傀儡'],
   ['priest','normal','魔核祭司'],['priest','ward','结界祭司'],
+  ['artillery','triple','三重咒印'],
 ];
 class Gallery extends Phaser.Scene {
   create():void {

@@ -92,7 +92,7 @@ export class EnemySystem {
     // A capped special slot becomes a chaser, retaining the registered wave size.
     if ((kind === 'bomber' || kind === 'priest') && this.enemies.filter(enemy => enemy.spec.kind === kind).length >= SPECIAL_ENEMIES[kind].maximum) kind = 'chaser';
     const spec = enemySpec(kind, wave, this.mode);
-    const variant = kind === 'boss' || kind === 'artillery' ? 'normal' : rollVariant(kind, this.random, wave);
+    const variant = kind === 'boss' ? 'normal' : rollVariant(kind, this.random, wave);
     // Rotate through the arena's four edges, retaining a safe distance near walls.
     const firstEdge = this.spawnIndex++ % 4;
     for (let attempt = 0; attempt < 8; attempt++) {
@@ -125,7 +125,7 @@ export class EnemySystem {
   }
 
   private attackRange(enemy: Enemy): number { return enemy.variant === 'dasher' ? VARIANTS.dashRange : enemy.spec.range; }
-  private attackWindup(enemy: Enemy): number { return enemy.variant === 'dasher' ? VARIANTS.dashWindup : enemy.spec.windup; }
+  private attackWindup(enemy: Enemy): number { return enemy.variant === 'dasher' ? VARIANTS.dashWindup : enemy.spec.windup + (enemy.variant==='triple'?VARIANTS.sigilInterval*2:0); }
 
   private split(enemy: Enemy, x: number, y: number): void {
     // Spawn a complete pair or skip at capacity; never exceed the arena cap.
@@ -281,7 +281,7 @@ export class EnemySystem {
           }
         }
       } else if (distance <= this.attackRange(enemy) && enemy.cooldown === 0) {
-        if (spec.kind === 'artillery' && !this.areaAttacks.begin(enemy.id, player.view.x, player.view.y, spec.damage, spec.windup)) continue;
+        if (spec.kind === 'artillery' && !this.areaAttacks.begin(enemy.id, player.view.x, player.view.y, spec.damage, spec.windup, enemy.variant==='triple')) continue;
         enemy.windup = this.attackWindup(enemy);
         const ranged = spec.kind === 'ranged' || spec.kind === 'artillery';
         enemy.aim.x = distance > 0 ? dx / distance : 1;

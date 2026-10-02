@@ -205,6 +205,24 @@ export function prepareEnemyTextures(scene: Phaser.Scene): void {
     paintEnemyDetails(g,'artillery');
   });
   texture(scene, enemyTexture('boss'), 128, 128, g => paintEnemyDetails(g,'boss'));
+  texture(scene,enemyTexture('artillery','triple'),128,128,g=>{
+    // Three orbiting cores and a pronged crown distinguish it at battle size.
+    g.fillStyle(ink).fillEllipse(64,104,77,18);
+    shape(g,[31,100,42,48,64,35,87,48,99,100,78,110,52,109],0x5a477b);
+    shape(g,[43,53,62,39,64,97,47,103],0xb88ccb);
+    shape(g,[66,41,84,54,90,103,70,102],0x332f5b);
+    g.fillStyle(ink).fillEllipse(64,52,33,24);
+    g.fillStyle(0xffcce8).fillEllipse(57,52,5,4).fillEllipse(72,52,5,4);
+    shape(g,[44,40,37,24,53,31,64,18,76,31,92,24,84,40],0xd1b68b);
+    g.lineStyle(2,0xdebbed,0.7).strokeEllipse(64,22,90,28);
+    for(const [x,y,color] of [[24,24,0xffbce6],[64,11,0xe1b7ff],[104,24,0x9feaff]]) {
+      g.fillStyle(color,0.18).fillCircle(x,y,18);g.lineStyle(2,color).strokeCircle(x,y,14);
+      shape(g,[x,y-10,x+7,y,x,y+10,x-7,y],color);g.lineStyle(1,0xffffff).lineBetween(x,y-6,x+4,y);
+    }
+    for(const x of [27,101])shape(g,[x-8,67,x,57,x+8,68,x,78],0xbe9fd3);
+    g.lineStyle(2,0xedc6ea).lineBetween(49,79,63,94).lineBetween(63,94,78,79);
+    shape(g,[64,69,70,77,64,85,58,77],0xdab9e7);
+  });
   // Distinct silhouettes and insignia remain visible through hit/ice tinting.
   const variants: [EnemyKind, EnemyVariant][] = [['chaser','splitter'],['swift','dasher'],['ranged','volley'],['brute','guardian']];
   for (const [kind, variant] of variants) {

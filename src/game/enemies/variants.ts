@@ -1,7 +1,7 @@
 import { SPECIAL_ENEMIES } from './specialConfig.ts';
 import type { EnemyKind, EnemySpec } from './roster.ts';
 
-export type EnemyVariant = 'normal' | 'splitter' | 'dasher' | 'volley' | 'guardian' | 'chain' | 'ward';
+export type EnemyVariant = 'normal' | 'splitter' | 'dasher' | 'volley' | 'guardian' | 'chain' | 'ward' | 'triple';
 export const VARIANTS = {
   chance: 0.25,
   chanceStep: 0.02,
@@ -16,9 +16,10 @@ export const VARIANTS = {
   blockChance: 0.35,
   blockCooldown: 400,
   fragmentWarning: 350,
+  sigilInterval: 450,
 } as const;
 const byKind: Record<EnemyKind, EnemyVariant> = {
-  bomber: 'chain', priest: 'ward', artillery: 'normal', boss: 'normal', chaser: 'splitter', swift: 'dasher', ranged: 'volley', brute: 'guardian',
+  bomber: 'chain', priest: 'ward', artillery: 'triple', boss: 'normal', chaser: 'splitter', swift: 'dasher', ranged: 'volley', brute: 'guardian',
 };
 /** Roll once at spawn; offspring are explicitly normal and cannot recursively split. */
 export function variantChance(wave: number): number {
