@@ -14,8 +14,8 @@ export interface EnemySpec {
   readonly knockback: number;
 }
 export const ENEMY_TYPES: Readonly<Record<EnemyKind, EnemySpec>> = {
-  bomber: {kind:'bomber',speed:100,radius:23,health:45,damage:22,range:150,windup:1200,cooldown:0,knockback:300},
-  priest: {kind:'priest',speed:66,radius:19,health:28,damage:0,range:520,windup:1000,cooldown:4200,knockback:280},
+  bomber: {kind:'bomber',speed:100,radius:18,health:28,damage:22,range:150,windup:1200,cooldown:0,knockback:300},
+  priest: {kind:'priest',speed:66,radius:15,health:28,damage:0,range:520,windup:1000,cooldown:4200,knockback:280},
   artillery: {kind:'artillery',speed:62,radius:18,health:32,damage:14,range:620,windup:1100,cooldown:3200,knockback:260},
   boss: {kind:'boss',speed:64,radius:54,health:900,damage:30,range:165,windup:900,cooldown:2100,knockback:15},
   chaser: {kind:'chaser',speed:88,radius:20,health:40,damage:10,range:50,windup:300,cooldown:1200,knockback:240},
