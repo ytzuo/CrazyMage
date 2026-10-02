@@ -32,7 +32,7 @@ export class ArenaScene extends Phaser.Scene {
     this.spell = new SpellRunner(this, this.builds.effectiveBuild);
     this.spell.reset(this.builds.snapshot.build.runId);
     this.ultimate = new UltimateSpell(this);
-    this.enemies = new EnemySystem(this, wave => this.builds.completeWave(wave), source => this.ultimate.charge.onKill(source));
+    this.enemies = new EnemySystem(this, wave => this.builds.completeWave(wave), (source, boss) => boss ? this.ultimate.charge.fill() : this.ultimate.charge.onKill(source));
     this.enemies.reset();
     this.cameras.main.setBounds(0, 0, ARENA.width, ARENA.height);
     this.cameras.main.startFollow(this.player.view, true, 0.12, 0.12);

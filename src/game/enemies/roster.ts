@@ -1,5 +1,5 @@
 import { waveDifficulty } from './difficulty.ts';
-export type EnemyKind = 'chaser' | 'ranged' | 'brute' | 'swift';
+export type EnemyKind = 'chaser' | 'ranged' | 'brute' | 'swift' | 'boss';
 export interface EnemySpec {
   readonly kind: EnemyKind;
   readonly speed: number;
@@ -12,6 +12,7 @@ export interface EnemySpec {
   readonly knockback: number;
 }
 export const ENEMY_TYPES: Readonly<Record<EnemyKind, EnemySpec>> = {
+  boss: {kind:'boss',speed:64,radius:54,health:900,damage:30,range:165,windup:900,cooldown:2100,knockback:15},
   chaser: {kind:'chaser',speed:88,radius:20,health:40,damage:10,range:50,windup:300,cooldown:1200,knockback:240},
   swift: {kind:'swift',speed:160,radius:14,health:18,damage:6,range:40,windup:350,cooldown:1000,knockback:280},
   ranged: {kind:'ranged',speed:72,radius:16,health:24,damage:8,range:520,windup:700,cooldown:2000,knockback:260},

@@ -15,7 +15,7 @@ export const VARIANTS = {
   fragmentWarning: 350,
 } as const;
 const byKind: Record<EnemyKind, EnemyVariant> = {
-  chaser: 'splitter', swift: 'dasher', ranged: 'volley', brute: 'guardian',
+  boss: 'normal', chaser: 'splitter', swift: 'dasher', ranged: 'volley', brute: 'guardian',
 };
 /** Roll once at spawn; offspring are explicitly normal and cannot recursively split. */
 export function rollVariant(kind: EnemyKind, random: () => number): EnemyVariant {

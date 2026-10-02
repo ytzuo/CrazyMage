@@ -12,11 +12,12 @@ export class WaveClock {
 
   scheduleNext(delay: number): void { this.countdown = Math.max(0, delay); }
 
-  update(delta: number): number {
+  update(delta: number, allowAdvance = true): number {
     const step = Math.max(0, delta);
     this.total += step;
     this.countdown -= step;
     if (this.countdown > 0) return 0;
+    if (!allowAdvance) { this.countdown = 0; return 0; }
     const waves = 1 + Math.floor(-this.countdown / this.interval);
     this.countdown += waves * this.interval;
     this.wave += waves;

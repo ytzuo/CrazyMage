@@ -8,6 +8,7 @@ export class UltimateCharge {
   onKill(source: DamageSource = 'spell'): void {
     if (source === 'spell') this.value = Math.min(UltimateCharge.maximum, this.value + 10);
   }
+  fill(): void { this.value = UltimateCharge.maximum; }
   consume(): boolean {
     if (!this.ready) return false;
     this.value = 0; return true;
