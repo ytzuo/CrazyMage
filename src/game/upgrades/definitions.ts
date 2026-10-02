@@ -34,7 +34,7 @@ export const UPGRADES: readonly UpgradeDefinition[] = [
   { id: 'fire.explosion', name: '冲击爆炸', description: '每枚首次命中产生范围溅射，之后仍可继续穿透；同次施法每个目标最多受到一次溅射。', maxStacks: 1, effect: { kind: 'fire', module: 'explosion' } },
   {id:'ice.ground',name:'落地冰棘',description:'冰矛到达射程末端后驻留地面，持续伤害并减速附近敌人。',maxStacks:2,effect:{kind:'ice',module:'ground'}},
   {id:'ice.shards',name:'碎冰迸射',description:'寒霜中的敌人死亡时迸出冰片，打击并减速附近敌人。',maxStacks:2,effect:{kind:'ice',module:'shards'}},
-  { id: 'ice.damage', name: '凛冬冲击', description: '提高冰矛伤害，保留穿透、寒意与追袭。', maxStacks: 2, effect: { kind: 'ice', module: 'damage' } },
+  { id: 'ice.damage', name: '凛冬冲击', description: '提高冰矛伤害，同时增强已获得的落地冰棘和碎冰伤害。', maxStacks: 2, effect: { kind: 'ice', module: 'damage' } },
   { id: 'ice.radius', name: '贯穿冰矛', description: '冰矛额外贯穿两个敌人，追加冰矛同样生效。', maxStacks: 2, effect: { kind: 'ice', module: 'radius' } },
   { id: 'ice.cold', name: '深度寒霜', description: '减速增加 10 个百分点，持续时间增加 0.5 秒；重复命中刷新，不无限叠加。', maxStacks: 2, effect: { kind: 'ice', module: 'cold' } },
   { id: 'ice.echo', name: '冰矛追袭', description: '短暂延迟后沿原方向追加一枚冰矛，每枚威力降低。', maxStacks: 1, effect: { kind: 'ice', module: 'echo' } },
