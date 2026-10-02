@@ -3,22 +3,18 @@ import { ARENA, PLAYER, type Direction } from '../config';
 import { segmentCircleHit } from '../combat/collision';
 import type { Player } from '../entities/Player';
 import { ENEMY_SHOTS } from './roster';
+import { prepareEnemyAttackTextures } from '../art/EnemyAttackTextures';
 interface Shot { view: Phaser.GameObjects.Image; direction: Direction; damage: number; age: number }
 /** Fixed aim; bounded projectiles are released on hit, expiry, boundary or reset. */
 export class EnemyShots {
   private shots: Shot[] = [];
   get count(): number { return this.shots.length; }
   constructor(private scene: Phaser.Scene) {
-    if(scene.textures.exists('enemy-shot')) return;
-    const g=scene.make.graphics({},false);
-    g.fillStyle(0xba98f3,0.2).fillCircle(12,12,11);
-    g.fillStyle(0xc0a2ff).fillCircle(12,12,7);
-    g.fillStyle(0xf0ddff).fillCircle(12,12,3);
-    g.generateTexture('enemy-shot',24,24);g.destroy();
+    prepareEnemyAttackTextures(scene);
   }
   fire(x:number,y:number,direction:Direction,damage:number): boolean {
     if(this.shots.length>=ENEMY_SHOTS.maximum) return false;
-    const view=this.scene.add.image(x,y,'enemy-shot').setDepth(11);
+    const view=this.scene.add.image(x,y,'enemy-shot-detail').setDepth(11).setRotation(Math.atan2(direction.y,direction.x));
     this.shots.push({view,direction:{...direction},damage,age:0});return true;
   }
   update(delta:number,player:Player): void {

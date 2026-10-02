@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { prepareEnemyAttackTextures } from '../art/EnemyAttackTextures';
 import type { Direction } from '../config';
 import type { School } from '../upgrades/definitions';
 interface Mote { view:Phaser.GameObjects.Image; age:number; life:number; vx:number; vy:number; size:number; grow:number; spin:number }
@@ -9,6 +10,7 @@ export class CombatEffects {
   private motes:Mote[]=[];
   get count():number{return this.motes.length;}
   constructor(private scene:Phaser.Scene){
+    prepareEnemyAttackTextures(scene);
     if(scene.textures.exists('feedback-spark'))return;
     const g=scene.make.graphics({},false);
     g.fillStyle(0xffffff).fillTriangle(16,1,21,16,16,31).fillTriangle(16,1,11,16,16,31);
@@ -20,11 +22,12 @@ export class CombatEffects {
     g.lineStyle(2,0xffffff).beginPath().moveTo(22,1).lineTo(9,16).lineTo(19,13).lineTo(8,31).strokePath();
     g.generateTexture('feedback-zap',32,32);g.destroy();
   }
-  private add(x:number,y:number,color:number,size:number,life:number,vx=0,vy=0,grow=0,ring=false,texture?:string):void{
+  private add(x:number,y:number,color:number,size:number,life:number,vx=0,vy=0,grow=0,ring=false,texture?:string,rotation?:number):void{
     if(this.motes.length>=CombatEffects.limit)this.motes.shift()!.view.destroy();
     const view=this.scene.add.image(x,y,texture ?? (ring?'feedback-ring':'feedback-spark')).setTint(color).setDepth(13).setDisplaySize(size,size);
-    if(!ring)view.setRotation(Math.atan2(vy,vx)+Math.PI/2);
-    this.motes.push({view,age:0,life,vx,vy,size,grow,spin:ring?0:2});
+    if(rotation!==undefined)view.setRotation(rotation);
+    else if(!ring)view.setRotation(Math.atan2(vy,vx)+Math.PI/2);
+    this.motes.push({view,age:0,life,vx,vy,size,grow,spin:ring||rotation!==undefined?0:2});
   }
   private burst(x:number,y:number,color:number,count:number,size:number,speed:number):void{
     for(let i=0;i<count;i++){
@@ -59,7 +62,7 @@ export class CombatEffects {
   }
   attack(x:number,y:number,direction:Direction,ranged:boolean):void{
     const color=ranged?0xd9a8ff:0xff966b;
-    this.add(x+direction.x*22,y+direction.y*22,color,26,220,0,0,1,true);
+    this.add(x+direction.x*22,y+direction.y*22,color,ranged?46:72,240,0,0,0.45,true,ranged?'enemy-range-ranged':'enemy-slash-detail',Math.atan2(direction.y,direction.x));
     for(let i=-1;i<=1;i++)this.add(x,y,color,10,260,direction.x*100-direction.y*i*45,direction.y*100+direction.x*i*45,-0.6);
   }
   cast(x:number,y:number,school:School,aim:Direction):void{

@@ -1,13 +1,14 @@
 import Phaser from 'phaser';
+import { prepareEnemyAttackTextures } from '../art/EnemyAttackTextures';
 import { ARENA, PLAYER } from '../config';
 import type { Player } from '../entities/Player';
 import type { Enemy } from './EnemySystem';
 
-interface Zone { view: Phaser.GameObjects.Arc; x: number; y: number; radius: number; wait: number; resolved: boolean }
+interface Zone { view: Phaser.GameObjects.Image; x: number; y: number; radius: number; wait: number; resolved: boolean }
 /** One attack per living boss, at most three fixed ground warnings per attack. */
 export class BossCombat {
   private attacks = new Map<number, Zone[]>();
-  constructor(private scene: Phaser.Scene) {}
+  constructor(private scene: Phaser.Scene) { prepareEnemyAttackTextures(scene); }
 
   update(enemy: Enemy, delta: number, player: Player): void {
     enemy.windup = Math.max(0, enemy.windup - delta);
@@ -24,8 +25,8 @@ export class BossCombat {
         if (zone.wait > 0) continue;
         if (Math.hypot(player.view.x - zone.x, player.view.y - zone.y) <= zone.radius + PLAYER.radius)
           player.hurt(enemy.spec.damage, zone.x, zone.y);
-        // Brief expanding strike remains owned by this attack, then is recycled.
-        zone.view.setFillStyle(0xffa366, 0.4).setStrokeStyle(5, 0xffd29a).setRadius(zone.radius + 12);
+        // Ground rupture remains owned by this attack, then is recycled.
+        zone.view.setTexture('enemy-impact-detail').setAlpha(1).setDisplaySize(zone.radius * 2, zone.radius * 2);
         zone.wait = 0; zone.resolved = true;
         enemy.attackTime = 230;
       }
@@ -45,8 +46,8 @@ export class BossCombat {
       }));
       this.attacks.set(enemy.id, points.map((point, index) => {
         const radius = melee ? 180 : 80;
-        const view = this.scene.add.circle(point.x, point.y, radius, melee ? 0xff713c : 0xef506c, 0.16)
-          .setStrokeStyle(3, melee ? 0xffb070 : 0xff7993, 0.95).setDepth(7);
+        const view = this.scene.add.image(point.x, point.y, melee ? 'enemy-range-melee' : 'enemy-range-boss')
+          .setDisplaySize(radius * 2, radius * 2).setDepth(7);
         return { ...point, radius, view, wait: delay + (melee ? 0 : index * 220), resolved: false };
       }));
       enemy.windup = delay;

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { ARENA, ENEMY, PLAYER, type Direction } from '../config';
 import { Health } from '../combat/Health';
 import type { Player } from '../entities/Player';
+import { prepareEnemyAttackTextures } from '../art/EnemyAttackTextures';
 import { BossCombat } from './BossCombat';
 import { WaveClock } from './WaveClock';
 import { WaveTracker } from './WaveTracker';
@@ -27,11 +28,11 @@ export interface Enemy {
   burstWait: number;
   blockCooldown: number;
   aim: Direction;
-  aimLine: Phaser.GameObjects.Rectangle;
+  aimLine: Phaser.GameObjects.Image;
   view: Phaser.GameObjects.Container;
   body: Phaser.GameObjects.Image;
   bar: Phaser.GameObjects.Rectangle;
-  warning: Phaser.GameObjects.Arc;
+  warning: Phaser.GameObjects.Image;
   health: Health;
   slow: SlowStatus;
   spawning: number;
@@ -57,7 +58,7 @@ export class EnemySystem {
   private spawnIndex = 0;
   private nextId = 0;
 
-  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareIcePrisonTexture(scene); this.bosses = new BossCombat(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
+  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.bosses = new BossCombat(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
 
   private spawn(player: Player, wave: number, kind: EnemyKind): boolean {
     if (this.enemies.length >= ENEMY.maxCount - Number(kind !== 'boss')) return false;
@@ -80,15 +81,15 @@ export class EnemySystem {
   private createEnemy(x: number, y: number, wave: number, spec: EnemySpec, variant: EnemyVariant, warningTime: number = ENEMY.spawnWarning): void {
     const view = this.scene.add.container(x, y).setDepth(9);
     const shadow = this.scene.add.ellipse(0, 12, spec.radius * 2.2, spec.radius * 0.8, 0x000000, 0.3);
-    const warning = this.scene.add.circle(0, 0, spec.radius + 8, 0xeea56e, 0.06).setStrokeStyle(2, 0xefb87d, 0.65);
+    const warning = this.scene.add.image(0, 0, 'enemy-range-melee').setDisplaySize((spec.radius + 8) * 2, (spec.radius + 8) * 2);
     const body = this.scene.add.image(0, -3, enemyTexture(spec.kind, variant)).setScale(enemyArtScale(spec.kind, spec.radius));
-    const aimLine = this.scene.add.rectangle(0, 0, 1, 3, 0xd9a8ff, 0.85).setOrigin(0, 0.5).setVisible(false);
+    const aimLine = this.scene.add.image(0, 0, 'enemy-aim-detail').setTint(0xd9a8ff).setOrigin(0, 0.5).setVisible(false);
     const background = this.scene.add.rectangle(0, -spec.radius - 18, spec.radius * 2, 5, 0x211d26).setStrokeStyle(1, 0x473843);
     const bar = this.scene.add.rectangle(-spec.radius, -spec.radius - 18, spec.radius * 2, 3, 0xe29a9c).setOrigin(0, 0.5);
     view.add([shadow, warning, aimLine, body, background, bar]).setAlpha(0.45);
     if (spec.kind === 'boss') {
       bar.setFillStyle(0xffb36f);
-      view.add(this.scene.add.text(0, -spec.radius - 38, '魔核守卫 · BOSS', { fontSize: '14px', color: '#ffd09c', stroke: '#241b32', strokeThickness: 3 }).setOrigin(0.5));
+      view.add(this.scene.add.image(0, -spec.radius - 42, 'boss-skull-mark').setDisplaySize(28, 28));
     }
     this.enemies.push({ spec, variant, dashTime: 0, dashHit: false, burstRemaining: 0, burstWait: 0, blockCooldown: 0, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: warningTime, windup: 0, cooldown: 0, attackTime: 0, frozen: 0, icePrison: null, flash: 0, knockback: { x: 0, y: 0 } });
   }
@@ -209,9 +210,10 @@ export class EnemySystem {
         const ranged = spec.kind === 'ranged';
         enemy.aim.x = distance > 0 ? dx / distance : 1;
         enemy.aim.y = distance > 0 ? dy / distance : 0;
-        enemy.warning.setRadius(ranged ? spec.radius + 10 : spec.range).setFillStyle(ranged ? 0xc79bf0 : 0xff8058, 0.12).setStrokeStyle(2, ranged ? 0xd9a8ff : 0xffa16b, 0.9).setAlpha(0.55).setVisible(true);
-        if (ranged || enemy.variant === 'dasher') enemy.aimLine.setDisplaySize(this.attackRange(enemy), enemy.variant === 'dasher' ? 8 : 3)
-          .setFillStyle(enemy.variant === 'dasher' ? 0xffad75 : enemy.variant === 'volley' ? 0xff94d5 : 0xd9a8ff)
+        const warningRadius = ranged ? spec.radius + 10 : spec.range;
+        enemy.warning.setTexture(ranged ? 'enemy-range-ranged' : 'enemy-range-melee').setDisplaySize(warningRadius * 2, warningRadius * 2).setAlpha(0.55).setVisible(true);
+        if (ranged || enemy.variant === 'dasher') enemy.aimLine.setDisplaySize(this.attackRange(enemy), enemy.variant === 'dasher' ? 24 : 12)
+          .setTint(enemy.variant === 'dasher' ? 0xffad75 : enemy.variant === 'volley' ? 0xff94d5 : 0xd9a8ff)
           .setRotation(Math.atan2(dy,dx)).setAlpha(1).setVisible(true);
       } else if (distance > 0) {
         const movement = spec.kind === 'ranged' ? (distance < 180 ? -1 : distance > 320 ? 1 : 0) : Number(distance > spec.radius + 18);
