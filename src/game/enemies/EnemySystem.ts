@@ -8,7 +8,7 @@ import { AreaAttacks } from './AreaAttacks';
 import { BossCombat } from './BossCombat';
 import { WaveClock } from './WaveClock';
 import { WaveTracker } from './WaveTracker';
-import { waveDifficulty } from './difficulty';
+import { enemyCapacity, waveDifficulty } from './difficulty';
 import { enemyKind, enemySpec, type EnemyKind, type EnemySpec } from './roster';
 import { VARIANTS, rollVariant, fragmentSpec, type EnemyVariant } from './variants';
 import { prepareIcePrisonTexture } from '../art/SpellTextures';
@@ -59,6 +59,7 @@ export class EnemySystem {
   private areaAttacks: AreaAttacks;
   private bossWaves = new Set<number>();
   mode: GameMode = 'race';
+  get capacity(): number { return enemyCapacity(this.waveClock.wave); }
   private pendingSpawns: {wave:number; index:number; remaining:number} | null = null;
   private spawnIndex = 0;
   private nextId = 0;
@@ -66,9 +67,9 @@ export class EnemySystem {
   constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.bosses = new BossCombat(scene); this.areaAttacks = new AreaAttacks(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
 
   private spawn(player: Player, wave: number, kind: EnemyKind): boolean {
-    if (this.enemies.length >= ENEMY.maxCount - Number(kind !== 'boss')) return false;
+    if (this.enemies.length >= this.capacity - Number(kind !== 'boss')) return false;
     const spec = enemySpec(kind, wave, this.mode);
-    const variant = kind === 'boss' || kind === 'artillery' ? 'normal' : rollVariant(kind, this.random);
+    const variant = kind === 'boss' || kind === 'artillery' ? 'normal' : rollVariant(kind, this.random, wave);
     // Rotate through the arena's four edges, retaining a safe distance near walls.
     const firstEdge = this.spawnIndex++ % 4;
     for (let attempt = 0; attempt < 8; attempt++) {
@@ -104,7 +105,7 @@ export class EnemySystem {
 
   private split(enemy: Enemy, x: number, y: number): void {
     // Spawn a complete pair or skip at capacity; never exceed the arena cap.
-    if (enemy.variant !== 'splitter' || this.enemies.length + 2 > ENEMY.maxCount) return;
+    if (enemy.variant !== 'splitter' || this.enemies.length + 2 > this.capacity) return;
     const spec = fragmentSpec(enemy.spec), margin = ARENA.inset + spec.radius;
     for (const side of [-1, 1]) {
       this.createEnemy(Phaser.Math.Clamp(x + side * (spec.radius + 6), margin, ARENA.width - margin),
@@ -139,7 +140,8 @@ export class EnemySystem {
   private replenish(player: Player): void {
     const pending=this.pendingSpawns;
     if(!pending) return;
-    while(pending.remaining > 0 && this.enemies.length < ENEMY.maxCount-1) {
+    let budget = 8;
+    while(pending.remaining > 0 && this.enemies.length < this.capacity-1 && budget-- > 0) {
       if(!this.spawn(player,pending.wave,enemyKind(pending.wave,pending.index))) break;
       pending.index++; pending.remaining--;
     }
@@ -149,7 +151,7 @@ export class EnemySystem {
   update(delta: number, player: Player): void {
     this.effects.update(delta);
     this.replenish(player);
-    const canAdvance = !this.pendingSpawns && this.enemies.length < ENEMY.maxCount-1 && (this.mode==='endless' || this.waveClock.wave<RACE_WAVES);
+    const canAdvance = !this.pendingSpawns && this.enemies.length < enemyCapacity(this.waveClock.wave+1)-1 && (this.mode==='endless' || this.waveClock.wave<RACE_WAVES);
     // One advance per update prevents a large delta from replacing a pending batch.
     const waves = this.waveClock.update(delta, canAdvance);
     for (let i = 0; i < waves; i++) this.spawnWave(player, this.waveClock.wave - waves + i + 1);

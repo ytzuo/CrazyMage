@@ -5,7 +5,7 @@ export const PLAYER = { speed: 300, radius: 18, health: 120, waveHealing: 15, in
 export const FIREBALL = { speed: 560, cooldown: 550, lifetime: 1400, damage: 20, radius: 10, maxProjectiles: 64 } as const;
 export const ICE = { cooldown: 1100 } as const;
 export const LIGHTNING = { cooldown: 900 } as const;
-export const ENEMY = { waveInterval: 30000, bossWaveInterval: 45000, clearDelay: 3000, spawnWarning: 500, maxCount: 36 } as const;
+export const ENEMY = { waveInterval: 30000, bossWaveInterval: 45000, clearDelay: 3000, spawnWarning: 500, initialCapacity: 48, capacityStep: 2, maxCount: 72 } as const;
 export interface Direction { x: number; y: number }
 
 export interface MovementState {
