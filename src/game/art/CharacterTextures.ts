@@ -162,6 +162,20 @@ export function prepareEnemyTextures(scene: Phaser.Scene): void {
       }
     });
   }
+  texture(scene, enemyTexture('artillery'), 128, 128, g => {
+    g.fillStyle(0x29253f).fillEllipse(64,101,84,22);
+    shape(g,[30,100,41,47,64,30,88,47,102,101,79,109,53,109],0x5f608d);
+    shape(g,[42,48,64,33,79,50,68,97,49,98],0x9898cb);
+    g.fillStyle(0x343448).fillEllipse(64,48,36,27);
+    g.fillStyle(0xe6d8ff).fillEllipse(56,47,6,5).fillEllipse(73,47,6,5);
+    g.lineStyle(4,0x73749b).strokeCircle(64,23,21);
+    g.lineStyle(2,0xd6c5ff).strokeCircle(64,23,16);
+    shape(g,[64,10,76,23,64,36,52,23],0xc4abf5);
+    shape(g,[64,14,70,23,64,32,59,23],0xffe5ef);
+    g.fillStyle(0x7f78a5).fillEllipse(28,71,17,26).fillEllipse(101,71,17,26);
+    for(const x of [28,101])g.lineStyle(2,0xd2b8f1).strokeCircle(x,66,10);
+    g.lineStyle(2,0xb8abe1).lineBetween(50,74,64,85).lineBetween(64,85,80,74);
+  });
   texture(scene, enemyTexture('boss'), 128, 128, g => {
     // Floating obsidian sentinel: crown, detached arms and a molten core.
     g.fillStyle(0x241b32).fillTriangle(64,4,112,91,16,91);

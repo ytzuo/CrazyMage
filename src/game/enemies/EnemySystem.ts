@@ -3,6 +3,7 @@ import { ARENA, ENEMY, PLAYER, type Direction } from '../config';
 import { Health } from '../combat/Health';
 import type { Player } from '../entities/Player';
 import { prepareEnemyAttackTextures } from '../art/EnemyAttackTextures';
+import { AreaAttacks } from './AreaAttacks';
 import { BossCombat } from './BossCombat';
 import { WaveClock } from './WaveClock';
 import { WaveTracker } from './WaveTracker';
@@ -54,16 +55,17 @@ export class EnemySystem {
   readonly shots: EnemyShots;
   readonly effects: CombatEffects;
   private bosses: BossCombat;
+  private areaAttacks: AreaAttacks;
   private bossWaves = new Set<number>();
   private spawnIndex = 0;
   private nextId = 0;
 
-  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.bosses = new BossCombat(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
+  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.bosses = new BossCombat(scene); this.areaAttacks = new AreaAttacks(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
 
   private spawn(player: Player, wave: number, kind: EnemyKind): boolean {
     if (this.enemies.length >= ENEMY.maxCount - Number(kind !== 'boss')) return false;
     const spec = enemySpec(kind, wave);
-    const variant = kind === 'boss' ? 'normal' : rollVariant(kind, this.random);
+    const variant = kind === 'boss' || kind === 'artillery' ? 'normal' : rollVariant(kind, this.random);
     // Rotate through the arena's four edges, retaining a safe distance near walls.
     const firstEdge = this.spawnIndex++ % 4;
     for (let attempt = 0; attempt < 8; attempt++) {
@@ -112,7 +114,7 @@ export class EnemySystem {
     for (const enemy of this.enemies) enemy.view.destroy();
     this.enemies.length = 0;
     this.shots.reset();
-    this.bosses.reset(); this.bossWaves.clear();
+    this.bosses.reset(); this.areaAttacks.reset(); this.bossWaves.clear();
     this.effects.reset();
     this.kills = this.spawnIndex = this.nextId = 0;
     this.waveClock.reset();
@@ -131,6 +133,8 @@ export class EnemySystem {
     this.effects.update(delta);
     const waves = this.waveClock.update(delta, (this.waveClock.wave + 1) % 5 !== 0 || this.enemies.length < ENEMY.maxCount);
     for (let i = 0; i < waves; i++) this.spawnWave(player, this.waveClock.wave - waves + i + 1);
+    this.areaAttacks.update(delta, player);
+    if (player.health.dead) return;
     for (const enemy of this.enemies) {
       const spec = enemy.spec;
       if (enemy.health.dead) continue;
@@ -191,8 +195,10 @@ export class EnemySystem {
           enemy.cooldown = enemy.variant === 'dasher' ? VARIANTS.dashCooldown : spec.cooldown;
           enemy.attackTime = 230;
           enemy.aimLine.setVisible(false);
-          this.effects.attack(enemy.view.x, enemy.view.y, enemy.aim, spec.kind === 'ranged');
-          if (spec.kind === 'ranged') {
+          this.effects.attack(enemy.view.x, enemy.view.y, enemy.aim, spec.kind === 'ranged' || spec.kind === 'artillery');
+          if (spec.kind === 'artillery') {
+            // Its locked ground zone resolves in AreaAttacks, never fire a projectile.
+          } else if (spec.kind === 'ranged') {
             this.shots.fire(enemy.view.x, enemy.view.y, enemy.aim, spec.damage);
             if (enemy.variant === 'volley') {
               enemy.burstRemaining = VARIANTS.volleyCount - 1; enemy.burstWait = VARIANTS.volleyInterval;
@@ -206,17 +212,18 @@ export class EnemySystem {
           }
         }
       } else if (distance <= this.attackRange(enemy) && enemy.cooldown === 0) {
+        if (spec.kind === 'artillery' && !this.areaAttacks.begin(enemy.id, player.view.x, player.view.y, spec.damage, spec.windup)) continue;
         enemy.windup = this.attackWindup(enemy);
-        const ranged = spec.kind === 'ranged';
+        const ranged = spec.kind === 'ranged' || spec.kind === 'artillery';
         enemy.aim.x = distance > 0 ? dx / distance : 1;
         enemy.aim.y = distance > 0 ? dy / distance : 0;
         const warningRadius = ranged ? spec.radius + 10 : spec.range;
         enemy.warning.setTexture(ranged ? 'enemy-range-ranged' : 'enemy-range-melee').setDisplaySize(warningRadius * 2, warningRadius * 2).setAlpha(0.55).setVisible(true);
-        if (ranged || enemy.variant === 'dasher') enemy.aimLine.setDisplaySize(this.attackRange(enemy), enemy.variant === 'dasher' ? 24 : 12)
+        if (spec.kind === 'ranged' || enemy.variant === 'dasher') enemy.aimLine.setDisplaySize(this.attackRange(enemy), enemy.variant === 'dasher' ? 24 : 12)
           .setTint(enemy.variant === 'dasher' ? 0xffad75 : enemy.variant === 'volley' ? 0xff94d5 : 0xd9a8ff)
           .setRotation(Math.atan2(dy,dx)).setAlpha(1).setVisible(true);
       } else if (distance > 0) {
-        const movement = spec.kind === 'ranged' ? (distance < 180 ? -1 : distance > 320 ? 1 : 0) : Number(distance > spec.radius + 18);
+        const movement = spec.kind === 'ranged' || spec.kind === 'artillery' ? (distance < 180 ? -1 : distance > 320 ? 1 : 0) : Number(distance > spec.radius + 18);
         const step = spec.speed * (1 - enemy.slow.strength) * delta / 1000 * movement;
         enemy.view.x += dx / distance * step;
         enemy.view.y += dy / distance * step;
@@ -238,7 +245,7 @@ export class EnemySystem {
     const base = enemyArtScale(spec.kind, spec.radius);
     const charge = enemy.windup > 0 ? 1 - enemy.windup / this.attackWindup(enemy) : 0;
     const strike = enemy.attackTime > 0 ? Math.sin((1 - enemy.attackTime / 230) * Math.PI) : 0;
-    const ranged = spec.kind === 'ranged', brute = spec.kind === 'brute';
+    const ranged = spec.kind === 'ranged' || spec.kind === 'artillery', brute = spec.kind === 'brute';
     const thrust = (ranged ? -6 : brute ? 18 : 12) * strike - charge * 6;
     body.setPosition(aim.x * thrust, -3 + aim.y * thrust - charge * (brute ? 12 : 4));
     body.setScale(base * (1 - charge * 0.12 + strike * 0.12), base * (1 + charge * 0.12 - strike * 0.1));
@@ -248,7 +255,7 @@ export class EnemySystem {
 
   freeze(enemy: Enemy, duration: number): void {
     if (enemy.spawning > 0 || enemy.health.dead || !this.enemies.includes(enemy)) return;
-    this.bosses.cancel(enemy.id);
+    this.bosses.cancel(enemy.id); this.areaAttacks.cancel(enemy.id);
     enemy.frozen = Math.max(enemy.frozen, Math.min(6000, duration));
     if(!enemy.icePrison){
       enemy.icePrison=this.scene.add.image(0,-4,'ice-prison-detail').setDisplaySize(enemy.spec.radius*2.8,enemy.spec.radius*3.2);
@@ -283,6 +290,7 @@ export class EnemySystem {
     enemy.flash = 120;
     enemy.knockback.x = direction.x * enemy.spec.knockback;
     enemy.knockback.y = direction.y * enemy.spec.knockback;
+    this.areaAttacks.cancel(enemy.id);
     // A hit interrupts a pending contact attack, allowing a close-range escape.
     if (enemy.spec.kind !== 'boss') enemy.windup = enemy.attackTime = enemy.dashTime = enemy.burstRemaining = enemy.burstWait = 0;
     this.animate(enemy);
@@ -292,15 +300,15 @@ export class EnemySystem {
     if (enemy.health.dead) {
       this.kills++;
       this.onKill(source, enemy.spec.kind === 'boss');
-      this.bosses.cancel(enemy.id);
-      const color = enemy.variant === 'splitter' ? 0x76dac6 : { boss:0xff9568, chaser:0xd39b96, ranged:0xc4a0ec, brute:0xe6ba78, swift:0xc6dc79 }[enemy.spec.kind];
+      this.bosses.cancel(enemy.id); this.areaAttacks.cancel(enemy.id);
+      const color = enemy.variant === 'splitter' ? 0x76dac6 : { artillery:0xac91de, boss:0xff9568, chaser:0xd39b96, ranged:0xc4a0ec, brute:0xe6ba78, swift:0xc6dc79 }[enemy.spec.kind];
       this.effects.death(enemy.view.x, enemy.view.y, color, enemy.spec.radius);
       const x = enemy.view.x, y = enemy.view.y;
       enemy.view.destroy();
       this.enemies.splice(this.enemies.indexOf(enemy), 1);
       this.split(enemy, x, y);
       // Clearing the arena schedules the next wave even when upgrades are exhausted.
-      if (this.enemies.length === 0) { this.waveClock.scheduleNext(ENEMY.clearDelay); this.shots.reset(); this.effects.clear(x, y); }
+      if (this.enemies.length === 0) { this.waveClock.scheduleNext(ENEMY.clearDelay); this.shots.reset(); this.areaAttacks.reset(); this.effects.clear(x, y); }
       if (this.waves.defeat(enemy.wave)) {
         const bossDefeated = this.bossWaves.delete(enemy.wave);
         this.onWaveClear(enemy.wave, bossDefeated);
