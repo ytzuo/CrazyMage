@@ -32,7 +32,7 @@ export interface MovementState {
   objects: number;
   projectiles: number;
   impacts: number;
-  enemyPositions: { id: number; x: number; y: number }[];
+  enemyPositions: { id: number; x: number; y: number; boss: boolean }[];
   wave: number;
   nextWaveIn: number;
   elapsedTime: number;

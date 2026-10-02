@@ -82,7 +82,7 @@ let lastWaveSeconds = -1;
 let lastRunSeconds = -1;
 const minimapPlayer = document.querySelector<SVGGElement>('#minimap-player')!;
 const minimapEnemies = document.querySelector<SVGGElement>('#minimap-enemies')!;
-const enemyMarkers = new Map<number, SVGCircleElement>();
+const enemyMarkers = new Map<number, SVGElement>();
 const notice = new BattleNotice(element('battle-notice'));
 let lastEnemyCount = 0;
 let minimapPosition = minimapPlayer.getAttribute('transform');
@@ -205,9 +205,12 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
     activeIds.add(enemy.id);
     let marker = enemyMarkers.get(enemy.id);
     if (!marker) {
-      marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      marker.setAttribute('class', 'minimap-enemy-dot');
-      marker.setAttribute('r', '30');
+      marker = document.createElementNS('http://www.w3.org/2000/svg', enemy.boss ? 'path' : 'circle');
+      marker.setAttribute('class', enemy.boss ? 'minimap-boss-skull' : 'minimap-enemy-dot');
+      if (enemy.boss) {
+        marker.setAttribute('fill-rule', 'evenodd');
+        marker.setAttribute('d', 'M-66 0C-80-88 80-88 66 0L48 24V60H28V42H10V60H-10V42H-28V60H-48V24Z M-48-24V0H-18V-24Z M18-24V0H48V-24Z M0 2L-12 24H12Z');
+      } else marker.setAttribute('r', '30');
       enemyMarkers.set(enemy.id, marker);
       minimapEnemies.append(marker);
     }

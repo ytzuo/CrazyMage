@@ -126,6 +126,7 @@ button:disabled { opacity: 0.45; cursor: default; }
 .minimap-player-halo { fill: #c0e29b26; }
 .minimap-player-dot { fill: #e2f3bd; stroke: #b6d584; stroke-width: 14; }
 .minimap-enemy-dot { fill: #f07878; stroke: #ffc3ad; stroke-width: 6; }
+.minimap-boss-skull { fill: #fff0ba; stroke: #632d35; stroke-width: 8; stroke-linejoin: round; }
 
 .pause-overlay { position: absolute; inset: 0; background: #0d1712c9; backdrop-filter: blur(6px); display: grid; place-items: center; z-index: 5; }
 .pause-overlay[hidden] { display: none; }
