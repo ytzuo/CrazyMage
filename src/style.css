@@ -393,3 +393,37 @@ button:disabled { opacity: 0.45; cursor: default; }
   .preview-ice-ring { opacity: .5; }
   .preview-lightning { opacity: 1; }
 }
+
+/* Clear → school ritual (2.2s) → existing card reveal. Finite CSS animations only. */
+.wave-ritual { --ritual-color: #ffb16d; --ritual-wash: #d87b3526; width: min(440px, 100%); text-align: center; color: var(--ritual-color); outline: none; animation: wave-ritual 2200ms ease both; }
+.ritual-ice { --ritual-color: #b3edff; --ritual-wash: #74c5e826; }
+.ritual-lightning { --ritual-color: #f6e7a4; --ritual-wash: #c2aaef26; }
+.ritual-art { position: relative; width: min(240px, 56vw); aspect-ratio: 1; margin: 0 auto 24px; background: radial-gradient(circle, var(--ritual-wash), transparent 67%); }
+.ritual-ring { position: absolute; inset: 8%; border: 1px solid currentColor; border-radius: 50%; opacity: .55; animation: ritual-ring 2200ms ease-out both; }
+.ritual-ring.ring-inner { inset: 24%; border-style: dashed; animation-name: ritual-inner; }
+.ritual-core { position: absolute; inset: 0; display: grid; place-items: center; font: 72px Georgia, serif; animation: ritual-core 2200ms ease both; }
+.ritual-orbit { position: absolute; inset: 0; transform: rotate(calc(var(--orbit) * 45deg)); }
+.ritual-mote { position: absolute; top: 48%; left: 7%; width: 8px; height: 8px; background: currentColor; border-radius: 50%; animation: ritual-mote 1900ms ease-in-out both; animation-delay: calc(var(--orbit) * 25ms); }
+.ritual-ice .ritual-mote { width: 10px; height: 16px; border-radius: 0; clip-path: polygon(50% 0,100% 50%,50% 100%,0 50%); }
+.ritual-ice .ring-outer { border-style: dashed; }
+.ritual-lightning .ritual-mote { height: 17px; border-radius: 0; clip-path: polygon(70% 0,0 55%,45% 50%,25% 100%,100% 35%,55% 40%); }
+.ritual-bolts { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 3; animation: ritual-bolts 2200ms linear both; }
+.wave-ritual small { font-size: 12px; letter-spacing: 3px; color: #d8ddcd; }
+.wave-ritual h2 { font: 28px "Songti SC", serif; letter-spacing: 7px; margin: 12px 0 24px; }
+.ritual-progress { height: 2px; width: 120px; margin: auto; background: #e7e2bc20; }
+.ritual-progress i { display: block; height: 100%; background: var(--ritual-color); transform-origin: left; animation: ritual-progress 2200ms linear both; }
+.ritual-sleep .wave-ritual, .ritual-sleep .wave-ritual * { animation-play-state: paused; }
+@keyframes wave-ritual { 0% { opacity: 0; transform: scale(.92); } 12%, 82% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.04); } }
+@keyframes ritual-ring { 0% { opacity: 0; transform: scale(.6) rotate(-30deg); } 35%, 70% { opacity: .6; } 100% { opacity: 0; transform: scale(1.25) rotate(30deg); } }
+@keyframes ritual-inner { 0% { opacity: 0; transform: scale(1.6) rotate(90deg); } 45%, 75% { opacity: .75; } 100% { opacity: 0; transform: scale(.9) rotate(0); } }
+@keyframes ritual-core { 0%, 10% { opacity: 0; transform: scale(.3); } 50%, 75% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.2); } }
+@keyframes ritual-mote { 0% { opacity: 0; transform: translateX(0) scale(.3); } 20%, 60% { opacity: 1; } 90%, 100% { opacity: 0; transform: translateX(92px) scale(.2); } }
+@keyframes ritual-bolts { 0%, 22%, 35%, 49%, 62%, 83%, 100% { opacity: 0; } 25%, 31%, 41%, 55%, 72%, 78% { opacity: .9; } }
+@keyframes ritual-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (max-height: 500px) { .ritual-art { width: 140px; margin-bottom: 12px; } .ritual-core { font-size: 48px; } .wave-ritual h2 { font-size: 22px; margin: 8px 0 14px; } }
+@media (prefers-reduced-motion: reduce) {
+  /* Keep animationend for the state handoff, but skip the wait and visual motion. */
+  .wave-ritual { animation-duration: 1ms; }
+  .wave-ritual * { animation: none; }
+  .ritual-progress i { transform: scaleX(1); }
+}
