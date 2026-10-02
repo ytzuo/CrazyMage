@@ -46,7 +46,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     </button>
     <button id="ultimate" class="ultimate-button" type="button" disabled hidden>
       <span class="ready-aura" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
-      <span class="ultimate-key" aria-hidden="true">Q</span><span class="ultimate-content"><strong id="ultimate-name"></strong><span id="ultimate-kind" class="skill-kind"></span><small id="ultimate-charge">0 / 100</small><span class="ultimate-track" aria-hidden="true"><span id="ultimate-fill"></span></span></span>
+      <span class="ultimate-key" aria-hidden="true">Q</span><span class="ultimate-content"><strong id="ultimate-name"></strong><span id="ultimate-kind" class="skill-kind"></span><small id="ultimate-charge">0 / 20 击杀</small><span class="ultimate-track" aria-hidden="true"><span id="ultimate-fill"></span></span></span>
     </button>
     <div id="battle-notice" class="battle-notice" role="status" aria-live="polite" hidden></div>
     <div id="school-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="选择开局流派" hidden></div>
@@ -111,22 +111,22 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
     element('skill-fill').style.transform = `scaleX(${state.skillEnergy/100})`;
     lastSkill = skillKey;
   }
-  const ultimateKey = `${school}/${state.progression.build.revision}/${state.ultimateEnergy}/${state.paused}/${selectingSchool}/${state.dead}/${state.won}/${state.progression.choice?.id}`;
+  const ultimateKey = `${school}/${state.progression.build.revision}/${state.ultimateKills}/${state.ultimateKillsRequired}/${state.paused}/${selectingSchool}/${state.dead}/${state.won}/${state.progression.choice?.id}`;
   if (ultimateKey !== lastUltimate) {
     const spec = state.progression.effective.ultimate;
-    const ready = state.ultimateEnergy === 100;
+    const ready = state.ultimateKills === state.ultimateKillsRequired;
     const button = element<HTMLButtonElement>('ultimate');
     button.hidden = selectingSchool;
     button.disabled = !ready || state.paused || selectingSchool || state.dead || state.won || !!state.progression.choice;
     button.dataset.schoolTone = school;
     button.classList.toggle('ready', ready);
-    button.title = `${describeUltimate(spec)}。普通击杀 +10 能量，大招击杀不回充；击杀 Boss 立即充满。范围内无目标时不消耗。`;
-    button.setAttribute('aria-label', `${spec.name}，${ready ? '已就绪，按 Q 或点击释放' : `充能 ${state.ultimateEnergy}%`}`);
+    button.title = `${describeUltimate(spec)}。每 ${state.ultimateKillsRequired} 次普通法术击杀充满，大招击杀不回充；击杀 Boss 立即充满。范围内无目标时不消耗。`;
+    button.setAttribute('aria-label', `${spec.name}，${state.ultimateKills} / ${state.ultimateKillsRequired} 击杀${ready ? '，已就绪，按 Q 或点击释放' : ''}`);
     element('ultimate-name').textContent = spec.name;
     element('ultimate-kind').textContent = school === 'fire' ? '➶' : '◎';
     element('ultimate-kind').title = school === 'fire' ? '指向型' : '身边 AOE';
     element('ultimate-kind').setAttribute('aria-label', element('ultimate-kind').title);
-    element('ultimate-charge').textContent = ready ? '已就绪' : `${state.ultimateEnergy} / 100`;
+    element('ultimate-charge').textContent = `${state.ultimateKills} / ${state.ultimateKillsRequired} 击杀${ready ? ' · 已就绪' : ''}`;
     element('ultimate-fill').style.transform = `scaleX(${state.ultimateEnergy / 100})`;
     lastUltimate = ultimateKey;
   }

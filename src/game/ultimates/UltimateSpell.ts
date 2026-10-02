@@ -34,7 +34,7 @@ export class UltimateSpell {
   }
   configure(school:School | UltimateSpec,level=1):void{
     this.spec=typeof school==='string'?ultimateSpec(school,level):school;
-    this.charge.configure(this.spec.school==='fire'?20:10);
+    this.charge.configure(this.spec.killsRequired);
   }
   private visual(x:number,y:number,size:number,ring:boolean,life=800,texture?:string,motion?:Motion):void {
     if(this.visuals.length>=40)this.visuals.shift()!.view.destroy();

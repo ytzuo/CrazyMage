@@ -1,8 +1,8 @@
 import type { School, UltimateModule } from '../upgrades/definitions';
 const DEFINITIONS = {
-  fire: { name:'焚天火墙', radius:520, damage:70, targets:36, freeze:0, pulses:3, interval:450, description:'沿施法方向推出多轮扇形火墙，每轮向前扫过敌人。' },
-  ice: { name:'永冬寒域', radius:320, damage:4, targets:72, freeze:1000, pulses:1, interval:400, description:'随玩家移动的寒域，持续伤害并积累寒霜，将敌人逐渐冻结。' },
-  lightning: { name:'雷暴追猎', radius:650, damage:95, targets:4, freeze:0, pulses:3, interval:220, description:'连续多轮锁定近敌，每轮最多四次落雷，可重复打击幸存目标。' },
+  fire: { killsRequired:20, name:'焚天火墙', radius:520, damage:70, targets:36, freeze:0, pulses:3, interval:450, description:'沿施法方向推出多轮扇形火墙，每轮向前扫过敌人。' },
+  ice: { killsRequired:10, name:'永冬寒域', radius:320, damage:4, targets:72, freeze:1000, pulses:1, interval:400, description:'随玩家移动的寒域，持续伤害并积累寒霜，将敌人逐渐冻结。' },
+  lightning: { killsRequired:15, name:'雷暴追猎', radius:650, damage:95, targets:4, freeze:0, pulses:3, interval:220, description:'连续多轮锁定近敌，每轮最多四次落雷，可重复打击幸存目标。' },
 } as const;
 export function ultimateSpec(school: School, level: number, modules: Readonly<Partial<Record<UltimateModule, number>>> = {}, endless = false) {
   const bonus=(school==='ice'?2:15)*(Math.max(1,Math.min(4,level))-1), base=DEFINITIONS[school];

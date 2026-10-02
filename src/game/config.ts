@@ -16,6 +16,8 @@ export interface MovementState {
   skillEnergy: number;
   skillRemaining: number;
   ultimateEnergy: number;
+  ultimateKills: number;
+  ultimateKillsRequired: number;
   ultimateCasts: number;
   ultimateEffects: number;
   x: number;
