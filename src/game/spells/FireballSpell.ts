@@ -1,3 +1,4 @@
+import { FireFields } from './FireFields';
 import { prepareFireTextures } from '../art/SpellTextures';
 import Phaser from 'phaser';
 import { ARENA, FIREBALL, type Direction } from '../config';
@@ -12,6 +13,7 @@ export class FireballSpell {
   private projectiles: Projectile[] = [];
   private impacts: Impact[] = [];
   private hits: { enemy: Enemy; t: number; x: number; y: number }[] = [];
+  private fields: FireFields;
   private cooldown = 0;
   private nextProjectile = 0;
   private runId = 0;
@@ -20,9 +22,10 @@ export class FireballSpell {
   constructor(private scene: Phaser.Scene, spec: FireballSpec) {
     this.spec = spec;
     prepareFireTextures(scene);
+    this.fields=new FireFields(scene);
   }
   get projectileCount(): number { return this.projectiles.length; }
-  get impactCount(): number { return this.impacts.length; }
+  get impactCount(): number { return this.impacts.length+this.fields.count; }
   configure(spec: FireballSpec): void {
     this.cooldown = preserveCooldown(this.cooldown, this.spec.cooldown, spec.cooldown);
     this.spec = spec;
@@ -35,6 +38,7 @@ export class FireballSpell {
   }
   update(delta: number, enemies: EnemySystem): void {
     this.cooldown = Math.max(0, this.cooldown - delta);
+    if(this.fields.update(delta,enemies))return;
     for (let i = this.projectiles.length - 1; i >= 0; i--) {
       const projectile = this.projectiles[i], spec = projectile.context.spec;
       const previousX = projectile.view.x, previousY = projectile.view.y;
@@ -62,6 +66,7 @@ export class FireballSpell {
         if (hit.enemy.health.dead) continue;
         const impactX = previousX + (x - previousX) * hit.t, impactY = previousY + (y - previousY) * hit.t;
         const nearby = spec.explosion && projectile.context.directTargets.size === 0 ? enemies.enemies.filter(enemy => enemy.spawning === 0 && !enemy.health.dead).map(enemy => ({ id: enemy.id, x: enemy.view.x, y: enemy.view.y })) : [];
+        const firstHit=projectile.context.directTargets.size===0;
         const exploded = resolveProjectileHit(projectile.context, { id: hit.enemy.id, x: impactX, y: impactY }, nearby, event => {
           const target = enemies.enemies.find(enemy => enemy.id === event.targetId);
           if (!target) return false;
@@ -70,6 +75,7 @@ export class FireballSpell {
           if (settled && event.source === 'direct') enemies.effects.spellHit(tx, ty, 'fire', projectile.direction);
           return settled;
         });
+        if(firstHit && projectile.context.directTargets.size>0 && spec.field) this.fields.add(impactX,impactY,spec.field);
         if (exploded) this.impact(impactX, impactY, spec.explosion!.radius);
         if (projectile.context.directTargets.size >= spec.maxTargets) { projectile.view.setPosition(impactX, impactY); break; }
       }
@@ -101,6 +107,7 @@ export class FireballSpell {
   reset(runId = 0): void {
     for (const projectile of this.projectiles) projectile.view.destroy();
     for (const impact of this.impacts) impact.view.destroy();
+    this.fields.reset();
     this.projectiles.length = this.impacts.length = this.hits.length = 0;
     this.cooldown = this.casts = this.nextProjectile = 0; this.runId = runId;
   }
