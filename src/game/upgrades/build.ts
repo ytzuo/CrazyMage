@@ -76,14 +76,14 @@ export function compileBuild(build: BuildState): EffectiveBuild {
   // Every endless choice adds lasting power even after coverage/object limits are reached.
   const growth = endless ? 1+0.02*build.revision : 1;
   const m = build.school === 'fire' ? build.modules : {}, i = build.school === 'ice' ? build.modules : {}, l = build.school === 'lightning' ? build.modules : {}, p = build.passives;
-  const fireDamage = growth * FIREBALL.damage * (1 + 0.3 * (m.damage ?? 0)) * (1 + (endless ? 0.15 * Math.max(0,(m.multi??0)-4) + 0.1 * Math.max(0,(m.pierce??0)-35) : 0)) * (m.multi ? 0.65 : 1);
+  const fireDamage = growth * FIREBALL.damage * (1 + 0.3 * (m.damage ?? 0)) * (1 + (endless ? 0.15 * Math.max(0,(m.multi??0)-2) + 0.1 * Math.max(0,(m.pierce??0)-35) : 0)) * (m.multi ? 0.65 : 1);
   const deathField = m.burn ? Object.freeze({damage:fireDamage*0.18*(1+0.3*((m.burn??1)-1)),radius:Math.min(420,Math.max(90,m.explosion?Math.min(600,80*(1+0.15*((m.explosion??1)-1)))*1.25:90)*(1+0.15*((m.burn??1)-1))),duration:Math.min(6000,3000+500*((m.burn??1)-1))}) : null;
   const fireball = Object.freeze({
     rebound: m.rebound ? Object.freeze({damageMultiplier:0.8*(1+0.25*((m.rebound??1)-1)),lifetime:2200}) : null,
     burn: m.burn ? Object.freeze({field:deathField,damage:fireDamage*0.25*(1+0.35*((m.burn??1)-1)),duration:Math.min(6000,3000+500*((m.burn??1)-1)),radius:Math.min(300,140+20*((m.burn??1)-1)),targets:Math.min(8,3+(m.burn??1)-1)}) : null,
     damage: fireDamage,
     cooldown: Math.max(150, FIREBALL.cooldown * (endless ? 1/(1+0.15*(p.cooldown??0)) : 1 - 0.1 * (p.cooldown ?? 0))),
-    count: Math.min(9,1 + 2 * (m.multi ?? 0)), maxTargets: Math.min(36,1 + (m.pierce ?? 0)),
+    count: Math.min(5,1 + 2 * (m.multi ?? 0)), maxTargets: Math.min(36,1 + (m.pierce ?? 0)),
     speed: FIREBALL.speed, lifetime: FIREBALL.lifetime,
     explosion: m.explosion ? Object.freeze({ radius: Math.min(600,80*(1+0.15*((m.explosion??1)-1))), multiplier: 0.35*(1+0.2*((m.explosion??1)-1)) }) : null,
   });

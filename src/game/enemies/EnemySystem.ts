@@ -416,8 +416,8 @@ export class EnemySystem {
     }
   }
 
-  /** True means contact settled, including a block; callers must not retry the same hit. */
-  hit(enemy: Enemy, damage: number, direction: Direction, source: DamageSource = 'spell', burn?: BurnSpec | null, periodic = false, ice?:IceEffectsSpec|null, shard=false): boolean {
+  /** True means contact settled, including a block. Disable deriveEffects for plain return hits. */
+  hit(enemy: Enemy, damage: number, direction: Direction, source: DamageSource = 'spell', burn?: BurnSpec | null, periodic = false, ice?:IceEffectsSpec|null, shard=false, deriveEffects=true): boolean {
     if (enemy.spawning > 0 || enemy.health.dead || !this.enemies.includes(enemy) || damage <= 0) return false;
     if (!periodic && enemy.variant === 'guardian' && enemy.frozen === 0 && enemy.blockCooldown === 0 && this.random() < VARIANTS.blockChance) {
       enemy.blockCooldown = VARIANTS.blockCooldown;
@@ -426,9 +426,9 @@ export class EnemySystem {
       // Contact is settled even without damage: consume pierce/splash once, allow ice control.
       return true;
     }
-    if(ice)this.applyIce(enemy,ice);
-    if(burn) this.ignite(enemy,burn,true);
-    const shatter=enemy.frozen>0 && enemy.frozenExecution;
+    if(deriveEffects && ice)this.applyIce(enemy,ice);
+    if(deriveEffects && burn) this.ignite(enemy,burn,true);
+    const shatter=deriveEffects && enemy.frozen>0 && enemy.frozenExecution;
     if(shatter)this.effects.shatter(enemy.view.x,enemy.view.y,enemy.spec.radius);
     const protectedDamage = shatter ? enemy.health.current + enemy.health.shield : this.special.protect(enemy, damage);
     if (protectedDamage > 0 && !enemy.health.hurt(protectedDamage)) return false;
@@ -449,7 +449,7 @@ export class EnemySystem {
     if (enemy.spec.kind !== 'bomber') enemy.warning.setVisible(false);
     enemy.aimLine.setVisible(false);
     }
-    if (enemy.health.dead) this.defeat(enemy, source, ice, shard);
+    if (enemy.health.dead) this.defeat(enemy, source, ice, shard, deriveEffects);
     return true;
   }
 
@@ -460,9 +460,9 @@ export class EnemySystem {
     this.defeat(enemy, null);
   }
 
-  private defeat(enemy: Enemy, source: DamageSource | null, ice?: IceEffectsSpec | null, shard=false): void {
-    if(source && enemy.burn?.spec.field) this.fireFields.add(enemy.view.x,enemy.view.y,enemy.burn.spec.field);
-    if (source) this.spreadBurn(enemy);
+  private defeat(enemy: Enemy, source: DamageSource | null, ice?: IceEffectsSpec | null, shard=false, deriveEffects=true): void {
+    if(deriveEffects && source && enemy.burn?.spec.field) this.fireFields.add(enemy.view.x,enemy.view.y,enemy.burn.spec.field);
+    if (deriveEffects && source) this.spreadBurn(enemy);
     if (source) { this.kills++; this.onKill(source, enemy.spec.kind === 'boss'); }
     this.special.onDeath(enemy, source);
     this.bosses.cancel(enemy.id); this.areaAttacks.cancel(enemy.id);
@@ -472,7 +472,7 @@ export class EnemySystem {
     enemy.view.destroy();
     this.enemies.splice(this.enemies.indexOf(enemy), 1);
     this.split(enemy, x, y);
-    if(source && !shard && enemy.iceShard && (enemy.slow.strength>0 || enemy.frozen>0 || !!ice?.shards))
+    if(deriveEffects && source && !shard && enemy.iceShard && (enemy.slow.strength>0 || enemy.frozen>0 || !!ice?.shards))
       this.iceShards.burst(x,y,enemy.iceShard.spec,this);
     // Clearing the arena schedules the next wave even when upgrades are exhausted.
     if (this.enemies.length === 0) { this.waveClock.scheduleNext(ENEMY.clearDelay); this.shots.reset(); this.areaAttacks.reset(); this.special.reset(); this.effects.clear(x, y); }

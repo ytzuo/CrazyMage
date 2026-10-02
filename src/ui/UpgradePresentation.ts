@@ -20,7 +20,7 @@ export const UPGRADE_PRESENTATION: Record<string, { symbol: string; summary: str
   'ultimate.lightning.power': {symbol:'ϟ', summary:'每次落雷的威力更强。'},
   'ultimate.lightning.reach': {symbol:'↗', summary:'雷暴锁定更远处的敌人。'},
   'ultimate.lightning.mastery': {symbol:'⌁', summary:'追加一轮追猎落雷。'},
-  'fire.rebound': {symbol:'↶',summary:'火球折返追随角色，回程可再次命中；强化回程威力，每枚整趟只爆炸一次，燃烧敌人死亡留下火区。'},
+  'fire.rebound': {symbol:'↶',summary:'火球折返追随角色，回程命中一名敌人后消散，只造成直接伤害，不触发附加效果；强化回程威力。'},
   'fire.burn': {symbol:'♨',summary:'火球点燃敌人，死亡传播火种并留下火区；强化燃烧与火区威力。'},
   'fire.damage': { symbol:'✹', summary:'让每一枚火球更有威力。' },
   'fire.multi': { symbol:'⋔', summary:'同时射出更多火球，单枚威力降低。' },
@@ -43,7 +43,7 @@ export const UPGRADE_PRESENTATION: Record<string, { symbol: string; summary: str
 };
 
 const ENDLESS_SUMMARIES: Readonly<Record<string, string>> = {
-  'fire.multi': '增加扇形火球，最多 9 枚；数量封顶后继续增伤。单枚威力只降低一次。',
+  'fire.multi': '增加扇形火球，最多 5 枚；数量封顶后继续增伤。单枚威力只降低一次。',
   'fire.pierce': '每枚火球贯穿更多敌人，最多 36 个；数量封顶后继续增伤，不增加飞行距离。',
   'fire.explosion': '首次命中爆炸，后续穿透不再引爆。范围与威力持续强化，范围封顶后仍增伤；同次施法对每个敌人只溅射一次。',
 };

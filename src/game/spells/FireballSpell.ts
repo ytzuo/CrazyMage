@@ -76,23 +76,29 @@ export class FireballSpell {
           const target = enemies.enemies.find(enemy => enemy.id === event.targetId);
           if (!target) return false;
           const tx = target.view.x, ty = target.view.y;
-          const settled = enemies.hit(target, event.damage, projectile.direction, 'spell', event.source==='direct'?spec.burn:null);
+          const settled = enemies.hit(target, event.damage, projectile.direction, 'spell', event.source==='direct'?spec.burn:null,false,null,false,!projectile.returning);
           if (settled && event.source === 'direct') enemies.effects.spellHit(tx, ty, 'fire', projectile.direction);
           return settled;
         });
         if (exploded) this.impact(impactX, impactY, spec.explosion!.radius);
-        if(enemies.waves.cleared!==cleared) {this.hits.length=0;return;}
-        if (projectile.context.directTargets.size >= spec.maxTargets) { if(!projectile.returning) projectile.view.setPosition(impactX, impactY); break; }
+        if(enemies.waves.cleared!==cleared) {
+          if(projectile.returning&&projectile.context.directTargets.size>=spec.maxTargets){
+            projectile.view.destroy();this.projectiles.splice(i,1);
+          }
+          this.hits.length=0;return;
+        }
+        if (projectile.context.directTargets.size >= spec.maxTargets) { projectile.view.setPosition(impactX, impactY); break; }
       }
       this.hits.length = 0;
       const finished=projectile.context.directTargets.size>=spec.maxTargets || fraction<1 || projectile.age>=lifetime;
       if(!projectile.returning && finished && spec.rebound) {
+        // The return leg only settles one direct hit; no inherited spell effects.
         const returnSpec=Object.freeze({...spec,damage:spec.damage*spec.rebound.damageMultiplier,
-          burn:spec.burn?Object.freeze({...spec.burn,damage:spec.burn.damage*spec.rebound.damageMultiplier,field:spec.burn.field?Object.freeze({...spec.burn.field,damage:spec.burn.field.damage*spec.rebound.damageMultiplier}):null}):null});
+          maxTargets:1,explosion:null,burn:null});
         projectile.context={...projectile.context,spec:returnSpec,directTargets:new Set<number>()};
         projectile.returning=true;projectile.age=0;projectile.view.setTint(0xffe1a0);
         this.impact(projectile.view.x,projectile.view.y);
-      } else if((!projectile.returning && finished) || (projectile.returning && (fraction<1 || projectile.age>=lifetime || Math.hypot(home.x-projectile.view.x,home.y-projectile.view.y)<=24))) {
+      } else if((!projectile.returning && finished) || (projectile.returning && (finished || fraction<1 || projectile.age>=lifetime || Math.hypot(home.x-projectile.view.x,home.y-projectile.view.y)<=24))) {
         this.impact(projectile.view.x, projectile.view.y);
         projectile.view.destroy(); this.projectiles.splice(i, 1);
       }
