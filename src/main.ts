@@ -40,9 +40,11 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       </svg>
     </aside>
     <button id="skill" class="ultimate-button skill-button" type="button" disabled hidden>
+      <span class="ready-aura" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
       <span class="ultimate-key" aria-hidden="true">E</span><span class="ultimate-content"><strong id="skill-name"></strong><span id="skill-kind" class="skill-kind"></span><small id="skill-charge"></small><span class="ultimate-track" aria-hidden="true"><span id="skill-fill"></span></span></span>
     </button>
     <button id="ultimate" class="ultimate-button" type="button" disabled hidden>
+      <span class="ready-aura" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
       <span class="ultimate-key" aria-hidden="true">Q</span><span class="ultimate-content"><strong id="ultimate-name"></strong><span id="ultimate-kind" class="skill-kind"></span><small id="ultimate-charge">0 / 100</small><span class="ultimate-track" aria-hidden="true"><span id="ultimate-fill"></span></span></span>
     </button>
     <div id="battle-notice" class="battle-notice" role="status" aria-live="polite" hidden></div>

@@ -276,6 +276,29 @@ button:disabled { opacity: 0.45; cursor: default; }
 .ultimate-button[data-school-tone="lightning"] { --ultimate-color: #f3e69b; }
 .ultimate-button.ready { border-color: var(--ultimate-color); box-shadow: 0 0 18px #a5ca7826; }
 .ultimate-button.ready:enabled:hover { background: #2b4135; }
+/* Two bounded HUD effects; only opacity and transform animate. */
+.ready-aura { position: absolute; inset: -3px; border-radius: 12px; pointer-events: none; opacity: 0; }
+.ultimate-button.ready .ready-aura { opacity: 1; }
+.ready-aura::before { content: ''; position: absolute; inset: 0; border: 2px solid #ffa04d; border-radius: inherit; box-shadow: 0 0 9px #ff722c88, inset 0 0 8px #ff722c55; }
+.ready-aura i { position: absolute; width: 9px; height: 19px; top: -11px; left: 12%; background: linear-gradient(0deg, #ff662bee, #ffcd72, #ffe6b900); border-radius: 70% 25% 60% 30%; transform-origin: center bottom; opacity: .8; --spark-delay: 0s; }
+.ready-aura i:nth-child(2) { left: 45%; --spark-delay: -.3s; }
+.ready-aura i:nth-child(3) { left: 80%; --spark-delay: -.6s; }
+.ready-aura i:nth-child(4) { top: auto; bottom: -7px; left: 25%; --spark-delay: -.8s; }
+.ready-aura i:nth-child(5) { top: 45%; left: -6px; --spark-delay: -.2s; }
+.ready-aura i:nth-child(6) { top: 50%; left: auto; right: -6px; --spark-delay: -.5s; }
+.ultimate-button.ready:enabled .ready-aura i { animation: ready-flame 900ms ease-in-out infinite alternate; animation-delay: var(--spark-delay); }
+.ultimate-button[data-school-tone="ice"] .ready-aura::before { border-color: #d8faff; box-shadow: 0 0 8px #8bdaef88, inset 0 0 10px #b3f1ff55; }
+.ultimate-button[data-school-tone="ice"] .ready-aura i { height: 16px; width: 12px; border-radius: 0; background: linear-gradient(120deg, #ffffff, #c1f5ffe6 45%, #60a6c8aa 46%, #dffbff); clip-path: polygon(50% 0, 100% 60%, 55% 100%, 0 65%); }
+.ultimate-button.ready:enabled[data-school-tone="ice"] .ready-aura i { animation-name: ready-frost; animation-duration: 1800ms; }
+.ultimate-button[data-school-tone="lightning"] .ready-aura::before { border-color: #f9eeb5; box-shadow: 0 0 9px #dcd2ff88, inset 0 0 8px #f4df7755; }
+.ultimate-button[data-school-tone="lightning"] .ready-aura i { height: 22px; width: 13px; border-radius: 0; background: #fff3a6; clip-path: polygon(65% 0, 15% 48%, 47% 48%, 25% 100%, 100% 32%, 60% 32%); }
+.ultimate-button.ready:enabled[data-school-tone="lightning"] .ready-aura i { animation: ready-spark 1100ms steps(1, end) infinite; animation-delay: var(--spark-delay); }
+@keyframes ready-flame { from { transform: translateY(2px) scale(.7, .75) rotate(-9deg); opacity: .45; } to { transform: translateY(-3px) scale(1.1, 1.2) rotate(9deg); opacity: 1; } }
+@keyframes ready-frost { from { transform: scale(.85); opacity: .45; } to { transform: scale(1.05); opacity: 1; } }
+@keyframes ready-spark { 0%, 45%, 90% { opacity: 0; transform: translate(0, 0) scale(.8); } 12%, 58% { opacity: 1; transform: translate(2px, -3px) scale(1.1); } 24%, 70% { opacity: .65; transform: translate(-2px, 1px) scale(.9); } }
+@media (prefers-reduced-motion: reduce) {
+  .ultimate-button.ready:enabled[data-school-tone] .ready-aura i { animation: none; opacity: .8; }
+}
 .ultimate-key { display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0; border: 1px solid currentColor; border-radius: 8px; font-size: 21px; font-weight: 700; }
 .ultimate-content { flex: 1; min-width: 0; }
 .ultimate-content strong { display: block; font-size: 15px; }
