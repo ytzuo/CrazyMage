@@ -1,6 +1,6 @@
 import type { School, SkillModule } from '../upgrades/definitions';
 export const SCHOOL_SKILLS = {
-  fire: {name:'焰爆', cooldown:12000, description:'向前推出烈焰，触敌或到达落点后爆开。'},
+  fire: {name:'焰爆', cooldown:10000, description:'向前推出烈焰，触敌或到达落点后爆开。'},
   ice: {name:'寒霜脉冲', cooldown:10000, description:'释放近身寒潮，让周围敌人陷入强烈减速。'},
   lightning: {name:'贯雷', cooldown:9000, description:'向前射出一道贯穿敌人的雷光。'},
 } as const;
