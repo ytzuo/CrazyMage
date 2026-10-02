@@ -14,7 +14,7 @@ document.querySelector<HTMLButtonElement>('#check')!.onclick=()=>{
       try{
         const player=new Player(this),enemies=new EnemySystem(this, undefined, undefined, () => 0.9);
         const figure=player.view.list[2] as Phaser.GameObjects.Container;
-        const wand=figure.list[1] as Phaser.GameObjects.Container;
+        const wand=figure.getByName('mage-wand') as Phaser.GameObjects.Container;
         const baseline=this.children.list.length;
         check(player.health.maximum===120,'starting health mismatch');
         const intervals=SCHOOLS.map(school=>{const b=compileBuild(initialBuild(1,school));return school==='fire'?b.fireball.cooldown:school==='ice'?b.ice.cooldown:b.lightning.cooldown;});

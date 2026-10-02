@@ -1,6 +1,7 @@
 import { paintEnemyDetails, paintVariantDetails } from './EnemyModelDetails';
 import { prepareSpecialEnemyTextures } from './SpecialEnemyTextures';
 import { prepareEnemyLegTextures } from './EnemyLegTextures';
+import { prepareMageLegTextures, paintMageLeg } from './MageLegTextures';
 import Phaser from 'phaser';
 import type { EnemyKind } from '../enemies/roster';
 import { SCHOOLS, type School } from '../upgrades/definitions';
@@ -41,9 +42,8 @@ export function prepareMageTextures(scene: Phaser.Scene): void {
   for (const school of SCHOOLS) {
     const palette = MAGE_PALETTES[school];
     for(const gender of ['male','female'] as const) {
-    texture(scene, mageBodyTexture(school,gender), 128, 192, g => {
-      g.fillStyle(ink).fillRoundedRect(43, 162, 18, 17, 4).fillRoundedRect(67, 162, 18, 17, 4);
-      g.fillStyle(0x6b5550).fillRect(45, 167, 13, 4).fillRect(69, 167, 13, 4);
+    const paintBody=(g:Phaser.GameObjects.Graphics,limbs:boolean):void=>{
+      if(limbs)for(const x of [42,67])paintMageLeg(g,palette,x);
       shape(g, gender==='female'?[47,112,80,112,91,163,78,176,63,172,45,177,30,164]:[44,112,84,112,96,166,78,173,63,169,47,174,31,166], palette.robe);
       shape(g, [44,119,57,126,49,166,34,163], palette.light, palette.robe);
       shape(g, [71,119,83,116,93,164,77,169], palette.dark, palette.dark);
@@ -96,7 +96,11 @@ export function prepareMageTextures(scene: Phaser.Scene): void {
       if(school==='fire') shape(g,[60,57,56,69,63,67,67,72,69,63,64,53],palette.crystal,palette.trim);
       else if(school==='ice') g.lineStyle(2,palette.crystal).lineBetween(57,61,69,71).lineBetween(57,71,69,61).lineBetween(63,56,63,76);
       else shape(g,[65,53,57,67,64,67,60,79,71,62,65,62],palette.crystal,palette.trim);
-    });
+    };
+    const bodyKey=mageBodyTexture(school,gender);
+    texture(scene,bodyKey,128,192,g=>paintBody(g,true));
+    texture(scene,`${bodyKey}-torso`,128,192,g=>paintBody(g,false));
+    prepareMageLegTextures(scene,bodyKey,palette);
     }
     texture(scene, mageStaffTexture(school), 64, 112, g => {
       shape(g,[40,19,47,19,46,97,41,97],0x6f4936);
