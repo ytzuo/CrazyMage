@@ -8,9 +8,9 @@ export function skillSpec(school:School, modules:Readonly<Partial<Record<SkillMo
   const power=modules.power??0, reach=modules.reach??0, tempo=modules.tempo??0;
   return Object.freeze({...SCHOOL_SKILLS[school], school,
     cooldown:SCHOOL_SKILLS[school].cooldown*(1-0.1*tempo),
-    damage:(school==='fire'?50:school==='ice'?18:55)*(1+0.3*power),
-    reach:(school==='fire'?190:school==='ice'?0:560)*(1+0.15*reach),
-    radius:(school==='fire'?110:school==='ice'?240:0)*(1+0.15*reach),
-    width:48*(1+0.15*reach), slow:0.65, duration:2500});
+    damage:(school==='fire'?70:school==='ice'?30:80)*(1+0.3*power),
+    reach:(school==='fire'?230:school==='ice'?0:640)*(1+0.15*reach),
+    radius:(school==='fire'?120:school==='ice'?260:0)*(1+0.15*reach),
+    width:56*(1+0.15*reach), slow:0.7, duration:3000});
 }
 export type SkillSpec=ReturnType<typeof skillSpec>;
