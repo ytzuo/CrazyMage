@@ -3,13 +3,14 @@ import { ARENA, PLAYER, type Direction } from '../config';
 import { Health } from '../combat/Health';
 import { SCHOOL_COLOR } from '../effects/CombatEffects';
 import type { School } from '../upgrades/definitions';
-import { prepareMageTextures, mageBodyTexture, mageStaffTexture } from '../art/CharacterTextures';
+import { prepareMageTextures, mageBodyTexture, mageStaffTexture, type CharacterGender } from '../art/CharacterTextures';
 
 export class Player {
   readonly view: Phaser.GameObjects.Container;
   private mage: Phaser.GameObjects.Image;
   private staff: Phaser.GameObjects.Image;
   private school: School = 'fire';
+  private gender: CharacterGender = 'male';
   private figure: Phaser.GameObjects.Container;
   private shadow: Phaser.GameObjects.Ellipse;
   private aura: Phaser.GameObjects.Arc;
@@ -35,7 +36,7 @@ export class Player {
     this.shadow = scene.add.ellipse(0, 9, 40, 16, 0x000000, 0.35);
     this.figure = scene.add.container(0, -7);
     prepareMageTextures(scene);
-    this.mage = scene.add.image(0, 0, mageBodyTexture(this.school)).setOrigin(0.5, 2 / 3).setScale(0.5);
+    this.mage = scene.add.image(0, 0, mageBodyTexture(this.school,this.gender)).setOrigin(0.5, 2 / 3).setScale(0.5);
     this.wand = scene.add.container(12, 3);
     this.staff = scene.add.image(0, 0, mageStaffTexture(this.school)).setScale(0.5);
     this.wandGlow = scene.add.circle(6, -23, 9, 0xffd99b, 0.2);
@@ -44,10 +45,15 @@ export class Player {
     this.view.add([this.aura, this.shadow, this.figure]);
   }
 
+  setGender(gender: CharacterGender): void {
+    this.gender = gender;
+    this.mage.setTexture(mageBodyTexture(this.school,gender));
+  }
+
   setSchool(school: School): void {
     if (this.school !== school) {
       this.school = school;
-      this.mage.setTexture(mageBodyTexture(school));
+      this.mage.setTexture(mageBodyTexture(school,this.gender));
       this.staff.setTexture(mageStaffTexture(school));
     }
     this.wandGlow.setFillStyle(SCHOOL_COLOR[school]);

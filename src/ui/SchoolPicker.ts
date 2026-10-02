@@ -1,14 +1,15 @@
 import { MODE_NAMES, isGameMode, readRecords, formatTime, type GameMode } from '../game/modes';
-import type { SchoolArtwork } from '../game/art/CharacterTextures';
+import type { SchoolArtwork, CharacterGender } from '../game/art/CharacterTextures';
 import { SCHOOLS, SCHOOL_INFO, isSchool, type School } from '../game/upgrades/definitions';
 /** One choice per run; illustrative previews never start or update the combat scene. */
 export class SchoolPicker {
   private visible:boolean|null=null;
   private artworkReady=false;
   private mode:GameMode='race';
+  private gender:CharacterGender='male';
   private abort=new AbortController();
-  constructor(private host:HTMLElement,choose:(school:School,mode:GameMode)=>void,private artwork:()=>SchoolArtwork|null) {
-    host.innerHTML=`<section class="build-card school-card"><header><div><small>本局挑战</small><h2>选择流派</h2></div></header><div class="mode-options" aria-label="游戏模式"><button data-mode="race" aria-pressed="true"><strong>竞速模式</strong><small>20 波 · 固定成长路线</small></button><button data-mode="endless" aria-pressed="false"><strong>无尽模式</strong><small>无限成长 · 持续挑战</small></button></div><div class="upgrade-options">${SCHOOLS.map(school=>{
+  constructor(private host:HTMLElement,choose:(school:School,mode:GameMode,gender:CharacterGender)=>void,private artwork:(gender:CharacterGender)=>SchoolArtwork|null) {
+    host.innerHTML=`<section class="build-card school-card"><header><div><small>本局挑战</small><h2>选择流派</h2></div><button class="gender-toggle" data-gender aria-pressed="false" aria-label="当前男角色，切换为女角色">角色：男 ♂</button></header><div class="mode-options" aria-label="游戏模式"><button data-mode="race" aria-pressed="true"><strong>竞速模式</strong><small>20 波 · 固定成长路线</small></button><button data-mode="endless" aria-pressed="false"><strong>无尽模式</strong><small>无限成长 · 持续挑战</small></button></div><div class="upgrade-options">${SCHOOLS.map(school=>{
       const info=SCHOOL_INFO[school];
       const effect=school==='fire'
         ? '<span class="preview-fireball"></span><span class="preview-impact"></span>'
@@ -19,10 +20,18 @@ export class SchoolPicker {
     document.addEventListener('visibilitychange',()=>host.classList.toggle('preview-sleep',document.hidden),{signal:this.abort.signal});
     host.classList.toggle('preview-sleep',document.hidden);
     host.addEventListener('click',event=>{
+      if((event.target as Element).closest('[data-gender]')) {
+        this.gender=this.gender==='male'?'female':'male';
+        const button=this.host.querySelector<HTMLButtonElement>('[data-gender]')!;
+        button.textContent=this.gender==='male'?'角色：男 ♂':'角色：女 ♀';
+        button.setAttribute('aria-pressed',String(this.gender==='female'));
+        button.setAttribute('aria-label',this.gender==='male'?'当前男角色，切换为女角色':'当前女角色，切换为男角色');
+        this.artworkReady=false;this.refreshArtwork();return;
+      }
       const mode=(event.target as Element).closest<HTMLButtonElement>('[data-mode]')?.dataset.mode;
       if(mode&&isGameMode(mode)){this.mode=mode;this.refreshRecords();return;}
       const value=(event.target as Element).closest<HTMLButtonElement>('[data-school]')?.dataset.school;
-      if(value&&isSchool(value))choose(value,this.mode);
+      if(value&&isSchool(value))choose(value,this.mode,this.gender);
     },{signal:this.abort.signal});
     host.addEventListener('keydown',event=>{
       if(event.key!=='Tab')return;
@@ -32,8 +41,15 @@ export class SchoolPicker {
     },{signal:this.abort.signal});
   }
   update(visible:boolean):void {
-    if(visible&&!this.artworkReady) {
-      const art=this.artwork();
+    if(visible)this.refreshArtwork();
+    if(this.visible===visible)return;
+    this.visible=visible;this.host.hidden=!visible;
+    if(visible)this.refreshRecords();
+    if(visible)this.host.querySelector<HTMLButtonElement>('button')?.focus({preventScroll:true});
+  }
+  private refreshArtwork():void {
+    if(!this.artworkReady) {
+      const art=this.artwork(this.gender);
       if(art) {
         for(const school of SCHOOLS) {
           const card=this.host.querySelector<HTMLElement>(`[data-school="${school}"]`)!;
@@ -43,10 +59,6 @@ export class SchoolPicker {
         this.artworkReady=true;
       }
     }
-    if(this.visible===visible)return;
-    this.visible=visible;this.host.hidden=!visible;
-    if(visible)this.refreshRecords();
-    if(visible)this.host.querySelector<HTMLButtonElement>('button')?.focus({preventScroll:true});
   }
   private refreshRecords():void {
     const records=readRecords();

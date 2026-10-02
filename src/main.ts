@@ -242,7 +242,7 @@ panel = new BuildPanel(element('build-overlay'), (batch, id) => {
   }
 }, inspectBuild);
 
-picker = new SchoolPicker(element('school-overlay'), (school,mode) => { if(scene.chooseSchool(school,mode)) { notice.show(`${SCHOOL_INFO[school].name}流派`, `${SCHOOL_INFO[school].spell}已就绪`, school); syncPause(); } }, () => scene.schoolArtwork());
+picker = new SchoolPicker(element('school-overlay'), (school,mode,gender) => { if(scene.chooseSchool(school,mode,gender)) { notice.show(`${SCHOOL_INFO[school].name}流派`, `${SCHOOL_INFO[school].spell}已就绪`, school); syncPause(); } }, gender => scene.schoolArtwork(gender));
 
 game = new Phaser.Game({
   type: Phaser.AUTO,

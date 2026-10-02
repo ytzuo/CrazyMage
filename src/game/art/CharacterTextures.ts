@@ -29,17 +29,19 @@ export const MAGE_PALETTES = {
   ice: {robe:0x4c8ba7,light:0xa3d6dd,dark:0x2d526d,trim:0xe0faff,crystal:0x9deaff},
   lightning: {robe:0x735aab,light:0xb59ace,dark:0x3f315f,trim:0xf6dfa0,crystal:0xffe77a},
 } as const;
-export const mageBodyTexture = (school:School):string => school==='fire'?'mage-body-detail':`mage-body-${school}-detail`;
+export type CharacterGender = 'male' | 'female';
+export const mageBodyTexture = (school:School, gender:CharacterGender='male'):string => gender==='female'?`mage-body-${school}-female-detail`:school==='fire'?'mage-body-detail':`mage-body-${school}-detail`;
 export const mageStaffTexture = (school:School):string => school==='fire'?'mage-staff-detail':`mage-staff-${school}-detail`;
 export type SchoolArtwork = Record<School,{body:string;staff:string}>;
 
 export function prepareMageTextures(scene: Phaser.Scene): void {
   for (const school of SCHOOLS) {
     const palette = MAGE_PALETTES[school];
-    texture(scene, mageBodyTexture(school), 128, 192, g => {
+    for(const gender of ['male','female'] as const) {
+    texture(scene, mageBodyTexture(school,gender), 128, 192, g => {
       g.fillStyle(ink).fillRoundedRect(43, 162, 18, 17, 4).fillRoundedRect(67, 162, 18, 17, 4);
       g.fillStyle(0x6b5550).fillRect(45, 167, 13, 4).fillRect(69, 167, 13, 4);
-      shape(g, [44,112,84,112,96,166,78,173,63,169,47,174,31,166], palette.robe);
+      shape(g, gender==='female'?[47,112,80,112,91,163,78,176,63,172,45,177,30,164]:[44,112,84,112,96,166,78,173,63,169,47,174,31,166], palette.robe);
       shape(g, [44,119,57,126,49,166,34,163], palette.light, palette.robe);
       shape(g, [71,119,83,116,93,164,77,169], palette.dark, palette.dark);
       g.lineStyle(2,palette.trim).lineBetween(44,128,39,159).lineBetween(56,135,53,164);
@@ -52,6 +54,13 @@ export function prepareMageTextures(scene: Phaser.Scene): void {
       g.lineStyle(1,0xc59464).lineBetween(77,137,86,137);
       shape(g, [42,112,62,123,84,112,78,104,48,104], 0xb5c6d0);
       shape(g, [49,112,63,119,56,128], palette.light);
+      if(gender==='female') {
+        // Long side locks and a braid remain readable below the shared school hat.
+        shape(g,[43,91,55,88,51,116,44,135,36,133,39,110],0x503741);
+        shape(g,[75,89,86,95,90,123,82,140,77,129,79,108],0x503741);
+        g.lineStyle(3,0x976553).lineBetween(42,106,39,126).lineBetween(83,110,85,124);
+        g.fillStyle(palette.trim).fillRoundedRect(77,130,9,4,1);
+      }
       g.fillStyle(0xab785b).fillRoundedRect(46,91,36,26,8);
       g.fillStyle(0xe6bf94).fillRoundedRect(47,89,32,24,8);
       g.fillStyle(0xf8d9ad).fillEllipse(57,97,17,13);
@@ -59,6 +68,11 @@ export function prepareMageTextures(scene: Phaser.Scene): void {
       g.fillStyle(ink).fillRoundedRect(53,98,5,8,2).fillRoundedRect(69,98,5,8,2);
       g.fillStyle(0xffffff).fillRect(54,98,2,2).fillRect(70,98,2,2);
       g.lineStyle(1,0x9f6958).lineBetween(61,110,66,110);
+      if(gender==='female') {
+        g.lineStyle(2,ink).lineBetween(51,99,56,97).lineBetween(71,97,76,99);
+        g.fillStyle(0xd98d88,0.5).fillEllipse(51,107,6,3).fillEllipse(76,107,6,3);
+        g.fillStyle(palette.trim).fillCircle(81,108,2.5);
+      } else g.lineStyle(2,0x674d40).lineBetween(52,96,58,95).lineBetween(68,95,74,96);
       shape(g, [34,88,52,41,63,36,67,51,84,88], palette.robe);
       shape(g, [37,86,53,44,59,42,53,85], palette.light, palette.light);
       shape(g, [65,51,82,86,65,84], palette.dark, palette.dark);
@@ -73,6 +87,7 @@ export function prepareMageTextures(scene: Phaser.Scene): void {
       else if(school==='ice') g.lineStyle(2,palette.crystal).lineBetween(57,61,69,71).lineBetween(57,71,69,61).lineBetween(63,56,63,76);
       else shape(g,[65,53,57,67,64,67,60,79,71,62,65,62],palette.crystal,palette.trim);
     });
+    }
     texture(scene, mageStaffTexture(school), 64, 112, g => {
       shape(g,[40,19,47,19,46,97,41,97],0x6f4936);
       g.lineStyle(2,0xbc8a56).lineBetween(42,27,42,91);

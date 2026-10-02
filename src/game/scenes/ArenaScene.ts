@@ -9,11 +9,11 @@ import { EnemySystem } from '../enemies/EnemySystem';
 import { AimIndicator } from '../ui/AimIndicator';
 import { SchoolSkill } from '../spells/SchoolSkill';
 import { UltimateSpell } from '../ultimates/UltimateSpell';
-import { mageBodyTexture, mageStaffTexture, type SchoolArtwork } from '../art/CharacterTextures';
+import { mageBodyTexture, mageStaffTexture, type SchoolArtwork, type CharacterGender } from '../art/CharacterTextures';
 import { BuildStore } from '../upgrades/BuildStore';
 
 export class ArenaScene extends Phaser.Scene {
-  private previewArt?: SchoolArtwork;
+  private previewArt: Partial<Record<CharacterGender, SchoolArtwork>> = {};
   private player!: Player;
   private spell!: SpellRunner;
   private ultimate!: UltimateSpell;
@@ -209,11 +209,12 @@ export class ArenaScene extends Phaser.Scene {
     this.publish();
   }
 
-  chooseSchool(school: School, mode: GameMode = 'race'): boolean {
+  chooseSchool(school: School, mode: GameMode = 'race', gender: CharacterGender = 'male'): boolean {
     if(!this.selectingSchool || !isSchool(school) || !this.player || this.player.health.dead) return false;
     this.mode=mode; this.won=false;
     this.builds.reset(school,mode);
     this.enemies.mode=mode;
+    this.player.setGender(gender);
     this.applyBuild();
     this.spell.reset(this.builds.snapshot.build.runId);
     this.enemies.reset(this.player);
@@ -268,10 +269,10 @@ export class ArenaScene extends Phaser.Scene {
     return true;
   }
 
-  schoolArtwork(): SchoolArtwork | null {
+  schoolArtwork(gender: CharacterGender = 'male'): SchoolArtwork | null {
     if (!this.player) return null;
-    return this.previewArt ??= Object.fromEntries(SCHOOLS.map(school => [school, {
-      body: this.textures.getBase64(mageBodyTexture(school)),
+    return this.previewArt[gender] ??= Object.fromEntries(SCHOOLS.map(school => [school, {
+      body: this.textures.getBase64(mageBodyTexture(school,gender)),
       staff: this.textures.getBase64(mageStaffTexture(school)),
     }])) as SchoolArtwork;
   }

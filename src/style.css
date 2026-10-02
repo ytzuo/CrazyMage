@@ -515,3 +515,9 @@ button:disabled { opacity: 0.45; cursor: default; }
 @media(max-width:760px) { .mode-options { gap:8px; margin-bottom:12px; } .mode-options button { padding:10px; } .mode-options strong { font-size:14px; } .school-record { margin:4px 0; } }
 
 @media(max-width:760px) { .school-choice .school-record { grid-column:2; } .school-choice .school-preview { grid-row:1 / 5; } }
+
+.school-card header { justify-content:space-between; }
+.school-card .gender-toggle { border-radius:20px; padding:9px 15px; color:#e7eeda; background:#304734; }
+.school-card .gender-toggle[aria-pressed="true"] { border-color:#d3b8df; background:#493c52; }
+
+@media(max-width:760px) { .school-card .gender-toggle { padding:8px 12px; font-size:12px; white-space:nowrap; } }
