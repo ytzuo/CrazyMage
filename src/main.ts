@@ -98,9 +98,9 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
     button.dataset.schoolTone = school;
     button.classList.toggle('ready', ready);
     button.title = spec.description;
-    button.setAttribute('aria-label', `${spec.name}，${ready ? '已就绪，按 E 或点击释放' : '充能中'}`);
+    button.setAttribute('aria-label', `${spec.name}，${ready ? '已就绪，按 E 或点击释放' : `充能 ${state.skillEnergy}%`}`);
     element('skill-name').textContent = spec.name;
-    element('skill-charge').textContent = ready ? '已就绪' : `${Math.ceil(state.skillRemaining/1000)}s`;
+    element('skill-charge').textContent = ready ? '已就绪 · 100%' : `${state.skillEnergy}% · ${Math.ceil(state.skillRemaining/1000)}s`;
     element('skill-fill').style.transform = `scaleX(${state.skillEnergy/100})`;
     lastSkill = skillKey;
   }

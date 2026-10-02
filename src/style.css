@@ -281,14 +281,14 @@ button:disabled { opacity: 0.45; cursor: default; }
 .ultimate-content strong { display: block; font-size: 15px; }
 .ultimate-content small { display: block; margin-top: 3px; font: 11px ui-monospace, monospace; }
 .ultimate-track { display: block; height: 4px; margin-top: 7px; border-radius: 2px; overflow: hidden; background: #71846a45; }
-#ultimate-fill { display: block; height: 100%; background: var(--ultimate-color); transform: scaleX(0); transform-origin: left; transition: transform 180ms ease-out; }
+#ultimate-fill, #skill-fill { display: block; height: 100%; background: var(--ultimate-color); transform: scaleX(0); transform-origin: left; transition: transform 180ms ease-out; }
 @media (max-width: 760px) {
   .ultimate-button { left: var(--edge-left); transform: none; bottom: calc(var(--edge-bottom) + 128px); width: 152px; gap: 9px; padding: 10px; }
   .ultimate-key { width: 28px; height: 32px; font-size: 18px; }
   .ultimate-content strong { font-size: 13px; }
 }
 @media (max-height: 500px) and (min-width: 600px) { .ultimate-button { bottom: calc(var(--edge-bottom) + 96px); } }
-@media (prefers-reduced-motion: reduce) { #ultimate-fill { transition: none; } }
+@media (prefers-reduced-motion: reduce) { #ultimate-fill, #skill-fill { transition: none; } }
 
 /* Reward cards: finite 3D reveal, no timer and no looping shimmer. */
 .reward-options { gap: 20px; padding: 6px 2px 10px; }
@@ -454,6 +454,7 @@ button:disabled { opacity: 0.45; cursor: default; }
 .reward-card.reward-ultimate .reward-category, .owned-ultimate .owned-kind { color: #f3d697; }
 .level-route > b { margin-left: auto; }
 
+.skill-button .ultimate-track { height: 6px; }
 .skill-button { bottom: calc(var(--edge-bottom) + 88px); }
 @media (max-width: 760px) { .skill-button { bottom: calc(var(--edge-bottom) + 204px); } }
 @media (max-height: 500px) and (min-width: 600px) { .skill-button { bottom: calc(var(--edge-bottom) + 172px); } }
