@@ -55,8 +55,11 @@ export class Player {
   }
 
   update(direction: Direction, delta: number, aim: Direction | null = null): void {
-    const look=aim ?? direction,length=Math.hypot(look.x,look.y);
-    if(length>0){this.look.x=look.x/length;this.look.y=look.y/length;}
+    // Movement never changes the stored casting direction.
+    if(aim){
+      const length=Math.hypot(aim.x,aim.y);
+      if(length>0){this.look.x=aim.x/length;this.look.y=aim.y/length;}
+    }
     this.health.update(delta);
     this.castTime = Math.max(0, this.castTime - delta);
     this.flashTime = Math.max(0, this.flashTime - delta);
