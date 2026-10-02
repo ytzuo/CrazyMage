@@ -1,5 +1,11 @@
 # 升级兼容架构
 
+## Boss 奖励与大招兼容
+
+大招升级使用独立 `ULTIMATE_UPGRADES` 池和 `ultimate` 效果类型，`BuildState.ultimateModules` 保存威力、范围、流派特色三类层数。与普通法术模块、被动槽分开；`compileBuild` 产生 `effective.ultimate`，大招运行器和构筑页直接读取该结果。选择仍通过统一 `applyUpgrade`、批次验证、合法性检查和历史记录，三种模块兼容、顺序无关。
+
+`EnemySystem` 将 Boss 和小怪计入同一波次。Boss 死亡立即补能，但只在该波剩余怪物清零后报告 Boss 波完成；`BuildStore` 为该波排入普通奖励和额外的大招奖励，批次 `kind` 区分候选池。池耗尽只跳过对应奖励，不会丢弃后续大招奖励。普通满级也能继续获取大招强化；满层候选移除，重复提交和重复完成不奖励，重开清理。详见 [流派大招](ultimates.md) 和 [周期 Boss](bosses.md)。
+
 状态：基础架构已实现，三种流派法术与冰霜减速已实现，危险升级及其他状态结算待扩展。玩法与数值约定见 [攻击升级与组合设计](attack-upgrade-design.md)。当前 `FireballSpell` 已读取计算后的参数，支持多重、穿透和首次命中爆炸，旧弹丸保留发射快照。
 
 ## 1. 核心结构

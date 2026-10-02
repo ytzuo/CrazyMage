@@ -247,7 +247,7 @@ export class EnemySystem {
   freeze(enemy: Enemy, duration: number): void {
     if (enemy.spawning > 0 || enemy.health.dead || !this.enemies.includes(enemy)) return;
     this.bosses.cancel(enemy.id);
-    enemy.frozen = Math.max(enemy.frozen, Math.min(3000, duration));
+    enemy.frozen = Math.max(enemy.frozen, Math.min(6000, duration));
     if(!enemy.icePrison){
       enemy.icePrison=this.scene.add.image(0,-4,'ice-prison-detail').setDisplaySize(enemy.spec.radius*2.8,enemy.spec.radius*3.2);
       enemy.view.add(enemy.icePrison);enemy.view.bringToTop(enemy.bar);

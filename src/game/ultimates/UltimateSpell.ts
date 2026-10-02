@@ -29,7 +29,7 @@ export class UltimateSpell {
     }
     g.generateTexture('ultimate-ring',256,256);g.destroy();
   }
-  configure(school:School,level:number):void{this.spec=ultimateSpec(school,level);}
+  configure(school:School | UltimateSpec,level=1):void{this.spec=typeof school==='string'?ultimateSpec(school,level):school;}
   private visual(x:number,y:number,size:number,ring:boolean,life=800,texture?:string,motion?:Motion):void {
     if(this.visuals.length>=40)this.visuals.shift()!.view.destroy();
     const view=this.scene.add.image(x,y,texture ?? (ring?(this.spec.school==='fire'?'fire-nova-detail':this.spec.school==='ice'?'ice-frost-detail':'ultimate-ring'):'lightning-bolt-detail')).setTint(ring && (!texture || texture==='ultimate-ring')?0xb8caff:0xffffff).setDepth(ring?8:14);
@@ -44,7 +44,7 @@ export class UltimateSpell {
   cast(x:number,y:number,enemies:EnemySystem,aim:Direction={x:1,y:0}):boolean {
     if(!this.charge.ready || this.sequence)return false;
     const length=Math.hypot(aim.x,aim.y);
-    const seq:Sequence={spec:this.spec,x,y,enemies,elapsed:0,next:1,aim:length>0?{x:aim.x/length,y:aim.y/length}:{x:1,y:0},fireHits:[[],[],[]]};
+    const seq:Sequence={spec:this.spec,x,y,enemies,elapsed:0,next:1,aim:length>0?{x:aim.x/length,y:aim.y/length}:{x:1,y:0},fireHits:Array.from({length:this.spec.pulses},()=>[])};
     if(!this.targets(seq).length)return false;
     this.charge.consume();this.casts++;this.sequence=seq;
     this.pulse(seq,0);

@@ -1,5 +1,14 @@
 /** Short selection copy; combat parameters remain in the shared build compiler. */
 export const UPGRADE_PRESENTATION: Record<string, { symbol: string; summary: string }> = {
+  'ultimate.fire.power': {symbol:'✹', summary:'火墙的冲击更强。'},
+  'ultimate.fire.reach': {symbol:'➶', summary:'火墙向更远处推进。'},
+  'ultimate.fire.mastery': {symbol:'✺', summary:'追加一轮向前推进的火墙。'},
+  'ultimate.ice.power': {symbol:'❄', summary:'冰封瞬间的寒潮冲击更强。'},
+  'ultimate.ice.reach': {symbol:'◎', summary:'冰封覆盖更广的敌群。'},
+  'ultimate.ice.mastery': {symbol:'❅', summary:'冰块维持更久，留下更从容的处决机会。'},
+  'ultimate.lightning.power': {symbol:'ϟ', summary:'每次落雷的威力更强。'},
+  'ultimate.lightning.reach': {symbol:'↗', summary:'雷暴锁定更远处的敌人。'},
+  'ultimate.lightning.mastery': {symbol:'⌁', summary:'追加一轮追猎落雷。'},
   'fire.damage': { symbol:'✹', summary:'让每一枚火球更有威力。' },
   'fire.multi': { symbol:'⋔', summary:'同时射出更多火球，单枚威力降低。' },
   'fire.pierce': { symbol:'➶', summary:'火球贯穿敌人，继续击中后方目标。' },

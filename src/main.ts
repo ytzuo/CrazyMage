@@ -6,7 +6,7 @@ import { ArenaScene } from './game/scenes/ArenaScene';
 import { observePerformance } from './game/diagnostics/performance';
 import { BuildPanel, spellSummary } from './ui/BuildPanel';
 import { SchoolPicker } from './ui/SchoolPicker';
-import { ultimateSpec, ultimateSummary } from './game/ultimates/definitions';
+import { ultimateSummary } from './game/ultimates/definitions';
 import { BattleNotice } from './ui/BattleNotice';
 import { SCHOOL_INFO, definition } from './game/upgrades/definitions';
 import type { BuildSnapshot } from './game/upgrades/BuildStore';
@@ -84,16 +84,16 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
   selectingSchool = state.selectingSchool;
   picker?.update(selectingSchool);
   const school = state.progression.build.school;
-  const ultimateKey = `${school}/${state.progression.build.spellLevel}/${state.ultimateEnergy}/${state.paused}/${selectingSchool}/${state.dead}/${state.progression.choice?.id}`;
+  const ultimateKey = `${school}/${state.progression.build.revision}/${state.ultimateEnergy}/${state.paused}/${selectingSchool}/${state.dead}/${state.progression.choice?.id}`;
   if (ultimateKey !== lastUltimate) {
-    const spec = ultimateSpec(school, state.progression.build.spellLevel);
+    const spec = state.progression.effective.ultimate;
     const ready = state.ultimateEnergy === 100;
     const button = element<HTMLButtonElement>('ultimate');
     button.hidden = selectingSchool;
     button.disabled = !ready || state.paused || selectingSchool || state.dead || !!state.progression.choice;
     button.dataset.schoolTone = school;
     button.classList.toggle('ready', ready);
-    button.title = `${ultimateSummary(school, state.progression.build.spellLevel)}。普通击杀 +10 能量，大招击杀不回充。范围内无目标时不消耗。`;
+    button.title = `${ultimateSummary(school, state.progression.build.spellLevel, state.progression.build.ultimateModules)}。普通击杀 +10 能量，大招击杀不回充；击杀 Boss 立即充满。范围内无目标时不消耗。`;
     button.setAttribute('aria-label', `${spec.name}，${ready ? '已就绪，按 Q 或点击释放' : `充能 ${state.ultimateEnergy}%`}`);
     element('ultimate-name').textContent = spec.name;
     element('ultimate-charge').textContent = ready ? '已就绪' : `${state.ultimateEnergy} / 100`;
@@ -101,8 +101,8 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
     lastUltimate = ultimateKey;
   }
   if (ultimateRun === state.progression.build.runId && !selectingSchool) {
-    if (state.ultimateCasts > ultimateCasts) notice.show(ultimateSpec(school, state.progression.build.spellLevel).name, '释放大招', school);
-    else if (state.ultimateEnergy === 100 && ultimateEnergy < 100) notice.show('大招已就绪', ultimateSpec(school, state.progression.build.spellLevel).name, school);
+    if (state.ultimateCasts > ultimateCasts) notice.show(state.progression.effective.ultimate.name, '释放大招', school);
+    else if (state.ultimateEnergy === 100 && ultimateEnergy < 100) notice.show('大招已就绪', state.progression.effective.ultimate.name, school);
   }
   ultimateRun = state.progression.build.runId;
   ultimateEnergy = state.ultimateEnergy; ultimateCasts = state.ultimateCasts;

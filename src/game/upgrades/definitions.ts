@@ -11,7 +11,8 @@ export type IceModule = 'damage' | 'radius' | 'cold' | 'echo';
 export type LightningModule = 'damage' | 'chain' | 'range' | 'conduction';
 export type SpellModule = FireModule | IceModule | LightningModule;
 export type Passive = 'speed' | 'health' | 'shield' | 'cooldown';
-export type UpgradeEffect = { kind: 'fire'; module: FireModule } | { kind: 'ice'; module: IceModule } | { kind: 'lightning'; module: LightningModule } | { kind: 'passive'; stat: Passive };
+export type UltimateModule = 'power' | 'reach' | 'mastery';
+export type UpgradeEffect = { kind: 'ultimate'; school: School; module: UltimateModule } | { kind: 'fire'; module: FireModule } | { kind: 'ice'; module: IceModule } | { kind: 'lightning'; module: LightningModule } | { kind: 'passive'; stat: Passive };
 export interface UpgradeDefinition { id: string; name: string; description: string; maxStacks: number; effect: UpgradeEffect }
 export const UPGRADES: readonly UpgradeDefinition[] = [
   { id: 'fire.damage', name: '灼热增幅', description: '按基础伤害增加 30%，保留其他火球能力。', maxStacks: 2, effect: { kind: 'fire', module: 'damage' } },
@@ -31,4 +32,16 @@ export const UPGRADES: readonly UpgradeDefinition[] = [
   { id: 'passive.shield', name: '魔法护盾', description: '护盾容量 +20，10 秒未受伤后恢复；先吸收伤害。', maxStacks: 3, effect: { kind: 'passive', stat: 'shield' } },
   { id: 'passive.cooldown', name: '施法加速', description: '按基础值降低施法冷却 10%，保留当前冷却进度。', maxStacks: 3, effect: { kind: 'passive', stat: 'cooldown' } },
 ];
-export const definition = (id: string): UpgradeDefinition | undefined => UPGRADES.find(item => item.id === id);
+/** Boss rewards have their own pool and never consume a normal spell level or passive slot. */
+export const ULTIMATE_UPGRADES: readonly UpgradeDefinition[] = [
+  { id:'ultimate.fire.power', name:'烈焰洪流', description:'火墙的冲击更强。', maxStacks:3, effect:{kind:'ultimate',school:'fire',module:'power'} },
+  { id:'ultimate.fire.reach', name:'燎原之势', description:'火墙向更远处推进。', maxStacks:3, effect:{kind:'ultimate',school:'fire',module:'reach'} },
+  { id:'ultimate.fire.mastery', name:'余烬续燃', description:'追加一轮向前推进的火墙。', maxStacks:3, effect:{kind:'ultimate',school:'fire',module:'mastery'} },
+  { id:'ultimate.ice.power', name:'极寒冲击', description:'冰封瞬间的寒潮冲击更强。', maxStacks:3, effect:{kind:'ultimate',school:'ice',module:'power'} },
+  { id:'ultimate.ice.reach', name:'凛冬疆域', description:'冰封覆盖更广的敌群。', maxStacks:3, effect:{kind:'ultimate',school:'ice',module:'reach'} },
+  { id:'ultimate.ice.mastery', name:'永冻冰棺', description:'冰块维持更久，留下更从容的处决机会。', maxStacks:3, effect:{kind:'ultimate',school:'ice',module:'mastery'} },
+  { id:'ultimate.lightning.power', name:'天罚重击', description:'每次落雷的威力更强。', maxStacks:3, effect:{kind:'ultimate',school:'lightning',module:'power'} },
+  { id:'ultimate.lightning.reach', name:'雷云扩张', description:'雷暴锁定更远处的敌人。', maxStacks:3, effect:{kind:'ultimate',school:'lightning',module:'reach'} },
+  { id:'ultimate.lightning.mastery', name:'雷鸣不息', description:'追加一轮追猎落雷。', maxStacks:3, effect:{kind:'ultimate',school:'lightning',module:'mastery'} },
+];
+export const definition = (id: string): UpgradeDefinition | undefined => [...UPGRADES, ...ULTIMATE_UPGRADES].find(item => item.id === id);

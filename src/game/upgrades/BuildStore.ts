@@ -1,7 +1,7 @@
 import { applyUpgrade, canAcquire, compileBuild, initialBuild, stacks, type BuildState, type EffectiveBuild } from './build.ts';
-import { UPGRADES, definition, type School } from './definitions.ts';
+import { UPGRADES, ULTIMATE_UPGRADES, definition, type School } from './definitions.ts';
 export interface HistoryEntry { readonly sequence: number; readonly id: string; readonly wave: number; readonly elapsed: number; readonly level: number }
-export interface ChoiceBatch { readonly id: string; readonly wave: number; readonly options: readonly string[] }
+export interface ChoiceBatch { readonly id: string; readonly wave: number; readonly kind: 'normal' | 'ultimate'; readonly options: readonly string[] }
 export interface BuildSnapshot { readonly build: BuildState; readonly effective: EffectiveBuild; readonly history: readonly HistoryEntry[]; readonly choice: ChoiceBatch | null; readonly completedWaves: number; readonly pendingRewards: number; readonly exhausted: boolean }
 /** Owns atomic choices; previews consume neither wave rewards nor randomness. */
 export class BuildStore {
@@ -12,7 +12,7 @@ export class BuildStore {
   private history: readonly HistoryEntry[] = Object.freeze([]);
   private choice: ChoiceBatch | null = null;
   private rewardedWaves = new Set<number>();
-  private rewards: number[] = [];
+  private rewards: { wave: number; kind: 'normal' | 'ultimate' }[] = [];
   private random: () => number;
   constructor(random: () => number = Math.random) { this.random = random; }
   get effectiveBuild(): EffectiveBuild { return this.effective; }
@@ -22,11 +22,14 @@ export class BuildStore {
     this.build = initialBuild(++this.runId, school); this.effective = compileBuild(this.build);
     this.history = Object.freeze([]); this.choice = null; this.rewards = []; this.rewardedWaves.clear(); this.batchId = 0;
   }
-  completeWave(wave: number): void {
+  completeWave(wave: number, bossDefeated = false): void {
     if (!Number.isInteger(wave) || wave < 1 || this.rewardedWaves.has(wave)) return;
-    if (this.snapshot.exhausted) return;
+    const normalAvailable = !this.snapshot.exhausted;
+    const ultimateAvailable = bossDefeated && ULTIMATE_UPGRADES.some(card => canAcquire(this.build, card));
+    if (!normalAvailable && !ultimateAvailable) return;
     this.rewardedWaves.add(wave);
-    this.rewards.push(wave);
+    if (normalAvailable) this.rewards.push({wave, kind:'normal'});
+    if (ultimateAvailable) this.rewards.push({wave, kind:'ultimate'});
     this.offer();
   }
   preview(id: string): EffectiveBuild {
@@ -39,7 +42,7 @@ export class BuildStore {
     if (!card || !canAcquire(this.build, card)) return false;
     const next = applyUpgrade(this.build, id);
     const effective = compileBuild(next);
-    const history = Object.freeze([...this.history, Object.freeze({ sequence: this.history.length + 1, id, wave: this.choice.wave, elapsed, level: card.effect.kind !== 'passive' ? next.spellLevel : stacks(next, card) })]);
+    const history = Object.freeze([...this.history, Object.freeze({ sequence: this.history.length + 1, id, wave: this.choice.wave, elapsed, level: card.effect.kind !== 'passive' && card.effect.kind !== 'ultimate' ? next.spellLevel : stacks(next, card) })]);
     this.rewards.shift();
     this.build = next; this.effective = effective; this.history = history; this.choice = null;
     this.offer();
@@ -47,7 +50,13 @@ export class BuildStore {
   }
   private offer(): void {
     if (this.choice || !this.rewards.length) return;
-    const pool = UPGRADES.filter(card => canAcquire(this.build, card));
+    // Exhausted pools discard only their own reward, preserving later boss rewards.
+    let pool = (this.rewards[0].kind === 'ultimate' ? ULTIMATE_UPGRADES : UPGRADES).filter(card => canAcquire(this.build, card));
+    while (!pool.length) {
+      this.rewards.shift();
+      if (!this.rewards.length) return;
+      pool = (this.rewards[0].kind === 'ultimate' ? ULTIMATE_UPGRADES : UPGRADES).filter(card => canAcquire(this.build, card));
+    }
     const options: string[] = [];
     const draw = (onlySpell = false): boolean => {
       const eligible = pool.filter(card => !onlySpell || card.effect.kind !== 'passive');
@@ -60,7 +69,6 @@ export class BuildStore {
     };
     draw(true);
     while (options.length < 3 && draw()) { /* weighted draw without replacement */ }
-    if (!options.length) this.rewards = [];
-    if (options.length) this.choice = Object.freeze({ id: `${this.build.runId}:${++this.batchId}`, wave: this.rewards[0], options: Object.freeze(options) });
+    this.choice = Object.freeze({ id: `${this.build.runId}:${++this.batchId}`, ...this.rewards[0], options: Object.freeze(options) });
   }
 }
