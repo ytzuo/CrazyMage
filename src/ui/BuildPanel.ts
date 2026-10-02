@@ -1,6 +1,6 @@
 import type { BuildSnapshot } from '../game/upgrades/BuildStore';
 import { stacks, type EffectiveBuild } from '../game/upgrades/build';
-import { ultimateSummary } from '../game/ultimates/definitions';
+import { ultimateSpec } from '../game/ultimates/definitions';
 import { UPGRADE_PRESENTATION } from './UpgradePresentation';
 import { definition, SCHOOL_INFO } from '../game/upgrades/definitions';
 export const number = (value: number): string => Number(value.toFixed(2)).toString();
@@ -93,13 +93,14 @@ export class BuildPanel {
   }
 
   private details(snapshot: BuildSnapshot): string {
-    const p = snapshot.effective.player;
+    const school=SCHOOL_INFO[snapshot.build.school];
+    const ultimate=ultimateSpec(snapshot.build.school,snapshot.build.spellLevel);
     const collection = [...new Set(snapshot.history.map(entry=>entry.id))].map(id=>{
       const card=definition(id)!, entries=snapshot.history.filter(entry=>entry.id===id);
       const passive=card.effect.kind==='passive', art=UPGRADE_PRESENTATION[id];
-      return `<article class="owned-card school-${snapshot.build.school}${passive?' owned-passive':''}"><span class="owned-kind">${passive?'被动':'法术强化'}<b>×${entries.length}</b></span><span class="owned-symbol" aria-hidden="true">${art?.symbol ?? '✦'}</span><h4>${card.name}</h4><p>${art?.summary ?? '增强战斗能力。'}</p><small>${entries.map(entry=>`第 ${entry.wave} 波 · ${Math.floor(entry.elapsed/60000)}:${String(Math.floor(entry.elapsed/1000)%60).padStart(2,'0')}`).join(' / ')}</small></article>`;
+      return `<article class="owned-card school-${snapshot.build.school}${passive?' owned-passive':''}"><span class="owned-kind">${passive?'被动':'法术强化'}<b>×${entries.length}</b></span><span class="owned-symbol" aria-hidden="true">${art?.symbol ?? '✦'}</span><h4>${card.name}</h4><p>${art?.summary ?? '增强战斗能力。'}</p></article>`;
     }).join('');
-    return `<div class="build-details"><h3>${SCHOOL_INFO[snapshot.build.school].name} · ${SCHOOL_INFO[snapshot.build.school].spell} Lv.${snapshot.build.spellLevel} / 4</h3><p>${spellSummary(snapshot.effective)}</p><p class="combination">${snapshot.build.school === 'fire' && snapshot.effective.fireball.maxTargets > 1 ? "每枚火球独立保留穿透。" : ""}${snapshot.build.school === 'fire' && snapshot.effective.fireball.explosion ? "首次命中爆炸，同次施法溅射不重复。" : ""}${snapshot.build.school === 'ice' ? "冰环与回响保留减速，重复命中刷新寒意。" : snapshot.build.school === 'lightning' ? "首击沿瞄准方向选敌，每次连锁不重复访问目标。" : ""}</p><h3>专属大招 · Q</h3><p>${ultimateSummary(snapshot.build.school, snapshot.build.spellLevel)}</p><p>普通击杀 10 只充满；大招击杀不回充。随法术等级增加伤害。</p><h3>被动 ${Object.keys(snapshot.build.passives).length} / 3</h3><p>移速 ${number(p.speed)} · 生命上限 ${p.maximum} · 护盾容量 ${p.shield}</p><h3>获取的强化</h3><div class="owned-cards">${collection || '<p class="owned-empty">尚未获取强化</p>'}</div><details class="build-numbers"><summary>查看详细参数</summary><ul>${snapshot.effective.breakdown.map(text=>`<li>${text}</li>`).join('') || '<li>尚未选择强化</li>'}</ul></details></div>`;
+    return `<div class="build-details"><h3>${school.name} · ${school.spell}</h3><p>${school.description}</p><h3>${ultimate.name} · Q</h3><p>${ultimate.description}</p><p>普通击杀充能，满能量后释放；大招击杀不回充。</p><h3>获取的强化</h3><div class="owned-cards">${collection || '<p class="owned-empty">尚未获取强化</p>'}</div></div>`;
   }
   destroy(): void { this.abort.abort(); }
 }

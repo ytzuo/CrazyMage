@@ -446,8 +446,5 @@ button:disabled { opacity: 0.45; cursor: default; }
 .owned-symbol { display: grid; place-items: center; margin: 14px auto 12px; width: 56px; height: 56px; border: 1px solid #c9b78a40; border-radius: 50%; color: var(--owned-color); font: 30px Georgia, serif; }
 .owned-card h4 { margin: 0 0 6px; text-align: center; font: 600 18px "Songti SC", serif; letter-spacing: 1px; }
 .owned-card p { font-size: 12px; margin: 0 0 14px; line-height: 1.7; text-align: center; }
-.owned-card small { display: block; border-top: 1px solid #c9b78a30; padding-top: 10px; font-size: 10px; line-height: 1.8; }
-.build-numbers { margin-top: 20px; }
-.build-numbers summary { cursor: pointer; color: #b7cba6; }
 @media (max-width: 760px) { .owned-cards { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; } .owned-card { padding: 14px; } }
 @media (max-width: 360px) { .owned-cards { grid-template-columns: 1fr; } }
