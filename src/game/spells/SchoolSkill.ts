@@ -22,7 +22,7 @@ export function skillEndpoint(x:number,y:number,direction:Direction,reach:number
 /** One time charge; bounded cosmetic images, all advanced by active game time. */
 export class SchoolSkill {
   private school:School='fire';
-  private remaining:number=SCHOOL_SKILLS.fire.cooldown;
+  private remaining=0;
   private visuals:Visual[]=[];
   private release:Release|null=null;
   constructor(private scene:Phaser.Scene){prepareFireTextures(scene);prepareIceTextures(scene);prepareLightningTextures(scene);}
@@ -116,6 +116,6 @@ export class SchoolSkill {
   reset(school:School='fire'):void {
     for(const visual of this.visuals)visual.view.destroy();this.visuals.length=0;
     this.release=null;
-    this.school=school;this.remaining=SCHOOL_SKILLS[school].cooldown;
+    this.school=school;this.remaining=0;
   }
 }

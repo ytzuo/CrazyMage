@@ -458,3 +458,5 @@ button:disabled { opacity: 0.45; cursor: default; }
 .skill-button { bottom: calc(var(--edge-bottom) + 88px); }
 @media (max-width: 760px) { .skill-button { bottom: calc(var(--edge-bottom) + 204px); } }
 @media (max-height: 500px) and (min-width: 600px) { .skill-button { bottom: calc(var(--edge-bottom) + 172px); } }
+
+.skill-kind { position: absolute; top: -9px; right: 9px; padding: 2px 7px; border: 1px solid #9fae8066; border-radius: 12px; color: var(--ultimate-color); background: #17271f; font-size: 10px; white-space: nowrap; }

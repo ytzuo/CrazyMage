@@ -146,7 +146,7 @@ export class ArenaScene extends Phaser.Scene {
     this.player.update(this.movement.read(), step, attack);
     const basicAim = attack ?? this.player.aimDirection;
     this.aimIndicator.update(this.player.view.x, this.player.view.y, this.builds.snapshot.build.school,
-      basicAim, this.skill.ready ? this.skillAim() : basicAim, this.skill.ready, this.enemies);
+      basicAim);
     this.skill.update(step);
     if (this.builds.pendingChoice) { this.movement.setEnabled(false); this.publish(); return; }
     this.ultimate.update(step);

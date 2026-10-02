@@ -40,10 +40,10 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       </svg>
     </aside>
     <button id="skill" class="ultimate-button skill-button" type="button" disabled hidden>
-      <span class="ultimate-key" aria-hidden="true">E</span><span class="ultimate-content"><strong id="skill-name"></strong><small id="skill-charge"></small><span class="ultimate-track" aria-hidden="true"><span id="skill-fill"></span></span></span>
+      <span class="ultimate-key" aria-hidden="true">E</span><span class="ultimate-content"><strong id="skill-name"></strong><span id="skill-kind" class="skill-kind"></span><small id="skill-charge"></small><span class="ultimate-track" aria-hidden="true"><span id="skill-fill"></span></span></span>
     </button>
     <button id="ultimate" class="ultimate-button" type="button" disabled hidden>
-      <span class="ultimate-key" aria-hidden="true">Q</span><span class="ultimate-content"><strong id="ultimate-name"></strong><small id="ultimate-charge">0 / 100</small><span class="ultimate-track" aria-hidden="true"><span id="ultimate-fill"></span></span></span>
+      <span class="ultimate-key" aria-hidden="true">Q</span><span class="ultimate-content"><strong id="ultimate-name"></strong><span id="ultimate-kind" class="skill-kind"></span><small id="ultimate-charge">0 / 100</small><span class="ultimate-track" aria-hidden="true"><span id="ultimate-fill"></span></span></span>
     </button>
     <div id="battle-notice" class="battle-notice" role="status" aria-live="polite" hidden></div>
     <div id="school-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="选择开局流派" hidden></div>
@@ -100,6 +100,7 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
     button.title = spec.description;
     button.setAttribute('aria-label', `${spec.name}，${ready ? '已就绪，按 E 或点击释放' : `充能 ${state.skillEnergy}%`}`);
     element('skill-name').textContent = spec.name;
+    element('skill-kind').textContent = school === 'ice' ? '◎ 身边 AOE' : '➶ 指向型';
     element('skill-charge').textContent = ready ? '已就绪 · 100%' : `${state.skillEnergy}% · ${Math.ceil(state.skillRemaining/1000)}s`;
     element('skill-fill').style.transform = `scaleX(${state.skillEnergy/100})`;
     lastSkill = skillKey;
@@ -116,6 +117,7 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
     button.title = `${ultimateSummary(school, state.progression.build.spellLevel, state.progression.build.ultimateModules)}。普通击杀 +10 能量，大招击杀不回充；击杀 Boss 立即充满。范围内无目标时不消耗。`;
     button.setAttribute('aria-label', `${spec.name}，${ready ? '已就绪，按 Q 或点击释放' : `充能 ${state.ultimateEnergy}%`}`);
     element('ultimate-name').textContent = spec.name;
+    element('ultimate-kind').textContent = school === 'fire' ? '➶ 指向型' : '◎ 身边 AOE';
     element('ultimate-charge').textContent = ready ? '已就绪' : `${state.ultimateEnergy} / 100`;
     element('ultimate-fill').style.transform = `scaleX(${state.ultimateEnergy / 100})`;
     lastUltimate = ultimateKey;
