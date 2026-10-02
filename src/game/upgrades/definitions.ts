@@ -6,7 +6,7 @@ export const SCHOOL_INFO = {
   lightning: {name:'闪电', spell:'连锁闪电', symbol:'ϟ', description:'定向电击在怪群中跳跃，强化连锁、距离与传导。'},
 } as const;
 export const isSchool = (value:string): value is School => SCHOOLS.includes(value as School);
-export type FireModule = 'damage' | 'multi' | 'pierce' | 'explosion' | 'burn' | 'embers' | 'rebound';
+export type FireModule = 'damage' | 'multi' | 'pierce' | 'explosion' | 'burn' | 'rebound';
 export type IceModule = 'damage' | 'radius' | 'cold' | 'echo';
 export type LightningModule = 'damage' | 'chain' | 'range' | 'conduction';
 export type SpellModule = FireModule | IceModule | LightningModule;
@@ -30,8 +30,7 @@ export const UPGRADES: readonly UpgradeDefinition[] = [
   { id: 'fire.multi', name: '多重火球', description: '增加 2 枚扇形弹丸；每枚使用强化后伤害的 65%。', maxStacks: 2, effect: { kind: 'fire', module: 'multi' } },
   { id: 'fire.pierce', name: '穿透火球', description: '每枚火球可额外命中 1 个不同目标。', maxStacks: 2, effect: { kind: 'fire', module: 'pierce' } },
   {id:'fire.rebound',name:'回旋焰弹',description:'火球达到命中或飞行上限后折返，可在回程再次命中。',maxStacks:2,effect:{kind:'fire',module:'rebound'}},
-  {id:'fire.embers',name:'余烬之地',description:'火球首次命中留下火区，爆炸强化扩大火区。',maxStacks:2,effect:{kind:'fire',module:'embers'}},
-  {id:'fire.burn',name:'灼烧蔓延',description:'火球命中点燃敌人，死亡向附近传播一代火种。',maxStacks:2,effect:{kind:'fire',module:'burn'}},
+  {id:'fire.burn',name:'灼烧蔓延',description:'火球命中点燃敌人，死亡传播火种并留下持续伤害火区。',maxStacks:2,effect:{kind:'fire',module:'burn'}},
   { id: 'fire.explosion', name: '冲击爆炸', description: '每枚首次命中产生范围溅射，之后仍可继续穿透；同次施法每个目标最多受到一次溅射。', maxStacks: 1, effect: { kind: 'fire', module: 'explosion' } },
   { id: 'ice.damage', name: '凛冬冲击', description: '按基础值增加冰环伤害 30%，保留寒意与回响。', maxStacks: 2, effect: { kind: 'ice', module: 'damage' } },
   { id: 'ice.radius', name: '扩大冰环', description: '按基础值扩大冰环半径 25%，每次回响也生效。', maxStacks: 2, effect: { kind: 'ice', module: 'radius' } },

@@ -1,3 +1,4 @@
+import { FireFields } from '../spells/FireFields';
 import type { BurnSpec } from '../combat/BurnSpec';
 import { RACE_WAVES, type GameMode } from '../modes';
 import Phaser from 'phaser';
@@ -60,6 +61,8 @@ export class EnemySystem {
   readonly effects: CombatEffects;
   private bosses: BossCombat;
   private areaAttacks: AreaAttacks;
+  private fireFields: FireFields;
+  get fireFieldCount():number {return this.fireFields.count;}
   private bossWaves = new Set<number>();
   mode: GameMode = 'race';
   get capacity(): number { return enemyCapacity(this.waveClock.wave); }
@@ -68,7 +71,7 @@ export class EnemySystem {
   private nextId = 0;
   private clearedDuringUpdate = false;
 
-  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareFireTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.bosses = new BossCombat(scene); this.areaAttacks = new AreaAttacks(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
+  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareFireTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.bosses = new BossCombat(scene); this.areaAttacks = new AreaAttacks(scene); this.fireFields=new FireFields(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
 
   private spawn(player: Player, wave: number, kind: EnemyKind): boolean {
     if (this.enemies.length >= this.capacity - Number(kind !== 'boss')) return false;
@@ -122,6 +125,7 @@ export class EnemySystem {
     for (const enemy of this.enemies) enemy.view.destroy();
     this.enemies.length = 0;
     this.shots.reset();
+    this.fireFields.reset();
     this.bosses.reset(); this.areaAttacks.reset(); this.bossWaves.clear();
     this.effects.reset();
     this.kills = this.spawnIndex = this.nextId = 0;
@@ -155,6 +159,7 @@ export class EnemySystem {
   update(delta: number, player: Player): void {
     this.effects.update(delta);
     this.clearedDuringUpdate=false;
+    if(this.fireFields.update(delta,this))return;
     this.updateBurns(delta);
     if(this.clearedDuringUpdate) return;
     this.replenish(player);
@@ -321,7 +326,7 @@ export class EnemySystem {
       (other.view.x-enemy.view.x)**2+(other.view.y-enemy.view.y)**2<=burn.spec.radius**2)
       .sort((a,b)=>(a.view.x-enemy.view.x)**2+(a.view.y-enemy.view.y)**2-((b.view.x-enemy.view.x)**2+(b.view.y-enemy.view.y)**2))
       .slice(0,burn.spec.targets);
-    const spec=Object.freeze({...burn.spec,damage:burn.spec.damage*0.6});
+    const spec=Object.freeze({...burn.spec,damage:burn.spec.damage*0.6,field:burn.spec.field?Object.freeze({...burn.spec.field,damage:burn.spec.field.damage*0.6}):null});
     for(const other of targets) this.ignite(other,spec,false);
   }
 
@@ -370,6 +375,7 @@ export class EnemySystem {
     enemy.aimLine.setVisible(false);
     }
     if (enemy.health.dead) {
+      if(enemy.burn?.spec.field) this.fireFields.add(enemy.view.x,enemy.view.y,enemy.burn.spec.field);
       this.spreadBurn(enemy);
       this.kills++;
       this.onKill(source, enemy.spec.kind === 'boss');

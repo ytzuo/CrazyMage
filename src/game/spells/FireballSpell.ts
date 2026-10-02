@@ -1,4 +1,3 @@
-import { FireFields } from './FireFields';
 import { prepareFireTextures } from '../art/SpellTextures';
 import Phaser from 'phaser';
 import { ARENA, FIREBALL, type Direction } from '../config';
@@ -6,14 +5,13 @@ import { segmentCircleHit } from '../combat/collision';
 import { preserveCooldown, resolveProjectileHit, type ProjectileContext } from '../combat/DamageResolver';
 import type { Enemy, EnemySystem } from '../enemies/EnemySystem';
 import type { FireballSpec } from '../upgrades/build';
-interface Projectile { returning:boolean;firstImpact:boolean;home:Direction; view: Phaser.GameObjects.Image; direction: Direction; age: number; context: ProjectileContext }
+interface Projectile { returning:boolean;home:Direction; view: Phaser.GameObjects.Image; direction: Direction; age: number; context: ProjectileContext }
 interface Impact { view: Phaser.GameObjects.Image; age: number; radius: number }
 /** Runtime consumes compiled specs. Flying projectiles retain their immutable launch snapshot. */
 export class FireballSpell {
   private projectiles: Projectile[] = [];
   private impacts: Impact[] = [];
   private hits: { enemy: Enemy; t: number; x: number; y: number }[] = [];
-  private fields: FireFields;
   private cooldown = 0;
   private nextProjectile = 0;
   private runId = 0;
@@ -22,10 +20,9 @@ export class FireballSpell {
   constructor(private scene: Phaser.Scene, spec: FireballSpec) {
     this.spec = spec;
     prepareFireTextures(scene);
-    this.fields=new FireFields(scene);
   }
   get projectileCount(): number { return this.projectiles.length; }
-  get impactCount(): number { return this.impacts.length+this.fields.count; }
+  get impactCount(): number { return this.impacts.length; }
   configure(spec: FireballSpec): void {
     this.cooldown = preserveCooldown(this.cooldown, this.spec.cooldown, spec.cooldown);
     this.spec = spec;
@@ -38,7 +35,6 @@ export class FireballSpell {
   }
   update(delta: number, enemies: EnemySystem, origin?: Direction): void {
     this.cooldown = Math.max(0, this.cooldown - delta);
-    if(this.fields.update(delta,enemies))return;
     const cleared=enemies.waves.cleared;
     for (let i = this.projectiles.length - 1; i >= 0; i--) {
       const projectile = this.projectiles[i], spec = projectile.context.spec;
@@ -76,7 +72,6 @@ export class FireballSpell {
         if (hit.enemy.health.dead) continue;
         const impactX = previousX + (x - previousX) * hit.t, impactY = previousY + (y - previousY) * hit.t;
         const nearby = spec.explosion && !projectile.context.explosionTriggered && projectile.context.directTargets.size === 0 ? enemies.enemies.filter(enemy => enemy.spawning === 0 && !enemy.health.dead).map(enemy => ({ id: enemy.id, x: enemy.view.x, y: enemy.view.y })) : [];
-        const firstHit=!projectile.firstImpact && projectile.context.directTargets.size===0;
         const exploded = resolveProjectileHit(projectile.context, { id: hit.enemy.id, x: impactX, y: impactY }, nearby, event => {
           const target = enemies.enemies.find(enemy => enemy.id === event.targetId);
           if (!target) return false;
@@ -85,10 +80,6 @@ export class FireballSpell {
           if (settled && event.source === 'direct') enemies.effects.spellHit(tx, ty, 'fire', projectile.direction);
           return settled;
         });
-        if(firstHit && projectile.context.directTargets.size>0) {
-          projectile.firstImpact=true;
-          if(spec.field) this.fields.add(impactX,impactY,spec.field);
-        }
         if (exploded) this.impact(impactX, impactY, spec.explosion!.radius);
         if(enemies.waves.cleared!==cleared) {this.hits.length=0;return;}
         if (projectile.context.directTargets.size >= spec.maxTargets) { if(!projectile.returning) projectile.view.setPosition(impactX, impactY); break; }
@@ -97,8 +88,7 @@ export class FireballSpell {
       const finished=projectile.context.directTargets.size>=spec.maxTargets || fraction<1 || projectile.age>=lifetime;
       if(!projectile.returning && finished && spec.rebound) {
         const returnSpec=Object.freeze({...spec,damage:spec.damage*spec.rebound.damageMultiplier,
-          burn:spec.burn?Object.freeze({...spec.burn,damage:spec.burn.damage*spec.rebound.damageMultiplier}):null,
-          field:spec.field?Object.freeze({...spec.field,damage:spec.field.damage*spec.rebound.damageMultiplier}):null});
+          burn:spec.burn?Object.freeze({...spec.burn,damage:spec.burn.damage*spec.rebound.damageMultiplier,field:spec.burn.field?Object.freeze({...spec.burn.field,damage:spec.burn.field.damage*spec.rebound.damageMultiplier}):null}):null});
         projectile.context={...projectile.context,spec:returnSpec,directTargets:new Set<number>()};
         projectile.returning=true;projectile.age=0;projectile.view.setTint(0xffe1a0);
         this.impact(projectile.view.x,projectile.view.y);
@@ -122,14 +112,13 @@ export class FireballSpell {
       const offset = (i - (this.spec.count - 1) / 2) * 0.16;
       const aim = { x: Math.cos(angle + offset), y: Math.sin(angle + offset) };
       const view = this.scene.add.image(Phaser.Math.Clamp(x + aim.x * 30, ARENA.inset, ARENA.width - ARENA.inset), Phaser.Math.Clamp(y - 12 + aim.y * 30, ARENA.inset, ARENA.height - ARENA.inset), 'fireball-detail').setOrigin(64 / 96, 0.5).setScale(0.75).setDepth(12).setRotation(angle + offset);
-      this.projectiles.push({ returning:false,firstImpact:false,home:{x,y:y-12},view, direction: aim, age: 0, context: { id: ++this.nextProjectile, cast, spec: this.spec, directTargets: new Set<number>() } });
+      this.projectiles.push({ returning:false,home:{x,y:y-12},view, direction: aim, age: 0, context: { id: ++this.nextProjectile, cast, spec: this.spec, directTargets: new Set<number>() } });
     }
     this.cooldown = this.spec.cooldown; return true;
   }
   reset(runId = 0): void {
     for (const projectile of this.projectiles) projectile.view.destroy();
     for (const impact of this.impacts) impact.view.destroy();
-    this.fields.reset();
     this.projectiles.length = this.impacts.length = this.hits.length = 0;
     this.cooldown = this.casts = this.nextProjectile = 0; this.runId = runId;
   }
