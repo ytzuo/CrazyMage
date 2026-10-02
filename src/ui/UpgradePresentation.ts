@@ -26,6 +26,8 @@ export const UPGRADE_PRESENTATION: Record<string, { symbol: string; summary: str
   'fire.multi': { symbol:'⋔', summary:'同时射出更多火球，单枚威力降低。' },
   'fire.pierce': { symbol:'➶', summary:'火球贯穿敌人，继续击中后方目标。' },
   'fire.explosion': { symbol:'✺', summary:'首次命中引发爆炸，波及周围敌人。' },
+  'ice.shards': {symbol:'❈',summary:'寒霜中的敌人死亡时迸出冰片，打击并减速附近敌人；强化冰片数量与威力。'},
+  'ice.frost': {symbol:'❅',summary:'连续冰环命中积累寒霜，最终短暂冻结；强化积累效率与冻结时间。'},
   'ice.damage': { symbol:'❄', summary:'寒潮冲击更强，保留已有控场效果。' },
   'ice.radius': { symbol:'◎', summary:'冰环覆盖更广，回响也随之扩大。' },
   'ice.cold': { symbol:'❅', summary:'敌人减速更明显，寒意持续更久。' },

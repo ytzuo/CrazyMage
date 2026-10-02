@@ -207,3 +207,7 @@ src/game/combat/DamageResolver.ts 伤害、派生事件、死亡与奖励结算
 `SpellRunner` 管理一个当前运行器。火球复用原有直接/溅射结算；冰环和闪电通过 `EnemySystem.hit` 非递归结算，同次脉冲或连锁每个目标一次。冰霜减速每怪物一份 `SlowStatus`；待释放回响保留施放快照。选卡重新配置时保留冷却进度；切换流派、重开和场景关闭清空旧运行器。
 
 `ArenaScene.selectingSchool` 是独立的等待状态，选择前不生成敌人，时间与输入冻结。主界面暂停原因增加开局选择；`SchoolPicker` 显示三选一，场景拒绝失效或重复开始。重开回到选择，选择结束后仍保留失焦/手动暂停原因。构筑详情、预览与 HUD 根据 `effective.school` 读取同一份参数，不显示未选法术。
+
+## 冰霜新增模块
+
+shards 与 frost 使用普通强化链路，compileBuild 生成 IceEffectsSpec，冰环与回响保存快照。敌人命中后保存碎冰来源与寒霜积累，死亡统一触发碎冰；派生冰片不递归触发。普通冻结与大招共享冰块外观，但 frozenExecution 明确区分控制和处决，避免普通冻结获得秒杀能力。详见 [冰霜组合路线](ice-routes.md)。

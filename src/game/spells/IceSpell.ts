@@ -25,7 +25,7 @@ export class IceSpell {
     for(const enemy of [...enemies.enemies]) {
       if((enemy.view.x-x)**2+(enemy.view.y-y)**2>(spec.radius+enemy.spec.radius)**2)continue;
       const dx=enemy.view.x-x,dy=enemy.view.y-y,d=Math.hypot(dx,dy)||1;
-      if(enemies.hit(enemy,spec.damage,{x:dx/d,y:dy/d}))enemies.slow(enemy,spec.slow,spec.duration);
+      if(enemies.hit(enemy,spec.damage,{x:dx/d,y:dy/d},'spell',null,false,spec.effects))enemies.slow(enemy,spec.slow,spec.duration);
     }
   }
   cast(x:number,y:number,_direction:Direction,enemies:EnemySystem):boolean {

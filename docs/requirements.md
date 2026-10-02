@@ -168,3 +168,7 @@
 5. 音效、命中特效、难度平衡、存档与流派卡。
 
 技术参考：[Phaser 官方介绍](https://docs.phaser.io/phaser/getting-started/what-is-phaser)、[输入系统](https://docs.phaser.io/phaser/concepts/input)。
+
+### 冰霜组合路线
+
+新增碎冰迸射与寒霜积压，可与现有冰环强化组合。寒霜敌人死亡迸出冰片，连续冰环命中触发短暂普通冻结；受击处决仍由 Q 大招提供。竞速每条两层，共用 Lv.8 上限，无尽持续升级但控制与对象数量有上限。详见 [冰霜组合路线](ice-routes.md)。

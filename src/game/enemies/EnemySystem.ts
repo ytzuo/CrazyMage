@@ -1,3 +1,5 @@
+import { IceShards } from '../effects/IceShards';
+import type { IceEffectsSpec, IceShardSpec } from '../combat/IceEffectsSpec';
 import { FireFields } from '../spells/FireFields';
 import type { BurnSpec } from '../combat/BurnSpec';
 import { RACE_WAVES, type GameMode } from '../modes';
@@ -24,6 +26,11 @@ import { prepareEnemyTextures, enemyTexture, enemyArtScale } from '../art/Charac
 interface Burning { spec:BurnSpec; remaining:number; wait:number; spread:boolean; view:Phaser.GameObjects.Image }
 export interface Enemy {
   burn: Burning | null;
+  iceShard: {spec:IceShardSpec;remaining:number} | null;
+  frostStacks:number;
+  frostRemaining:number;
+  frostProtection:number;
+  frozenExecution:boolean;
   id: number;
   wave: number;
   spec: EnemySpec;
@@ -62,6 +69,7 @@ export class EnemySystem {
   private bosses: BossCombat;
   private areaAttacks: AreaAttacks;
   private fireFields: FireFields;
+  private iceShards: IceShards;
   get fireFieldCount():number {return this.fireFields.count;}
   private bossWaves = new Set<number>();
   mode: GameMode = 'race';
@@ -71,7 +79,7 @@ export class EnemySystem {
   private nextId = 0;
   private clearedDuringUpdate = false;
 
-  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareFireTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.bosses = new BossCombat(scene); this.areaAttacks = new AreaAttacks(scene); this.fireFields=new FireFields(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
+  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareFireTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.bosses = new BossCombat(scene); this.areaAttacks = new AreaAttacks(scene); this.fireFields=new FireFields(scene); this.iceShards=new IceShards(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
 
   private spawn(player: Player, wave: number, kind: EnemyKind): boolean {
     if (this.enemies.length >= this.capacity - Number(kind !== 'boss')) return false;
@@ -104,7 +112,7 @@ export class EnemySystem {
       bar.setFillStyle(0xffb36f);
       view.add(this.scene.add.image(0, -spec.radius - 42, 'boss-skull-mark').setDisplaySize(28, 28));
     }
-    this.enemies.push({ burn:null, spec, variant, dashTime: 0, dashHit: false, burstRemaining: 0, burstWait: 0, blockCooldown: 0, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: warningTime, windup: 0, cooldown: 0, attackTime: 0, frozen: 0, icePrison: null, flash: 0, knockback: { x: 0, y: 0 } });
+    this.enemies.push({ burn:null, iceShard:null,frostStacks:0,frostRemaining:0,frostProtection:0,frozenExecution:false, spec, variant, dashTime: 0, dashHit: false, burstRemaining: 0, burstWait: 0, blockCooldown: 0, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: warningTime, windup: 0, cooldown: 0, attackTime: 0, frozen: 0, icePrison: null, flash: 0, knockback: { x: 0, y: 0 } });
   }
 
   private attackRange(enemy: Enemy): number { return enemy.variant === 'dasher' ? VARIANTS.dashRange : enemy.spec.range; }
@@ -126,6 +134,7 @@ export class EnemySystem {
     this.enemies.length = 0;
     this.shots.reset();
     this.fireFields.reset();
+    this.iceShards.reset();
     this.bosses.reset(); this.areaAttacks.reset(); this.bossWaves.clear();
     this.effects.reset();
     this.kills = this.spawnIndex = this.nextId = 0;
@@ -158,6 +167,7 @@ export class EnemySystem {
 
   update(delta: number, player: Player): void {
     this.effects.update(delta);
+    this.iceShards.update(delta);
     this.clearedDuringUpdate=false;
     if(this.fireFields.update(delta,this))return;
     this.updateBurns(delta);
@@ -179,9 +189,13 @@ export class EnemySystem {
         continue;
       }
       enemy.slow.update(delta);
+      enemy.frostProtection=Math.max(0,enemy.frostProtection-delta);
+      enemy.frostRemaining=Math.max(0,enemy.frostRemaining-delta);
+      if(!enemy.frostRemaining)enemy.frostStacks=0;
+      if(enemy.iceShard){enemy.iceShard.remaining-=delta;if(enemy.iceShard.remaining<=0)enemy.iceShard=null;}
       if (enemy.frozen > 0) {
         enemy.frozen = Math.max(0, enemy.frozen - delta);
-        if (enemy.frozen === 0) { enemy.icePrison?.destroy(); enemy.icePrison = null; }
+        if (enemy.frozen === 0) { enemy.frozenExecution=false; enemy.icePrison?.destroy(); enemy.icePrison = null; }
         if (enemy.frozen > 0) { enemy.icePrison?.setAlpha(Math.min(1,enemy.frozen/250)); enemy.knockback.x = enemy.knockback.y = 0; enemy.body.setTint(0x80dfff); continue; }
       }
       enemy.flash = Math.max(0, enemy.flash - delta);
@@ -287,18 +301,33 @@ export class EnemySystem {
     body.setFlipX(aim.x < 0);
   }
 
-  freeze(enemy: Enemy, duration: number): void {
+  freeze(enemy: Enemy, duration: number, execution=true): void {
     if (enemy.spawning > 0 || enemy.health.dead || !this.enemies.includes(enemy)) return;
     this.bosses.cancel(enemy.id); this.areaAttacks.cancel(enemy.id);
+    enemy.frozenExecution ||= execution;
     enemy.frozen = Math.max(enemy.frozen, Math.min(6000, duration));
     if(!enemy.icePrison){
       enemy.icePrison=this.scene.add.image(0,-4,'ice-prison-detail').setDisplaySize(enemy.spec.radius*2.8,enemy.spec.radius*3.2);
       enemy.view.add(enemy.icePrison);enemy.view.bringToTop(enemy.bar);
     }
+    enemy.icePrison?.setTint(enemy.frozenExecution?0xffffff:0xa8efff);
     enemy.windup = enemy.attackTime = enemy.dashTime = enemy.burstRemaining = enemy.burstWait = 0;
     enemy.knockback.x = enemy.knockback.y = 0;
     enemy.warning.setVisible(false); enemy.aimLine.setVisible(false);
     this.animate(enemy); enemy.body.setTint(0x80dfff);
+  }
+
+  private applyIce(enemy:Enemy, effects:IceEffectsSpec):void {
+    if(effects.shards)enemy.iceShard={spec:effects.shards,remaining:effects.shards.duration};
+    const frost=effects.frost;
+    if(!frost || enemy.frozen>0 || enemy.frostProtection>0)return;
+    enemy.frostStacks+=frost.gain;enemy.frostRemaining=4000;
+    if(enemy.frostStacks>=frost.threshold){
+      enemy.frostStacks=0;enemy.frostRemaining=0;
+      const duration=frost.duration*(enemy.spec.kind==='boss'?0.35:1);
+      enemy.frostProtection=duration+2500;
+      this.freeze(enemy,duration,false);
+    }
   }
 
   slow(enemy: Enemy, strength:number, duration:number): void {
@@ -346,7 +375,7 @@ export class EnemySystem {
   }
 
   /** True means contact settled, including a block; callers must not retry the same hit. */
-  hit(enemy: Enemy, damage: number, direction: Direction, source: DamageSource = 'spell', burn?: BurnSpec | null, periodic = false): boolean {
+  hit(enemy: Enemy, damage: number, direction: Direction, source: DamageSource = 'spell', burn?: BurnSpec | null, periodic = false, ice?:IceEffectsSpec|null, shard=false): boolean {
     if (enemy.spawning > 0 || enemy.health.dead || !this.enemies.includes(enemy) || damage <= 0) return false;
     if (!periodic && enemy.variant === 'guardian' && enemy.frozen === 0 && enemy.blockCooldown === 0 && this.random() < VARIANTS.blockChance) {
       enemy.blockCooldown = VARIANTS.blockCooldown;
@@ -355,8 +384,9 @@ export class EnemySystem {
       // Contact is settled even without damage: consume pierce/splash once, allow ice control.
       return true;
     }
+    if(ice)this.applyIce(enemy,ice);
     if(burn) this.ignite(enemy,burn,true);
-    const shatter=enemy.frozen>0;
+    const shatter=enemy.frozen>0 && enemy.frozenExecution;
     if(shatter)this.effects.shatter(enemy.view.x,enemy.view.y,enemy.spec.radius);
     if (!enemy.health.hurt(shatter?enemy.health.current+enemy.health.shield:damage)) return false;
     if(!periodic) this.effects.hit(enemy.view.x, enemy.view.y, direction);
@@ -386,6 +416,8 @@ export class EnemySystem {
       enemy.view.destroy();
       this.enemies.splice(this.enemies.indexOf(enemy), 1);
       this.split(enemy, x, y);
+      if(!shard && enemy.iceShard && (enemy.slow.strength>0 || enemy.frozen>0 || !!ice?.shards))
+        this.iceShards.burst(x,y,enemy.iceShard.spec,this);
       // Clearing the arena schedules the next wave even when upgrades are exhausted.
       if (this.enemies.length === 0) { this.waveClock.scheduleNext(ENEMY.clearDelay); this.shots.reset(); this.areaAttacks.reset(); this.effects.clear(x, y); }
       if (this.waves.defeat(enemy.wave)) {
