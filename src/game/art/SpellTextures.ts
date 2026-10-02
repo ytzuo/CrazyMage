@@ -44,6 +44,24 @@ function fireBurst(ctx:CanvasRenderingContext2D,nova:boolean):void {
   }
 }
 export function prepareIceTextures(scene:Phaser.Scene):void {
+  material(scene,'ice-fan-ground',ctx=>{
+    const glow=ctx.createRadialGradient(128,128,5,128,128,122);
+    glow.addColorStop(0,'#a5eaff20');glow.addColorStop(.75,'#b9f5ff66');glow.addColorStop(1,'#c9faff00');
+    ctx.fillStyle=glow;ctx.beginPath();ctx.moveTo(128,128);ctx.arc(128,128,123,-Math.PI*5/18,Math.PI*5/18);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#e4ffff88';ctx.lineWidth=1;
+    for(let i=0;i<13;i++){
+      const a=(i/12-.5)*Math.PI*5/9;
+      ctx.beginPath();ctx.moveTo(128+Math.cos(a)*25,128+Math.sin(a)*25);ctx.lineTo(128+Math.cos(a+.04)*75,128+Math.sin(a+.04)*75);ctx.lineTo(128+Math.cos(a)*115,128+Math.sin(a)*115);ctx.stroke();
+    }
+  });
+  cached(scene,'ice-ground-spike',64,96,g=>{
+    g.fillStyle(0x81d8ef,.18).fillEllipse(32,85,58,18);
+    polygon(g,[9,83,25,25,34,4,55,80,34,91],0x55a7ce,.8);
+    polygon(g,[25,25,34,4,34,91,9,83],0xc5f7ff,.9);
+    polygon(g,[34,4,55,80,42,73],0x8cdbea,.85);
+    g.lineStyle(2,0xefffff,.95).lineBetween(25,25,34,4).lineBetween(34,4,55,80);
+    g.lineStyle(1,0xffffff,.6).lineBetween(34,20,34,76);
+  });
   material(scene,'ice-frost-detail',ctx=>{
     cloud(ctx,128,128,121,118,[[0,'#b4eaff0a'],[.45,'#83cce71c'],[.8,'#daffff28'],[1,'#c4f6ff00']]);
     for(let i=0;i<24;i++){

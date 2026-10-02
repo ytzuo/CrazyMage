@@ -1,3 +1,4 @@
+import { IceZone } from './IceZone';
 import Phaser from 'phaser';
 import { ARENA, type Direction } from '../config';
 import type { School } from '../upgrades/definitions';
@@ -23,6 +24,7 @@ export class SchoolSkill {
   private remaining=0;
   private visuals:Visual[]=[];
   private release:Release|null=null;
+  private iceZone:IceZone|null=null;
   constructor(private scene:Phaser.Scene){prepareFireTextures(scene);prepareIceTextures(scene);prepareLightningTextures(scene);}
   get ready():boolean{return this.remaining===0;}
   get remainingMs():number{return this.remaining;}
@@ -37,6 +39,7 @@ export class SchoolSkill {
   }
   update(delta:number):void {
     this.remaining=Math.max(0,this.remaining-delta);
+    if(this.iceZone&&!this.iceZone.update(delta))this.iceZone=null;
     const release=this.release;
     if(release){
       release.age+=delta;
@@ -84,8 +87,8 @@ export class SchoolSkill {
     const length=Math.hypot(aim.x,aim.y), direction=length?{x:aim.x/length,y:aim.y/length}:{x:1,y:0};
     const angle=Math.atan2(direction.y,direction.x);
     if(school==='ice'){
-      this.visual(x,y,'ice-frost-detail',this.spec.radius*2);
-      this.damage(this.spec,x,y,x,y,direction,enemies);
+      this.iceZone?.reset();
+      this.iceZone=new IceZone(this.scene,enemies,x,y,direction,{radius:this.spec.radius,damage:this.spec.damage,duration:this.spec.duration,interval:300,fan:true,source:'spell',frost:0,freeze:0});
     }else{
       const reach=this.spec.reach;
       // Clip along the aim vector, preserving the direction near arena walls.
@@ -119,7 +122,7 @@ export class SchoolSkill {
   }
   reset(school:School='fire'):void {
     for(const visual of this.visuals)visual.view.destroy();this.visuals.length=0;
-    this.release=null;
+    this.release=null;this.iceZone?.reset();this.iceZone=null;
     this.spec=skillSpec(school);this.remaining=0;
   }
 }

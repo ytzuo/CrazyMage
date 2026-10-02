@@ -210,4 +210,6 @@ src/game/combat/DamageResolver.ts 伤害、派生事件、死亡与奖励结算
 
 ## 冰霜新增模块
 
-shards 与 frost 使用普通强化链路，compileBuild 生成 IceEffectsSpec，冰环与回响保存快照。敌人命中后保存碎冰来源与寒霜积累，死亡统一触发碎冰；派生冰片不递归触发。普通冻结与大招共享冰块外观，但 frozenExecution 明确区分控制和处决，避免普通冻结获得秒杀能力。详见 [冰霜组合路线](ice-routes.md)。
+shards 与 frost 使用普通强化链路，compileBuild 生成 IceEffectsSpec，冰环与回响保存快照。敌人命中后保存碎冰来源与寒霜积累，死亡统一触发碎冰；派生冰片不递归触发。普通冰环与大招寒域共享寒霜积累入口和控制冰块，当前技能均不启用处决。详见 [冰霜组合路线](ice-routes.md)。
+
+IceZone 统一执行 E 冰刺扇阵与 Q 随身寒域，冻结由 EnemySystem.accumulateFrost 管理。最终参数由 compileBuild 生成；区域保留伤害、时长、范围快照，Q 每帧只传入玩家位置，伤害与积累按共享周期结算，完成波次后立即终止。

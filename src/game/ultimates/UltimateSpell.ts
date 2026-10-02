@@ -1,3 +1,4 @@
+import { IceZone } from '../spells/IceZone';
 import { prepareFireTextures, prepareLightningTextures, prepareIceTextures } from '../art/SpellTextures';
 import Phaser from 'phaser';
 import type { EnemySystem } from '../enemies/EnemySystem';
@@ -13,9 +14,10 @@ export class UltimateSpell {
   readonly charge = new UltimateCharge();
   private visuals:Visual[]=[];
   private sequence:Sequence|null=null;
+  private iceZone:IceZone|null=null;
   spec:UltimateSpec=ultimateSpec('fire',1);
   casts=0;
-  get effectCount():number{return this.visuals.length;}
+  get effectCount():number{return this.visuals.length+Number(!!this.iceZone);}
   constructor(private scene:Phaser.Scene){
     prepareFireTextures(scene);prepareLightningTextures(scene);prepareIceTextures(scene);
     if(scene.textures.exists('ultimate-ring'))return;
@@ -45,23 +47,29 @@ export class UltimateSpell {
       .sort((a,b)=>((a.view.x-seq.x)**2+(a.view.y-seq.y)**2)-((b.view.x-seq.x)**2+(b.view.y-seq.y)**2)||a.id-b.id).slice(0,seq.spec.targets);
   }
   cast(x:number,y:number,enemies:EnemySystem,aim:Direction={x:1,y:0}):boolean {
-    if(!this.charge.ready || this.sequence)return false;
+    if(!this.charge.ready || this.sequence || this.iceZone)return false;
     const length=Math.hypot(aim.x,aim.y);
     const seq:Sequence={spec:this.spec,x,y,enemies,elapsed:0,next:1,aim:length>0?{x:aim.x/length,y:aim.y/length}:{x:1,y:0},fireHits:Array.from({length:this.spec.pulses},()=>[])};
     if(!this.targets(seq).length)return false;
-    this.charge.consume();this.casts++;this.sequence=seq;
-    this.pulse(seq,0);
+    this.charge.consume();this.casts++;
+    if(seq.spec.school==='ice'){
+      const spec=seq.spec;
+      this.iceZone=new IceZone(this.scene,enemies,x,y,seq.aim,{radius:spec.radius,damage:spec.damage,duration:spec.duration,interval:spec.interval,fan:false,source:'ultimate',frost:spec.frostGain,freeze:spec.freeze});
+      enemies.effects.empower(x,y,'ice');return true;
+    }
+    this.sequence=seq;
+    this.pulse(seq);
     if(seq.spec.school==='fire')this.fireDamage(seq);
     enemies.effects.empower(x,y,seq.spec.school);
     return true;
   }
-  private pulse(seq:Sequence,index:number):void {
+  private pulse(seq:Sequence):void {
     const {x,y,spec,enemies}=seq;
     const targets=spec.school==='fire'?[]:this.targets(seq);
     for(const enemy of [...targets]){
       const tx=enemy.view.x,ty=enemy.view.y,dx=tx-x,dy=ty-y,d=Math.hypot(dx,dy)||1;
-      const settled=enemies.hit(enemy,spec.damage,{x:dx/d,y:dy/d},'ultimate');
-      if(spec.school==='ice'&&settled)enemies.freeze(enemy,spec.freeze);
+      enemies.hit(enemy,spec.damage,{x:dx/d,y:dy/d},'ultimate');
+
       if(spec.school==='lightning'){
         this.visual(tx,ty,260,false,400);this.visual(tx,ty,70,true,400);
         enemies.effects.spellHit(tx,ty,'lightning',{x:dx/d,y:dy/d});
@@ -73,9 +81,6 @@ export class UltimateSpell {
         const angle=heading+(i-5)*Math.PI/18,dx=Math.cos(angle),dy=Math.sin(angle);
         this.visual(x+dx*60,y+dy*60,110,true,spec.interval,'fire-impact-detail',{x,y,dx,dy,reach:spec.radius});
       }
-    }else if(spec.school==='ice'&&index===0){
-      this.visual(x,y,spec.radius*2,true,800,'ice-frost-detail');
-      this.visual(x,y,spec.radius*1.3,true,650,'ice-frost-detail');
     }
     // Do not carry an old damage sequence into a newly spawned wave after clearing.
     if(!enemies.enemies.length)this.sequence=null;
@@ -101,12 +106,13 @@ export class UltimateSpell {
       if(!seq.enemies.enemies.length){this.sequence=null;return;}
     }
   }
-  update(delta:number):void {
+  update(delta:number,origin?:Direction):void {
+    if(this.iceZone&&!this.iceZone.update(delta,origin))this.iceZone=null;
     const seq=this.sequence;
     if(seq){
       seq.elapsed+=delta;
       while(this.sequence===seq&&seq.next<seq.spec.pulses&&seq.elapsed>=seq.next*seq.spec.interval){
-        this.pulse(seq,seq.next++);
+        seq.next++;this.pulse(seq);
       }
       if(seq.spec.school==='fire')this.fireDamage(seq);
       if((seq.spec.school==='fire'?seq.elapsed>=seq.spec.pulses*seq.spec.interval:seq.next>=seq.spec.pulses) || !seq.enemies.enemies.length)this.sequence=null;
@@ -121,5 +127,5 @@ export class UltimateSpell {
       }else if(v.ring)v.view.setDisplaySize(v.size*(0.8+0.2*t),v.size*(0.8+0.2*t));
     }
   }
-  reset(school:School='fire'):void{for(const v of this.visuals)v.view.destroy();this.visuals.length=0;this.sequence=null;this.charge.reset();this.casts=0;this.configure(school,1);}
+  reset(school:School='fire'):void{this.iceZone?.reset();this.iceZone=null;for(const v of this.visuals)v.view.destroy();this.visuals.length=0;this.sequence=null;this.charge.reset();this.casts=0;this.configure(school,1);}
 }

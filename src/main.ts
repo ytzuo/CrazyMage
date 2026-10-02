@@ -104,8 +104,8 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
     button.title = spec.description;
     button.setAttribute('aria-label', `${spec.name}，${ready ? '已就绪，按 E 或点击释放' : `充能 ${state.skillEnergy}%`}`);
     element('skill-name').textContent = spec.name;
-    element('skill-kind').textContent = school === 'ice' ? '◎' : '➶';
-    element('skill-kind').title = school === 'ice' ? '身边 AOE' : '指向型';
+    element('skill-kind').textContent = '➶';
+    element('skill-kind').title = '指向型';
     element('skill-kind').setAttribute('aria-label', element('skill-kind').title);
     element('skill-charge').textContent = ready ? '已就绪 · 100%' : `${state.skillEnergy}% · ${Math.ceil(state.skillRemaining/1000)}s`;
     element('skill-fill').style.transform = `scaleX(${state.skillEnergy/100})`;

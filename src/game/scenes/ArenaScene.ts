@@ -155,7 +155,7 @@ export class ArenaScene extends Phaser.Scene {
       basicAim);
     this.skill.update(step);
     if (this.won || this.builds.pendingChoice) { this.movement.setEnabled(false); this.publish(); return; }
-    this.ultimate.update(step);
+    this.ultimate.update(step,{x:this.player.view.x,y:this.player.view.y});
     if (this.won || this.builds.pendingChoice) { this.movement.setEnabled(false); this.publish(); return; }
     if (this.movement.consumeUltimate()) {
       this.castUltimate();
