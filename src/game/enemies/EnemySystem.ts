@@ -48,7 +48,7 @@ export interface Enemy {
 export class EnemySystem {
   readonly enemies: Enemy[] = [];
   kills = 0;
-  readonly waveClock = new WaveClock(ENEMY.waveInterval);
+  readonly waveClock = new WaveClock(ENEMY.waveInterval, wave => wave % 5 === 0 ? ENEMY.bossWaveInterval : ENEMY.waveInterval);
   readonly waves = new WaveTracker();
   readonly shots: EnemyShots;
   readonly effects: CombatEffects;

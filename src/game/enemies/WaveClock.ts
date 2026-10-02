@@ -5,7 +5,9 @@ export class WaveClock {
   private total = 0;
   readonly interval: number;
 
-  constructor(interval: number) { this.interval = interval; this.countdown = interval; }
+  constructor(interval: number, private durationForWave: (wave: number) => number = () => interval) {
+    this.interval = interval; this.countdown = durationForWave(this.wave);
+  }
 
   get remaining(): number { return this.countdown; }
   get elapsedTime(): number { return this.total; }
@@ -18,11 +20,13 @@ export class WaveClock {
     this.countdown -= step;
     if (this.countdown > 0) return 0;
     if (!allowAdvance) { this.countdown = 0; return 0; }
-    const waves = 1 + Math.floor(-this.countdown / this.interval);
-    this.countdown += waves * this.interval;
-    this.wave += waves;
+    let waves = 0;
+    while (this.countdown <= 0) {
+      this.wave++; waves++;
+      this.countdown += this.durationForWave(this.wave);
+    }
     return waves;
   }
 
-  reset(): void { this.wave = 1; this.total = 0; this.countdown = this.interval; }
+  reset(): void { this.wave = 1; this.total = 0; this.countdown = this.durationForWave(this.wave); }
 }
