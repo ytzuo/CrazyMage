@@ -1,7 +1,7 @@
 import type { BuildSnapshot } from '../game/upgrades/BuildStore';
 import { stacks, type EffectiveBuild } from '../game/upgrades/build';
 import { SCHOOL_SKILLS } from '../game/spells/SchoolSkill';
-import { UPGRADE_PRESENTATION } from './UpgradePresentation';
+import { UPGRADE_PRESENTATION, upgradeSummary } from './UpgradePresentation';
 import { definition, SCHOOL_INFO, SPELL_MAX_LEVEL, UPGRADES, ULTIMATE_UPGRADES } from '../game/upgrades/definitions';
 export const number = (value: number): string => Number(value.toFixed(2)).toString();
 export function spellSummary(effective: EffectiveBuild): string {
@@ -86,7 +86,8 @@ export class BuildPanel {
     return `<div class="upgrade-options reward-options">${snapshot.choice!.options.map((id, index) => {
       const card = definition(id)!;
       const passive = card.effect.kind === 'passive';
-      const {symbol, summary} = UPGRADE_PRESENTATION[id] ?? {symbol:'✦', summary:'增强你的战斗能力。'};
+      const symbol = UPGRADE_PRESENTATION[id]?.symbol ?? '✦';
+      const summary = upgradeSummary(id, snapshot.build.mode);
       const ultimate = card.effect.kind === 'ultimate';
       const skill = card.effect.kind === 'skill';
       const level = passive || ultimate || skill ? stacks(snapshot.build, card) + 1 : snapshot.build.spellLevel + 1;
@@ -101,7 +102,7 @@ export class BuildPanel {
     const collection = [...UPGRADES,...ULTIMATE_UPGRADES].filter(card=>stacks(snapshot.build,card)>0).map(card=>{
       const id=card.id, count=stacks(snapshot.build,card);
       const passive=card.effect.kind==='passive', art=UPGRADE_PRESENTATION[id];
-      return `<article class="owned-card school-${snapshot.build.school}${passive?' owned-passive':card.effect.kind==='ultimate'?' owned-ultimate':''}"><span class="owned-kind">${card.effect.kind==='skill'?`${snapshot.effective.skill.name} · E`:card.effect.kind==='ultimate'?`${ultimate.name} · Q`:passive?'被动':'法术强化'}<b>×${count}</b></span><span class="owned-symbol" aria-hidden="true">${art?.symbol ?? '✦'}</span><h4>${card.name}</h4><p>${art?.summary ?? '增强战斗能力。'}</p></article>`;
+      return `<article class="owned-card school-${snapshot.build.school}${passive?' owned-passive':card.effect.kind==='ultimate'?' owned-ultimate':''}"><span class="owned-kind">${card.effect.kind==='skill'?`${snapshot.effective.skill.name} · E`:card.effect.kind==='ultimate'?`${ultimate.name} · Q`:passive?'被动':'法术强化'}<b>×${count}</b></span><span class="owned-symbol" aria-hidden="true">${art?.symbol ?? '✦'}</span><h4>${card.name}</h4><p>${upgradeSummary(id, snapshot.build.mode)}</p></article>`;
     }).join('');
     return `<div class="build-details"><h3>${school.name} · ${school.spell}</h3><p>${school.description}</p><h3>${SCHOOL_SKILLS[snapshot.build.school].name} · E</h3><p>${SCHOOL_SKILLS[snapshot.build.school].description}</p><h3>${ultimate.name} · Q</h3><p>${ultimate.description}</p><p>普通击杀充能，击杀 Boss 立即充满；满能量后释放。</p><h3>获取的强化</h3><div class="owned-cards">${collection || '<p class="owned-empty">尚未获取强化</p>'}</div></div>`;
   }

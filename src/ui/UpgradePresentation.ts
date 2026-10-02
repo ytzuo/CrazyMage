@@ -1,3 +1,5 @@
+import type { GameMode } from '../game/modes';
+
 /** Short selection copy; combat parameters remain in the shared build compiler. */
 export const UPGRADE_PRESENTATION: Record<string, { symbol: string; summary: string }> = {
   'skill.fire.power': {symbol:'✹', summary:'焰爆打击更强。'},
@@ -35,3 +37,15 @@ export const UPGRADE_PRESENTATION: Record<string, { symbol: string; summary: str
   'passive.shield': { symbol:'◇', summary:'护盾吸收伤害，脱战后自动恢复。' },
   'passive.cooldown': { symbol:'◷', summary:'缩短施法间隔，更频繁地释放法术。' },
 };
+
+const ENDLESS_SUMMARIES: Readonly<Record<string, string>> = {
+  'fire.multi': '增加扇形火球，最多 9 枚；数量封顶后继续增伤。单枚威力只降低一次。',
+  'fire.pierce': '每枚火球贯穿更多敌人，最多 36 个；数量封顶后继续增伤，不增加飞行距离。',
+  'fire.explosion': '首次命中爆炸，后续穿透不再引爆。范围与威力持续强化，范围封顶后仍增伤；同次施法对每个敌人只溅射一次。',
+};
+
+/** Choice cards and owned cards share the same mode-specific explanation. */
+export function upgradeSummary(id: string, mode: GameMode): string {
+  return (mode === 'endless' ? ENDLESS_SUMMARIES[id] : undefined)
+    ?? UPGRADE_PRESENTATION[id]?.summary ?? '增强战斗能力。';
+}
