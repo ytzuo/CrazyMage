@@ -5,14 +5,11 @@ import type { EnemySystem } from '../enemies/EnemySystem';
 import { segmentCircleHit } from '../combat/collision';
 import { prepareFireTextures, prepareIceTextures, prepareLightningTextures } from '../art/SpellTextures';
 
-export const SCHOOL_SKILLS = {
-  fire: {name:'焰爆', cooldown:12000, description:'向前推出烈焰，触敌或到达落点后爆开。'},
-  ice: {name:'寒霜脉冲', cooldown:10000, description:'释放近身寒潮，让周围敌人陷入强烈减速。'},
-  lightning: {name:'贯雷', cooldown:9000, description:'向前射出一道贯穿敌人的雷光。'},
-} as const;
+import { skillSpec, type SkillSpec } from './skillDefinitions';
+export { SCHOOL_SKILLS } from './skillDefinitions';
 interface Visual {view:Phaser.GameObjects.Image; age:number; size:number; line:boolean; thickness:number; life:number}
-interface Release {school:'fire'|'lightning'; x:number; y:number; tx:number; ty:number; aim:Direction; age:number; enemies:EnemySystem; view:Phaser.GameObjects.Image}
-/** Shared by release and its ground preview so map edges preserve the same aim. */
+interface Release {school:'fire'|'lightning'; x:number; y:number; tx:number; ty:number; aim:Direction; age:number; enemies:EnemySystem; view:Phaser.GameObjects.Image; spec:SkillSpec}
+/** Clip the release along its aim vector at map edges. */
 export function skillEndpoint(x:number,y:number,direction:Direction,reach:number):{x:number;y:number} {
   const availableX=direction.x>0?(ARENA.width-ARENA.inset-x)/direction.x:direction.x<0?(ARENA.inset-x)/direction.x:Infinity;
   const availableY=direction.y>0?(ARENA.height-ARENA.inset-y)/direction.y:direction.y<0?(ARENA.inset-y)/direction.y:Infinity;
@@ -21,14 +18,15 @@ export function skillEndpoint(x:number,y:number,direction:Direction,reach:number
 }
 /** One time charge; bounded cosmetic images, all advanced by active game time. */
 export class SchoolSkill {
-  private school:School='fire';
+  private spec:SkillSpec=skillSpec('fire');
+  private get school():School{return this.spec.school;}
   private remaining=0;
   private visuals:Visual[]=[];
   private release:Release|null=null;
   constructor(private scene:Phaser.Scene){prepareFireTextures(scene);prepareIceTextures(scene);prepareLightningTextures(scene);}
   get ready():boolean{return this.remaining===0;}
   get remainingMs():number{return this.remaining;}
-  get energy():number{return Math.floor(100*(1-this.remaining/SCHOOL_SKILLS[this.school].cooldown));}
+  get energy():number{return Math.floor(100*(1-this.remaining/this.spec.cooldown));}
   private visual(x:number,y:number,texture:string,size:number,line=false,angle=0,thickness=36,life=400):Phaser.GameObjects.Image {
     if(this.visuals.length>=16)this.visuals.shift()!.view.destroy();
     const view=this.scene.add.image(x,y,texture).setDepth(12).setRotation(angle);
@@ -47,9 +45,9 @@ export class SchoolSkill {
         if(release.age>=80){
           this.release=null;release.view.setVisible(false);
           const angle=Math.atan2(release.aim.y,release.aim.x), reach=Math.hypot(release.tx-release.x,release.ty-release.y);
-          this.visual(release.x,release.y,'lightning-arc-detail-1',reach,true,angle,42,280);
+          this.visual(release.x,release.y,'lightning-arc-detail-1',reach,true,angle,release.spec.width*0.875,280);
           this.visual(release.x,release.y,'lightning-arc-detail-2',reach,true,angle,12,180);
-          this.damage('lightning',release.x,release.y,release.tx,release.ty,release.aim,release.enemies);
+          this.damage(release.spec,release.x,release.y,release.tx,release.ty,release.aim,release.enemies);
         }
       }else{
         const previousX=release.view.x,previousY=release.view.y,t=Math.min(1,release.age/160);
@@ -64,9 +62,9 @@ export class SchoolSkill {
         release.view.setPosition(nx,ny);
         if(touched||t===1){
           this.release=null;release.view.setVisible(false);
-          this.visual(nx,ny,'fire-impact-detail',220);
-          this.visual(nx,ny,'fire-nova-detail',150,false,0,36,280);
-          this.damage('fire',release.x,release.y,nx,ny,release.aim,release.enemies);
+          this.visual(nx,ny,'fire-impact-detail',release.spec.radius*2);
+          this.visual(nx,ny,'fire-nova-detail',release.spec.radius*1.36,false,0,36,280);
+          this.damage(release.spec,release.x,release.y,nx,ny,release.aim,release.enemies);
         }
       }
     }
@@ -81,41 +79,47 @@ export class SchoolSkill {
   }
   cast(x:number,y:number,aim:Direction,enemies:EnemySystem):boolean {
     if(!this.ready||this.release)return false;
-    this.remaining=SCHOOL_SKILLS[this.school].cooldown;
+    const school=this.school;
+    this.remaining=this.spec.cooldown;
     const length=Math.hypot(aim.x,aim.y), direction=length?{x:aim.x/length,y:aim.y/length}:{x:1,y:0};
     const angle=Math.atan2(direction.y,direction.x);
-    if(this.school==='ice'){
-      this.visual(x,y,'ice-frost-detail',480);
-      this.damage('ice',x,y,x,y,direction,enemies);
+    if(school==='ice'){
+      this.visual(x,y,'ice-frost-detail',this.spec.radius*2);
+      this.damage(this.spec,x,y,x,y,direction,enemies);
     }else{
-      const reach=this.school==='fire'?190:560;
+      const reach=this.spec.reach;
       // Clip along the aim vector, preserving the direction near arena walls.
       const endpoint=skillEndpoint(x,y,direction,reach), distance=Math.hypot(endpoint.x-x,endpoint.y-y);
-      const view=this.school==='fire'?this.visual(x,y,'fireball-detail',78,false,angle,36,300):this.visual(x,y,'lightning-arc-detail-0',distance,true,angle,8,180);
-      if(this.school==='fire')view.setOrigin(64/96,0.5).setDisplaySize(78,46);
-      this.release={school:this.school,x,y,tx:endpoint.x,ty:endpoint.y,aim:direction,age:0,enemies,view};
+      const view=school==='fire'?this.visual(x,y,'fireball-detail',78,false,angle,36,300):this.visual(x,y,'lightning-arc-detail-0',distance,true,angle,8,180);
+      if(school==='fire')view.setOrigin(64/96,0.5).setDisplaySize(78,46);
+      this.release={school:school,x,y,tx:endpoint.x,ty:endpoint.y,aim:direction,age:0,enemies,view,spec:this.spec};
     }
-    enemies.effects.cast(x,y,this.school,direction);
+    enemies.effects.cast(x,y,school,direction);
     return true;
   }
-  private damage(school:School,x:number,y:number,tx:number,ty:number,direction:Direction,enemies:EnemySystem):void {
+  private damage(spec:SkillSpec,x:number,y:number,tx:number,ty:number,direction:Direction,enemies:EnemySystem):void {
+    const school=spec.school;
     for(const enemy of [...enemies.enemies]){
       if(enemy.spawning>0||enemy.health.dead)continue;
       const ex=enemy.view.x,ey=enemy.view.y;
-      const hit=school==='fire'?Math.hypot(ex-tx,ey-ty)<=110+enemy.spec.radius
-        :school==='ice'?Math.hypot(ex-x,ey-y)<=240+enemy.spec.radius
-        :segmentCircleHit(x,y,tx,ty,ex,ey,enemy.spec.radius+24)!==null;
+      const hit=school==='fire'?Math.hypot(ex-tx,ey-ty)<=spec.radius+enemy.spec.radius
+        :school==='ice'?Math.hypot(ex-x,ey-y)<=spec.radius+enemy.spec.radius
+        :segmentCircleHit(x,y,tx,ty,ex,ey,enemy.spec.radius+spec.width/2)!==null;
       if(!hit)continue;
       const dx=ex-(school==='fire'?tx:x),dy=ey-(school==='fire'?ty:y),d=Math.hypot(dx,dy)||1;
-      if(enemies.hit(enemy,school==='fire'?50:school==='ice'?18:55,school==='lightning'?direction:{x:dx/d,y:dy/d})){
-        if(school==='ice')enemies.slow(enemy,0.65,2500);
+      if(enemies.hit(enemy,spec.damage,school==='lightning'?direction:{x:dx/d,y:dy/d})){
+        if(school==='ice')enemies.slow(enemy,spec.slow,spec.duration);
         enemies.effects.spellHit(ex,ey,school,direction);
       }
     }
   }
+  configure(spec:SkillSpec):void {
+    this.remaining=this.remaining/this.spec.cooldown*spec.cooldown;
+    this.spec=spec;
+  }
   reset(school:School='fire'):void {
     for(const visual of this.visuals)visual.view.destroy();this.visuals.length=0;
     this.release=null;
-    this.school=school;this.remaining=0;
+    this.spec=skillSpec(school);this.remaining=0;
   }
 }

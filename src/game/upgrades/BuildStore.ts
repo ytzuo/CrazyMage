@@ -42,7 +42,7 @@ export class BuildStore {
     if (!card || !canAcquire(this.build, card)) return false;
     const next = applyUpgrade(this.build, id);
     const effective = compileBuild(next);
-    const history = Object.freeze([...this.history, Object.freeze({ sequence: this.history.length + 1, id, wave: this.choice.wave, elapsed, level: card.effect.kind !== 'passive' && card.effect.kind !== 'ultimate' ? next.spellLevel : stacks(next, card) })]);
+    const history = Object.freeze([...this.history, Object.freeze({ sequence: this.history.length + 1, id, wave: this.choice.wave, elapsed, level: card.effect.kind !== 'passive' && card.effect.kind !== 'ultimate' && card.effect.kind !== 'skill' ? next.spellLevel : stacks(next, card) })]);
     this.rewards.shift();
     this.build = next; this.effective = effective; this.history = history; this.choice = null;
     this.offer();
@@ -59,7 +59,7 @@ export class BuildStore {
     }
     const options: string[] = [];
     const draw = (onlySpell = false): boolean => {
-      const eligible = pool.filter(card => !onlySpell || card.effect.kind !== 'passive');
+      const eligible = pool.filter(card => !onlySpell || (card.effect.kind !== 'passive' && card.effect.kind !== 'skill'));
       if (!eligible.length) return false;
       const weights = eligible.map(card => card.effect.kind !== 'passive' ? 3 + Number(card.id === 'fire.pierce' && !!this.build.modules.multi) : stacks(this.build, card) ? 2 : 1);
       let roll = Math.max(0, Math.min(0.999999, this.random())) * weights.reduce((sum, n) => sum + n, 0);

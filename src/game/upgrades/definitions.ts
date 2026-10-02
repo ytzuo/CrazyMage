@@ -11,10 +11,20 @@ export type IceModule = 'damage' | 'radius' | 'cold' | 'echo';
 export type LightningModule = 'damage' | 'chain' | 'range' | 'conduction';
 export type SpellModule = FireModule | IceModule | LightningModule;
 export type Passive = 'speed' | 'health' | 'shield' | 'cooldown';
+export type SkillModule = 'power' | 'reach' | 'tempo';
 export type UltimateModule = 'power' | 'reach' | 'mastery';
-export type UpgradeEffect = { kind: 'ultimate'; school: School; module: UltimateModule } | { kind: 'fire'; module: FireModule } | { kind: 'ice'; module: IceModule } | { kind: 'lightning'; module: LightningModule } | { kind: 'passive'; stat: Passive };
+export type UpgradeEffect = { kind:'skill'; school:School; module:SkillModule } | { kind: 'ultimate'; school: School; module: UltimateModule } | { kind: 'fire'; module: FireModule } | { kind: 'ice'; module: IceModule } | { kind: 'lightning'; module: LightningModule } | { kind: 'passive'; stat: Passive };
 export interface UpgradeDefinition { id: string; name: string; description: string; maxStacks: number; effect: UpgradeEffect }
 export const UPGRADES: readonly UpgradeDefinition[] = [
+  {id:'skill.fire.power',name:'烈焰凝聚',description:'提升小技能的威力。',maxStacks:3,effect:{kind:'skill',school:'fire',module:'power'}},
+  {id:'skill.fire.reach',name:'焰浪扩张',description:'扩大小技能的覆盖范围。',maxStacks:3,effect:{kind:'skill',school:'fire',module:'reach'}},
+  {id:'skill.fire.tempo',name:'余火复燃',description:'让小技能更快充能。',maxStacks:3,effect:{kind:'skill',school:'fire',module:'tempo'}},
+  {id:'skill.ice.power',name:'寒霜重压',description:'提升小技能的威力。',maxStacks:3,effect:{kind:'skill',school:'ice',module:'power'}},
+  {id:'skill.ice.reach',name:'寒潮扩散',description:'扩大小技能的覆盖范围。',maxStacks:3,effect:{kind:'skill',school:'ice',module:'reach'}},
+  {id:'skill.ice.tempo',name:'冰息循环',description:'让小技能更快充能。',maxStacks:3,effect:{kind:'skill',school:'ice',module:'tempo'}},
+  {id:'skill.lightning.power',name:'雷光增幅',description:'提升小技能的威力。',maxStacks:3,effect:{kind:'skill',school:'lightning',module:'power'}},
+  {id:'skill.lightning.reach',name:'贯雷延伸',description:'扩大小技能的覆盖范围。',maxStacks:3,effect:{kind:'skill',school:'lightning',module:'reach'}},
+  {id:'skill.lightning.tempo',name:'电能循环',description:'让小技能更快充能。',maxStacks:3,effect:{kind:'skill',school:'lightning',module:'tempo'}},
   { id: 'fire.damage', name: '灼热增幅', description: '按基础伤害增加 30%，保留其他火球能力。', maxStacks: 2, effect: { kind: 'fire', module: 'damage' } },
   { id: 'fire.multi', name: '多重火球', description: '增加 2 枚扇形弹丸；每枚使用强化后伤害的 65%。', maxStacks: 2, effect: { kind: 'fire', module: 'multi' } },
   { id: 'fire.pierce', name: '穿透火球', description: '每枚火球可额外命中 1 个不同目标。', maxStacks: 2, effect: { kind: 'fire', module: 'pierce' } },

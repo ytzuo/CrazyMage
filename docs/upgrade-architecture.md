@@ -1,5 +1,7 @@
 # 升级兼容架构
 
+小技能强化使用 `skill` 效果类型与独立 `BuildState.skillModules`，普通候选池按当前流派过滤，基础法术有有效候选时仍保底一张；其余候选可抽小技能强化。威力、范围和充能速度各三层，通过统一合法性检查、原子选择与历史记录，不提升基础法术等级、不占被动槽。`compileBuild` 提供 `effective.skill`，小技能运行器读取编译结果，待结算施放保存快照；配置更新保持充能比例。构筑收藏卡和选择卡标注“小技能强化”，Boss 大招池保持独立。
+
 ## Boss 奖励与大招兼容
 
 大招升级使用独立 `ULTIMATE_UPGRADES` 池和 `ultimate` 效果类型，`BuildState.ultimateModules` 保存威力、范围、流派特色三类层数。与普通法术模块、被动槽分开；`compileBuild` 产生 `effective.ultimate`，大招运行器和构筑页直接读取该结果。选择仍通过统一 `applyUpgrade`、批次验证、合法性检查和历史记录，三种模块兼容、顺序无关。

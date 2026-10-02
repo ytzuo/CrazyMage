@@ -223,7 +223,8 @@ export class ArenaScene extends Phaser.Scene {
     const fallback = input ?? this.player.aimDirection;
     if (school === 'ice') return input ?? this.touchAim() ?? fallback;
     const automatic = this.movement.touchDevice && !input;
-    const reach = school === 'fire' ? 300 : 560;
+    const spec = this.builds.effectiveBuild.skill;
+    const reach = spec.reach + (school === 'fire' ? spec.radius : 0);
     let best = Infinity, result = fallback;
     for (const enemy of this.enemies.enemies) {
       if (enemy.spawning > 0 || enemy.health.dead) continue;
@@ -283,6 +284,7 @@ export class ArenaScene extends Phaser.Scene {
     this.player.speed = effective.player.speed;
     this.player.health.configure(effective.player.maximum, effective.player.shield);
     this.spell.configure(effective);
+    this.skill.configure(effective.skill);
     this.ultimate.configure(effective.ultimate);
   }
 
