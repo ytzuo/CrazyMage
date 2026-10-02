@@ -191,7 +191,7 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
   }
 });
 
-panel = new BuildPanel(element('build-overlay'), id => scene.previewUpgrade(id), (batch, id) => {
+panel = new BuildPanel(element('build-overlay'), (batch, id) => {
   if (scene.chooseUpgrade(batch, id)) {
     notice.show('强化完成', definition(id)!.name, latestBuild!.build.school);
     syncPause();

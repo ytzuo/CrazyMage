@@ -1,6 +1,7 @@
 import type { BuildSnapshot } from '../game/upgrades/BuildStore';
 import { stacks, type EffectiveBuild } from '../game/upgrades/build';
 import { ultimateSummary } from '../game/ultimates/definitions';
+import { UPGRADE_PRESENTATION } from './UpgradePresentation';
 import { definition, SCHOOL_INFO } from '../game/upgrades/definitions';
 export const number = (value: number): string => Number(value.toFixed(2)).toString();
 export function spellSummary(effective: EffectiveBuild): string {
@@ -19,7 +20,7 @@ export function spellSummary(effective: EffectiveBuild): string {
 export class BuildPanel {
   private key = '';
   private abort = new AbortController();
-  constructor(private host: HTMLElement, private preview: (id: string) => EffectiveBuild, private choose: (batch: string, id: string) => void, private toggleDetails: () => void) {
+  constructor(private host: HTMLElement, private choose: (batch: string, id: string) => void, private toggleDetails: () => void) {
     host.addEventListener('click', event => {
       const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button');
       if (!button) return;
@@ -43,19 +44,19 @@ export class BuildPanel {
     this.key = key;
     const details = inspecting;
     this.host.innerHTML = `<section class="build-card"><header><div><small class="wave-clear-label">${details ? '本局构筑' : `✦ 第 ${snapshot.choice?.wave} 波完成`}</small><h2>${details ? '你的法术组合' : '选择一项强化'}</h2></div>${details ? `<button data-close aria-label="${snapshot.choice ? '返回升级' : '关闭构筑'}">${snapshot.choice ? '返回升级' : '关闭'} ×</button>` : '<button data-inspect aria-label="查看已获取升级">查看构筑</button>'}</header>${details ? this.details(snapshot) : `<div class="level-route"><span>${SCHOOL_INFO[snapshot.build.school].symbol} ${SCHOOL_INFO[snapshot.build.school].name}</span><div aria-label="法术等级 ${snapshot.build.spellLevel} / 4">${[1,2,3,4].map(level=>`<i class="${level<=snapshot.build.spellLevel?'filled':''}"></i>`).join('')}</div><b>Lv.${snapshot.build.spellLevel}</b></div>${this.options(snapshot)}`}</section>`;
-    this.host.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
+    (this.host.querySelector<HTMLButtonElement>('[data-upgrade]') ?? this.host.querySelector<HTMLButtonElement>('button'))?.focus({ preventScroll: true });
   }
   private options(snapshot: BuildSnapshot): string {
-    return `<div class="upgrade-options">${snapshot.choice!.options.map(id => {
+    return `<div class="upgrade-options reward-options">${snapshot.choice!.options.map((id, index) => {
       const card = definition(id)!;
-      const after = this.preview(id);
-      const p = after.player, before = snapshot.effective.player;
-      const change = card.effect.kind !== 'passive' || card.id === 'passive.cooldown'
-        ? `${spellSummary(snapshot.effective)} → ${spellSummary(after)}`
-        : `移速 ${number(before.speed)} → ${number(p.speed)} · 生命 ${before.maximum} → ${p.maximum} · 护盾 ${before.shield} → ${p.shield}`;
-      return `<button class="upgrade-option school-${snapshot.build.school}" style="--card-index:${snapshot.choice!.options.indexOf(id)}" data-upgrade="${id}" data-batch="${snapshot.choice!.id}"><b class="upgrade-symbol" aria-hidden="true">${card.effect.kind==='passive'?'◇':SCHOOL_INFO[snapshot.build.school].symbol}</b><small>${card.effect.kind !== 'passive' ? `${SCHOOL_INFO[snapshot.build.school].spell} Lv.${snapshot.build.spellLevel} → Lv.${snapshot.build.spellLevel + 1}` : `被动 Lv.${stacks(snapshot.build, card)} → Lv.${stacks(snapshot.build, card) + 1}`}</small><h3>${card.name}</h3><p>${card.description}</p><p class="upgrade-change">${change}</p><span>选择 →</span></button>`;
+      const passive = card.effect.kind === 'passive';
+      const {symbol, summary} = UPGRADE_PRESENTATION[id] ?? {symbol:'✦', summary:'增强你的战斗能力。'};
+      const level = passive ? stacks(snapshot.build, card) + 1 : snapshot.build.spellLevel + 1;
+      const category = passive ? '被动强化' : `${SCHOOL_INFO[snapshot.build.school].name}法术`;
+      return `<button class="upgrade-option reward-card school-${snapshot.build.school}${passive ? ' reward-passive' : ''}" style="--card-index:${index}" data-upgrade="${id}" data-batch="${snapshot.choice!.id}"><span class="reward-turner"><span class="reward-face reward-back" aria-hidden="true"><span class="reward-back-seal">✦</span></span><span class="reward-face reward-front"><span class="reward-category">${category}<small>Lv.${level}</small></span><span class="reward-emblem" aria-hidden="true">${symbol}</span><strong class="reward-title">${card.name}</strong><span class="reward-description">${summary}</span><span class="reward-pick">选择强化 <i aria-hidden="true">↗</i></span></span></span></button>`;
     }).join('')}</div>`;
   }
+
   private details(snapshot: BuildSnapshot): string {
     const p = snapshot.effective.player;
     const history = snapshot.history.map(entry => `<li><time>${Math.floor(entry.elapsed / 60000)}:${String(Math.floor(entry.elapsed / 1000) % 60).padStart(2, '0')}</time> · 第 ${entry.wave} 波 · ${definition(entry.id)!.name} · Lv.${entry.level}</li>`).join('');
