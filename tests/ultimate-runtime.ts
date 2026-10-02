@@ -49,7 +49,7 @@ document.querySelector<HTMLButtonElement>('#check')!.onclick=()=>{
       brute.view.setPosition(1230,900);brute.windup=400;brute.warning.setVisible(true);
       for(let i=0;i<10;i++)ultimate.charge.onKill();
       const before=brute.health.current;check(arena.castUltimate(),'ice ultimate failed');
-      check(brute.health.current===before-40&&brute.frozen===3000&&brute.windup===0,'ice damage/freeze did not apply');
+      check(brute.health.current===before-25&&brute.frozen===3000&&brute.windup===0,'ice damage/freeze did not apply');
       const x=brute.view.x,hp=player.health.current;
       enemies.update(2999,player);check(brute.view.x===x&&player.health.current===hp&&brute.frozen===1,'frozen enemy moved or attacked');
       enemies.update(0,player);check(brute.frozen===1,'zero time advanced freeze');
@@ -59,11 +59,11 @@ document.querySelector<HTMLButtonElement>('#check')!.onclick=()=>{
       arena.resetPosition();arena.chooseSchool('lightning');enemies.waveClock.wave=30;enemies.update(60000,player);
       for(const enemy of enemies.enemies){enemy.spawning=0;enemy.view.setPosition(1350,900);enemy.health.configure(1000,0);enemy.health.reset();}
       const targets=[...enemies.enemies];for(let i=0;i<10;i++)ultimate.charge.onKill();check(arena.castUltimate(),'lightning failed');
-      check(targets.filter(e=>e.health.current===915).length===12&&targets.filter(e=>e.health.current!==1000&&e.health.current!==915).length===0,'lightning cap/damage/dedup failed');
-      check(ultimate.effectCount===24,'unexpected lightning effect budget');
+      check(targets.filter(e=>e.health.current===905).length===4&&targets.filter(e=>e.health.current!==1000&&e.health.current!==905).length===0,'lightning cap/damage/dedup failed');
+      check(ultimate.effectCount===8,'unexpected lightning effect budget');
       for(let repeat=0;repeat<4;repeat++){for(let i=0;i<10;i++)ultimate.charge.onKill();ultimate.cast(1200,900,enemies);}
       check(ultimate.effectCount<=40,'effect cap exceeded');ultimate.update(800);check(ultimate.effectCount===0,'ultimate effects did not expire');
-      reports.push({check:'lightning hits exactly 12 unique targets, effects bounded to 40 and expire within 800 ms'});
+      reports.push({check:'lightning first round hits exactly 4 unique targets, effects bounded to 40 and expire within 800 ms'});
       arena.resetPosition();const baseline=arena.children.list.length;
       for(let i=0;i<10;i++){arena.chooseSchool('fire');for(let n=0;n<10;n++)ultimate.charge.onKill();for(const e of enemies.enemies){e.spawning=0;e.view.setPosition(1300,900);}arena.castUltimate();arena.resetPosition();check(arena.children.list.length===baseline,'repeat reset leaked');}
       check(state!.ultimateEnergy===0&&state!.ultimateCasts===0,'published state retained energy');

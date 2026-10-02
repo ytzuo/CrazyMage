@@ -82,8 +82,8 @@ run.onclick = async () => {
     const energy=Math.min(100,combat().kills*10);
     check(combat().ultimateEnergy===energy&&combat().ultimateCasts===0,'kills did not charge ultimate');
     check(get('ultimate-charge').textContent===(energy===100?'已就绪':`${energy} / 100`),'ultimate HUD does not match energy');
-    click('build');const details=get('build-overlay').textContent!;check(details.includes('获取记录'),'history missing');
-    const selected=[...doc.querySelectorAll('.build-details ol li')].length-1;check(selected===1,'history does not match choices');
+    click('build');const details=get('build-overlay').textContent!;check(details.includes('获取的强化'),'history missing');
+    const selected=[...doc.querySelectorAll('.owned-card')].length;check(selected===1,'history does not match choices');
     reports.push({check:'real full wave clear → one choice → shared build history',choices,state:combat(),details});
     if (new URLSearchParams(location.search).has('preview')) {
       result.textContent=JSON.stringify({passed:true,preview:true,reports},null,2);

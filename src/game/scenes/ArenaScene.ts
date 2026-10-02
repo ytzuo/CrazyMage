@@ -134,6 +134,7 @@ export class ArenaScene extends Phaser.Scene {
     const attack = this.movement.readAttack() ?? this.touchAim();
     this.player.update(this.movement.read(), step, attack);
     this.ultimate.update(step);
+    if (this.builds.pendingChoice) { this.movement.setEnabled(false); this.publish(); return; }
     if (this.movement.consumeUltimate()) {
       this.castUltimate();
       if (this.builds.pendingChoice) return;
