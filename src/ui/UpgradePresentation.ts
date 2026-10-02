@@ -31,7 +31,7 @@ export const UPGRADE_PRESENTATION: Record<string, { symbol: string; summary: str
   'ice.damage': { symbol:'❄', summary:'提高冰矛伤害，同时增强已获得的落地冰棘和碎冰伤害。' },
   'ice.radius': { symbol:'◎', summary:'命中迸出冰片，落地冰棘半径扩大一半；继续强化冰片。' },
   'ice.cold': { symbol:'❅', summary:'敌人减速更明显，寒意持续更久。' },
-  'ice.echo': { symbol:'◉', summary:'沿原方向追加较短射程冰矛，一次最多三根，落点逐段铺开。' },
+  'ice.echo': { symbol:'◉', summary:'从角色当前位置追加较短射程冰矛，一次最多四根，移动可铺开落点。' },
   'lightning.damage': { symbol:'ϟ', summary:'增强电击威力，让每次跳跃更致命。' },
   'lightning.chain': { symbol:'⌁', summary:'闪电继续跳跃，连接更多敌人。' },
   'lightning.range': { symbol:'↗', summary:'电弧延伸更远，更容易连接怪群。' },

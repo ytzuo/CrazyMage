@@ -37,7 +37,7 @@ export const UPGRADES: readonly UpgradeDefinition[] = [
   { id: 'ice.damage', name: '凛冬冲击', description: '提高冰矛伤害，同时增强已获得的落地冰棘和碎冰伤害。', maxStacks: 2, effect: { kind: 'ice', module: 'damage' } },
   { id: 'ice.radius', name: '冰片迸发', description: '冰矛命中迸出冰片，并使落地冰棘半径增大 50%；继续强化冰片。', maxStacks: 2, effect: { kind: 'ice', module: 'radius' } },
   { id: 'ice.cold', name: '深度寒霜', description: '减速增加 10 个百分点，持续时间增加 0.5 秒；重复命中刷新，不无限叠加。', maxStacks: 2, effect: { kind: 'ice', module: 'cold' } },
-  { id: 'ice.echo', name: '冰矛追袭', description: '追加较短射程冰矛，一次最多三根，落点逐段铺开；每根威力降低。', maxStacks: 2, effect: { kind: 'ice', module: 'echo' } },
+  { id: 'ice.echo', name: '冰矛追袭', description: '从角色当前位置追加较短射程冰矛，一次最多四根，移动可铺开落点；每根威力降低。', maxStacks: 3, effect: { kind: 'ice', module: 'echo' } },
   { id: 'lightning.damage', name: '电能增幅', description: '按基础值增加闪电伤害 30%，所有跳跃保留伤害增幅。', maxStacks: 2, effect: { kind: 'lightning', module: 'damage' } },
   { id: 'lightning.chain', name: '更多跳跃', description: '额外连锁 2 个不同目标，同次施法不重复命中。', maxStacks: 2, effect: { kind: 'lightning', module: 'chain' } },
   { id: 'lightning.range', name: '延伸电弧', description: '按基础值增加首击和连锁距离 25%。', maxStacks: 2, effect: { kind: 'lightning', module: 'range' } },

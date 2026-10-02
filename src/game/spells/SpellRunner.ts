@@ -20,9 +20,9 @@ export class SpellRunner {
     else if(this.active instanceof IceSpell)this.active.configure(effective.ice);
     else this.active.configure(effective.lightning);
   }
-  update(delta:number,enemies:EnemySystem,origin?:Direction){if(this.active instanceof FireballSpell)this.active.update(delta,enemies,origin);else this.active.update(delta,enemies);}
+  update(delta:number,enemies:EnemySystem,origin?:Direction){if(this.active instanceof FireballSpell||this.active instanceof IceSpell)this.active.update(delta,enemies,origin);else this.active.update(delta,enemies);}
   cast(x:number,y:number,aim:Direction,enemies:EnemySystem){
-    const cast=this.active instanceof FireballSpell?this.active.cast(x,y,aim):this.active.cast(x,y,aim,enemies);
+    const cast=this.active instanceof FireballSpell?this.active.cast(x,y,aim):this.active.cast(x,this.active instanceof IceSpell?y-12:y,aim,enemies);
     if(cast)enemies.effects.cast(x,y,this.school,aim);
     return cast;
   }
