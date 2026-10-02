@@ -46,7 +46,7 @@ export class ArenaScene extends Phaser.Scene {
       if(this.mode==='race' && this.enemies.waves.cleared===RACE_WAVES) {
         this.won=true; this.movement.setEnabled(false);
       } else this.builds.completeWave(wave, bossDefeated);
-    }, (source, boss) => boss ? this.ultimate.charge.fill() : this.ultimate.charge.onKill(source));
+    }, (source, boss) => boss ? this.ultimate.charge.fill() : this.ultimate.charge.onKill(source),undefined,(id,x,y,source)=>this.spell.enemyDefeated(id,x,y,this.enemies,source));
     this.enemies.reset();
     this.aimIndicator = new AimIndicator(this);
     this.cameras.main.setBounds(0, 0, ARENA.width, ARENA.height);

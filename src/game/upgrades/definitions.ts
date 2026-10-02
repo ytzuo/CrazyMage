@@ -39,7 +39,7 @@ export const UPGRADES: readonly UpgradeDefinition[] = [
   { id: 'ice.cold', name: '深度寒霜', description: '减速增加 10 个百分点，持续时间增加 0.5 秒；重复命中刷新，不无限叠加。', maxStacks: 2, effect: { kind: 'ice', module: 'cold' } },
   { id: 'ice.echo', name: '冰矛追袭', description: '从角色当前位置追加较短射程冰矛，一次最多四根，移动可铺开落点；每根威力降低。', maxStacks: 3, effect: { kind: 'ice', module: 'echo' } },
   {id:'lightning.fork',name:'分叉电弧',description:'连锁命中时分出较弱电弧，打击主链以外的敌人；继续强化分叉覆盖与威力。',maxStacks:2,effect:{kind:'lightning',module:'fork'}},
-  {id:'lightning.charge',name:'蓄雷印记',description:'普攻、贯雷和雷暴追猎命中积累雷印，蓄满引发范围放电；继续强化放电。',maxStacks:2,effect:{kind:'lightning',module:'charge'}},
+  {id:'lightning.charge',name:'蓄雷印记',description:'普攻、贯雷和雷暴追猎命中积累雷印，蓄满引发范围放电，满电敌人死亡再次放电；继续强化放电。',maxStacks:2,effect:{kind:'lightning',module:'charge'}},
   { id: 'lightning.damage', name: '电能增幅', description: '按基础值增加闪电伤害 30%，所有跳跃保留伤害增幅。', maxStacks: 2, effect: { kind: 'lightning', module: 'damage' } },
   { id: 'lightning.chain', name: '更多跳跃', description: '额外连锁 2 个不同目标，同次施法不重复命中。', maxStacks: 2, effect: { kind: 'lightning', module: 'chain' } },
   { id: 'lightning.range', name: '延伸电弧', description: '按基础值增加首击和连锁距离 25%。', maxStacks: 2, effect: { kind: 'lightning', module: 'range' } },

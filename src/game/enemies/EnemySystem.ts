@@ -85,7 +85,7 @@ export class EnemySystem {
   private nextId = 0;
   private clearedDuringUpdate = false;
 
-  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareFireTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.special = new SpecialEnemyCombat(scene); this.bosses = new BossCombat(scene); this.areaAttacks = new AreaAttacks(scene); this.fireFields=new FireFields(scene); this.iceShards=new IceShards(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
+  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random, private onDefeat: (id:number,x:number,y:number,source:DamageSource|null)=>void = () => {}) { prepareEnemyTextures(scene); prepareFireTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.special = new SpecialEnemyCombat(scene); this.bosses = new BossCombat(scene); this.areaAttacks = new AreaAttacks(scene); this.fireFields=new FireFields(scene); this.iceShards=new IceShards(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
 
   private spawn(player: Player, wave: number, kind: EnemyKind): boolean {
     if (this.enemies.length >= this.capacity - Number(kind !== 'boss')) return false;
@@ -476,6 +476,7 @@ export class EnemySystem {
     enemy.view.destroy();
     this.enemies.splice(this.enemies.indexOf(enemy), 1);
     this.split(enemy, x, y);
+    this.onDefeat(enemy.id,x,y,source);
     if(deriveEffects && source && !shard && enemy.iceShard && (enemy.slow.strength>0 || enemy.frozen>0 || !!ice?.shards))
       this.iceShards.burst(x,y,enemy.iceShard.spec,this);
     // Clearing the arena schedules the next wave even when upgrades are exhausted.

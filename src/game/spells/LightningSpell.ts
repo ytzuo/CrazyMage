@@ -7,13 +7,15 @@ import { preserveCooldown } from '../combat/DamageResolver';
 import { chainTargets } from './chain';
 import type { DamageSource } from '../ultimates/UltimateCharge';
 interface Arc {view:Phaser.GameObjects.Image;age:number;duration:number;diameter?:number}
-interface Charge {view:Phaser.GameObjects.Image;stacks:number;remaining:number}
+type ChargeSpec=NonNullable<LightningSpec['charge']>;
+interface Charge {view:Phaser.GameObjects.Image;stacks:number;remaining:number;armed:{spec:ChargeSpec;source:DamageSource}|null}
 /** Main chain, non-recursive forks and three-hit discharge share compiled parameters. */
 export class LightningSpell {
   private cooldown=0;
   private arcs:Arc[]=[];
   private charges=new Map<number,Charge>();
   private cleared=0;
+  private discharging=0;
   casts=0;
   get projectileCount():number{return 0;}
   get impactCount():number{return this.arcs.length+this.charges.size;}
@@ -40,7 +42,7 @@ export class LightningSpell {
       charge.remaining-=delta;
       const enemy=alive.get(id);
       if(!enemy||enemy.health.dead||charge.remaining<=0){charge.view.destroy();this.charges.delete(id);continue;}
-      const size=22+charge.stacks*7;
+      const size=charge.armed?44:22+charge.stacks*7;
       charge.view.setPosition(enemy.view.x,enemy.view.y-enemy.spec.radius-20)
         .setDisplaySize(size,size).setAlpha(Math.min(1,charge.remaining/250)*(0.8+0.2*Math.cos(charge.remaining/100)**2));
     }
@@ -72,31 +74,45 @@ export class LightningSpell {
       if(this.charges.size>=72)return;
       const view=this.scene.add.image(enemy.view.x,enemy.view.y-enemy.spec.radius-20,'lightning-charge-mark')
         .setDisplaySize(29,29).setDepth(17).setBlendMode(Phaser.BlendModes.ADD);
-      charge={view,stacks:0,remaining:spec.duration};this.charges.set(enemy.id,charge);
+      charge={view,stacks:0,remaining:spec.duration,armed:null};this.charges.set(enemy.id,charge);
     }
     charge.stacks++;charge.remaining=spec.duration;
     if(charge.stacks<spec.threshold)return;
-    this.removeCharge(enemy.id);
-    const x=enemy.view.x,y=enemy.view.y;
-    const targets=[enemy,...enemies.enemies.filter(other=>other.id!==enemy.id&&!other.health.dead&&other.spawning===0&&!burstHits.has(other.id)&&
+    charge.stacks=0;charge.armed={spec,source};
+    charge.view.setDisplaySize(44,44).setTint(0xffe297);
+    this.discharge(enemy.id,enemy.view.x,enemy.view.y,enemies,spec,burstHits,source,enemy);
+  }
+  enemyDefeated(id:number,x:number,y:number,enemies:EnemySystem,source:DamageSource|null):void {
+    const mark=this.charges.get(id),armed=mark?.armed;
+    this.removeCharge(id);
+    // Consume before damage; discharge deaths cannot create a recursive chain.
+    if(!armed||!mark||mark.remaining<=0||this.discharging>0)return;
+    this.discharge(id,x,y,enemies,armed.spec,new Set<number>(),source??armed.source);
+  }
+  private discharge(id:number,x:number,y:number,enemies:EnemySystem,spec:ChargeSpec,burstHits:Set<number>,source:DamageSource,primary?:Enemy):void {
+    const targets=[...(primary?[primary]:[]),...enemies.enemies.filter(other=>other.id!==id&&!other.health.dead&&other.spawning===0&&!burstHits.has(other.id)&&
       (other.view.x-x)**2+(other.view.y-y)**2<=spec.radius**2)
-      .sort((a,b)=>(a.view.x-x)**2+(a.view.y-y)**2-((b.view.x-x)**2+(b.view.y-y)**2)||a.id-b.id)
-      .slice(0,spec.targets-1)];
+      .sort((a,b)=>(a.view.x-x)**2+(a.view.y-y)**2-((b.view.x-x)**2+(b.view.y-y)**2)||a.id-b.id)]
+      .slice(0,spec.targets);
     const pulse=this.scene.add.image(x,y,'lightning-discharge-detail').setDepth(13).setDisplaySize(spec.radius*1.3,spec.radius*1.3)
       .setBlendMode(Phaser.BlendModes.ADD);
     this.remember(pulse,260,spec.radius*2);
-    for(const target of targets){
-      if(target.health.dead||burstHits.has(target.id))continue;
-      burstHits.add(target.id);
-      const tx=target.view.x,ty=target.view.y,dx=tx-x,dy=ty-y,d=Math.hypot(dx,dy)||1;
-      // Periodic entry avoids extra knockback; no lightning callbacks are installed on hit().
-      if(enemies.hit(target,spec.damage,{x:dx/d,y:dy/d},source,null,true)){
-        enemies.effects.spellHit(tx,ty,'lightning',{x:dx/d,y:dy/d});
-        if(target.id!==enemy.id)this.arc(x,y,tx,ty,true);
+    this.discharging++;
+    try{
+      for(const target of targets){
+        if(target.health.dead||burstHits.has(target.id))continue;
+        burstHits.add(target.id);
+        const tx=target.view.x,ty=target.view.y,dx=tx-x,dy=ty-y,d=Math.hypot(dx,dy)||1;
+        // Periodic entry avoids extra knockback; no charge callbacks are installed on hit().
+        if(enemies.hit(target,spec.damage,{x:dx/d,y:dy/d},source,null,true)){
+          enemies.effects.spellHit(tx,ty,'lightning',{x:dx/d,y:dy/d});
+          if(target.id!==id)this.arc(x,y,tx,ty,true);
+        }
+        if(enemies.waves.cleared!==this.cleared)return;
       }
-      if(enemies.waves.cleared!==this.cleared)return;
-    }
+    }finally{this.discharging--;}
   }
+
   cast(x:number,y:number,aim:Direction,enemies:EnemySystem):boolean {
     this.syncWave(enemies);
     if(this.cooldown>0)return false;

@@ -1,6 +1,7 @@
 import type Phaser from 'phaser';
 import type { Direction } from '../config';
 import type { EnemySystem } from '../enemies/EnemySystem';
+import type { DamageSource } from '../ultimates/UltimateCharge';
 import type { EffectiveBuild } from '../upgrades/build';
 import { FireballSpell } from './FireballSpell';
 import { IceSpell } from './IceSpell';
@@ -20,6 +21,9 @@ export class SpellRunner {
     else if(this.active instanceof FireballSpell)this.active.configure(effective.fireball);
     else if(this.active instanceof IceSpell)this.active.configure(effective.ice);
     else this.active.configure(effective.lightning);
+  }
+  enemyDefeated(id:number,x:number,y:number,enemies:EnemySystem,source:DamageSource|null):void {
+    if(this.active instanceof LightningSpell)this.active.enemyDefeated(id,x,y,enemies,source);
   }
   readonly accumulateLightning:LightningChargeHit=(enemy,enemies,burstHits,source)=>{
     if(this.active instanceof LightningSpell)this.active.accumulateCharge(enemy,enemies,burstHits,source);
