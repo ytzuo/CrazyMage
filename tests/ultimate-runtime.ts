@@ -49,13 +49,14 @@ document.querySelector<HTMLButtonElement>('#check')!.onclick=()=>{
       brute.view.setPosition(1230,900);brute.windup=400;brute.warning.setVisible(true);
       for(let i=0;i<10;i++)ultimate.charge.onKill();
       const before=brute.health.current;check(arena.castUltimate(),'ice ultimate failed');
-      check(brute.health.current===before-25&&brute.frozen===3000&&brute.windup===0,'ice damage/freeze did not apply');
+      check(brute.health.current===before-25&&brute.frozen===1800&&brute.windup===0,'ice damage/freeze did not apply');
       const x=brute.view.x,hp=player.health.current;
-      enemies.update(2999,player);check(brute.view.x===x&&player.health.current===hp&&brute.frozen===1,'frozen enemy moved or attacked');
+      enemies.update(1799,player);check(brute.view.x===x&&player.health.current===hp&&brute.frozen===1,'frozen enemy moved or attacked');
       enemies.update(0,player);check(brute.frozen===1,'zero time advanced freeze');
       enemies.update(1,player);check(brute.frozen===0,'enemy did not thaw');
       enemies.update(250,player);check(brute.windup>0,'thawed enemy did not resume attacks');
-      reports.push({check:'ice damage, cancels attack, freezes movement/attacks for 3 seconds, resumes after thaw'});
+      enemies.freeze(brute,1800);enemies.hit(brute,1,{x:1,y:0});check(brute.health.dead,'hit on ice prison failed to execute');
+      reports.push({check:'ice damage, cancels attack, freezes movement/attacks for 1.8 seconds, resumes after thaw'});
       arena.resetPosition();arena.chooseSchool('lightning');enemies.waveClock.wave=30;enemies.update(60000,player);
       for(const enemy of enemies.enemies){enemy.spawning=0;enemy.view.setPosition(1350,900);enemy.health.configure(1000,0);enemy.health.reset();}
       const targets=[...enemies.enemies];for(let i=0;i<10;i++)ultimate.charge.onKill();check(arena.castUltimate(),'lightning failed');

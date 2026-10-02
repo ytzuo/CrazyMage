@@ -19,5 +19,5 @@ test('school ultimates preserve distinct ranges and control while levels scale d
     assert.equal(last.damage,first.damage+45);assert.equal(last.radius,first.radius);assert.equal(last.targets,first.targets);
     assert.deepEqual(ultimateSpec(school,99),last);assert.ok(Object.isFrozen(last));
   }
-  assert.equal(ultimateSpec('ice',1).freeze,3000);assert.equal(ultimateSpec('lightning',1).targets,4);
+  assert.equal(ultimateSpec('ice',1).freeze,1800);assert.equal(ultimateSpec('lightning',1).targets,4);
 });

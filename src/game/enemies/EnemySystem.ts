@@ -7,6 +7,7 @@ import { WaveTracker } from './WaveTracker';
 import { waveDifficulty } from './difficulty';
 import { enemyKind, enemySpec, type EnemyKind, type EnemySpec } from './roster';
 import { VARIANTS, rollVariant, fragmentSpec, type EnemyVariant } from './variants';
+import { prepareIcePrisonTexture } from '../art/SpellTextures';
 import { segmentCircleHit } from '../combat/collision';
 import { SlowStatus } from '../combat/SlowStatus';
 import { EnemyShots } from './EnemyShots';
@@ -37,6 +38,7 @@ export interface Enemy {
   cooldown: number;
   attackTime: number;
   frozen: number;
+  icePrison: Phaser.GameObjects.Image | null;
   flash: number;
   knockback: Direction;
 }
@@ -52,7 +54,7 @@ export class EnemySystem {
   private spawnIndex = 0;
   private nextId = 0;
 
-  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number) => void = () => {}, private onKill: (source: DamageSource) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
+  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number) => void = () => {}, private onKill: (source: DamageSource) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareIcePrisonTexture(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
 
   private spawn(player: Player, wave: number, kind: EnemyKind): boolean {
     if (this.enemies.length >= ENEMY.maxCount) return false;
@@ -81,7 +83,7 @@ export class EnemySystem {
     const background = this.scene.add.rectangle(0, -spec.radius - 18, spec.radius * 2, 5, 0x211d26).setStrokeStyle(1, 0x473843);
     const bar = this.scene.add.rectangle(-spec.radius, -spec.radius - 18, spec.radius * 2, 3, 0xe29a9c).setOrigin(0, 0.5);
     view.add([shadow, warning, aimLine, body, background, bar]).setAlpha(0.45);
-    this.enemies.push({ spec, variant, dashTime: 0, dashHit: false, burstRemaining: 0, burstWait: 0, blockCooldown: 0, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: warningTime, windup: 0, cooldown: 0, attackTime: 0, frozen: 0, flash: 0, knockback: { x: 0, y: 0 } });
+    this.enemies.push({ spec, variant, dashTime: 0, dashHit: false, burstRemaining: 0, burstWait: 0, blockCooldown: 0, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: warningTime, windup: 0, cooldown: 0, attackTime: 0, frozen: 0, icePrison: null, flash: 0, knockback: { x: 0, y: 0 } });
   }
 
   private attackRange(enemy: Enemy): number { return enemy.variant === 'dasher' ? VARIANTS.dashRange : enemy.spec.range; }
@@ -131,7 +133,8 @@ export class EnemySystem {
       enemy.slow.update(delta);
       if (enemy.frozen > 0) {
         enemy.frozen = Math.max(0, enemy.frozen - delta);
-        if (enemy.frozen > 0) { enemy.knockback.x = enemy.knockback.y = 0; enemy.body.setTint(0x80dfff); continue; }
+        if (enemy.frozen === 0) { enemy.icePrison?.destroy(); enemy.icePrison = null; }
+        if (enemy.frozen > 0) { enemy.icePrison?.setAlpha(Math.min(1,enemy.frozen/250)); enemy.knockback.x = enemy.knockback.y = 0; enemy.body.setTint(0x80dfff); continue; }
       }
       enemy.flash = Math.max(0, enemy.flash - delta);
       if (enemy.flash === 0) { if(enemy.slow.strength>0) enemy.body.setTint(0x91dafa); else enemy.body.clearTint(); }
@@ -226,6 +229,10 @@ export class EnemySystem {
   freeze(enemy: Enemy, duration: number): void {
     if (enemy.spawning > 0 || enemy.health.dead || !this.enemies.includes(enemy)) return;
     enemy.frozen = Math.max(enemy.frozen, Math.min(3000, duration));
+    if(!enemy.icePrison){
+      enemy.icePrison=this.scene.add.image(0,-4,'ice-prison-detail').setDisplaySize(enemy.spec.radius*2.8,enemy.spec.radius*3.2);
+      enemy.view.add(enemy.icePrison);enemy.view.bringToTop(enemy.bar);
+    }
     enemy.windup = enemy.attackTime = enemy.dashTime = enemy.burstRemaining = enemy.burstWait = 0;
     enemy.knockback.x = enemy.knockback.y = 0;
     enemy.warning.setVisible(false); enemy.aimLine.setVisible(false);
@@ -246,7 +253,9 @@ export class EnemySystem {
       // Contact is settled even without damage: consume pierce/splash once, allow ice control.
       return true;
     }
-    if (!enemy.health.hurt(damage)) return false;
+    const shatter=enemy.frozen>0;
+    if(shatter)this.effects.shatter(enemy.view.x,enemy.view.y,enemy.spec.radius);
+    if (!enemy.health.hurt(shatter?enemy.health.current+enemy.health.shield:damage)) return false;
     this.effects.hit(enemy.view.x, enemy.view.y, direction);
     enemy.bar.scaleX = enemy.health.current / enemy.health.maximum;
     enemy.body.setTintFill(0xffe1b6);

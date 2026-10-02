@@ -19,6 +19,8 @@ export class Player {
   private castAim = { x: 1, y: 0 };
   get casting(): boolean { return this.castTime > 0; }
   private facing = 1;
+  private look = {x:1,y:0};
+  get aimDirection():Direction{return {...this.look};}
   private walkTime = 0;
   distance = 0;
   moving = false;
@@ -53,6 +55,8 @@ export class Player {
   }
 
   update(direction: Direction, delta: number, aim: Direction | null = null): void {
+    const look=aim ?? direction,length=Math.hypot(look.x,look.y);
+    if(length>0){this.look.x=look.x/length;this.look.y=look.y/length;}
     this.health.update(delta);
     this.castTime = Math.max(0, this.castTime - delta);
     this.flashTime = Math.max(0, this.flashTime - delta);
@@ -76,6 +80,7 @@ export class Player {
 
   /** Successful casts animate the existing body and hinged staff, never delay damage. */
   cast(aim: Direction, school: School): void {
+    this.look.x=aim.x;this.look.y=aim.y;
     this.castTime = 280;
     this.castAim.x = aim.x; this.castAim.y = aim.y;
     if (Math.abs(aim.x) > 0.01) this.facing = Math.sign(aim.x);
@@ -114,6 +119,7 @@ export class Player {
     this.distance = 0;
     this.walkTime = 0;
     this.facing = 1;
+    this.look.x=1;this.look.y=0;
     this.health.reset();
     this.knockback.x = this.knockback.y = 0;
     this.flashTime = this.castTime = 0;

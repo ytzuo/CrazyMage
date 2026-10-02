@@ -65,6 +65,19 @@ export function prepareIceTextures(scene:Phaser.Scene):void {
     }
   });
 }
+export function prepareIcePrisonTexture(scene:Phaser.Scene):void {
+  material(scene,'ice-prison-detail',ctx=>{
+    const gradient=ctx.createLinearGradient(35,30,204,227);gradient.addColorStop(0,'#eaffffb8');gradient.addColorStop(.35,'#82c8e554');gradient.addColorStop(.7,'#4185bf80');gradient.addColorStop(1,'#c9f7ffc4');
+    ctx.fillStyle=gradient;ctx.strokeStyle='#defaffdc';ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(70,25);ctx.lineTo(174,21);ctx.lineTo(219,69);ctx.lineTo(212,208);ctx.lineTo(165,237);ctx.lineTo(55,224);ctx.lineTo(32,174);ctx.lineTo(39,63);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='#e6ffff4d';ctx.beginPath();ctx.moveTo(70,25);ctx.lineTo(85,69);ctx.lineTo(39,63);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#366da450';ctx.beginPath();ctx.moveTo(174,21);ctx.lineTo(164,81);ctx.lineTo(165,237);ctx.lineTo(212,208);ctx.lineTo(219,69);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#eaffffb0';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(39,63);ctx.lineTo(85,69);ctx.lineTo(164,81);ctx.lineTo(219,69);ctx.moveTo(85,69);ctx.lineTo(75,203);ctx.lineTo(55,224);ctx.moveTo(164,81);ctx.lineTo(165,237);ctx.stroke();
+    ctx.strokeStyle='#f3ffffb0';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(54,84);ctx.lineTo(51,153);ctx.moveTo(97,40);ctx.lineTo(143,39);ctx.stroke();
+    ctx.strokeStyle='#93d5f480';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(117,94);ctx.lineTo(103,120);ctx.lineTo(115,138);ctx.lineTo(106,172);ctx.moveTo(103,120);ctx.lineTo(86,123);ctx.stroke();
+  });
+}
+
 export function prepareFireTextures(scene: Phaser.Scene): void {
   cached(scene,'fireball-detail',96,64,g=>{
     g.fillStyle(0xeb582b,.08).fillEllipse(54,32,76,54);

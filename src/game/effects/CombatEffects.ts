@@ -46,6 +46,10 @@ export class CombatEffects {
       this.add(x,y,i%2?color:0xfff1c6,fire?10:15,280+(i%2)*80,Math.cos(angle)*105,Math.sin(angle)*105,-0.65,false,fire?'feedback-ember':'feedback-zap');
     }
   }
+  shatter(x:number,y:number,radius:number):void {
+    this.burst(x,y,0xd2f7ff,12,12,140);
+    this.add(x,y,0x9de6ff,radius*2.8,350,0,0,0.6,true);
+  }
   block(x:number,y:number,radius:number):void{
     this.add(x,y,0xbcecff,radius*2.3,280,0,0,0.3,true);
     this.burst(x,y,0x9bd9ef,4,9,70);

@@ -197,8 +197,9 @@ export class ArenaScene extends Phaser.Scene {
 
   castUltimate(): boolean {
     if (!this.player || this.paused || this.selectingSchool || this.player.health.dead || this.builds.pendingChoice) return false;
-    if (!this.ultimate.cast(this.player.view.x, this.player.view.y, this.enemies)) return false;
-    this.player.cast(this.movement.readAttack() ?? { x: 0, y: -1 }, this.builds.snapshot.build.school);
+    const aim=this.movement.readAttack() ?? this.touchAim() ?? this.player.aimDirection;
+    if (!this.ultimate.cast(this.player.view.x, this.player.view.y, this.enemies, aim)) return false;
+    this.player.cast(aim, this.builds.snapshot.build.school);
     if (this.builds.pendingChoice) this.movement.setEnabled(false);
     this.publish();
     return true;
