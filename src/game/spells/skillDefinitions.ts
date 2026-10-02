@@ -8,6 +8,7 @@ export function skillSpec(school:School, modules:Readonly<Partial<Record<SkillMo
   const power=modules.power??0, reach=modules.reach??0, tempo=modules.tempo??0;
   return Object.freeze({...SCHOOL_SKILLS[school], school,
     cooldown:SCHOOL_SKILLS[school].cooldown*(1-0.1*tempo),
+    initialDamage:school==='ice'?30*(1+0.3*power):0,
     damage:(school==='fire'?70:school==='ice'?6:80)*(1+0.3*power),
     reach:(school==='fire'?230:school==='ice'?300:640)*(1+0.15*reach),
     radius:(school==='fire'?120:school==='ice'?300:0)*(1+0.15*reach),

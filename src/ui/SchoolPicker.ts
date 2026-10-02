@@ -13,7 +13,7 @@ export class SchoolPicker {
       const info=SCHOOL_INFO[school];
       const effect=school==='fire'
         ? '<span class="preview-fireball"></span><span class="preview-impact"></span>'
-        : school==='ice' ? '<span class="preview-ice-ring"></span>'
+        : school==='ice' ? '<span class="preview-ice-lance"></span>'
         : '<svg class="preview-lightning" viewBox="0 0 240 160" aria-hidden="true"><polyline class="preview-electric-glow" points="78,92 108,76 99,94 138,90 152,81 160,100 191,108 180,121 208,133"/><polyline points="78,92 108,76 99,94 138,90 152,81 160,100 191,108 180,121 208,133"/><polyline class="preview-electric-core" points="78,92 108,76 99,94 138,90 152,81 160,100 191,108 180,121 208,133"/><path class="preview-electric-branch" d="M108 76L115 63L106 66 M160 100L172 88L165 87 M180 121L168 135L176 131"/></svg>';
       return `<button class="upgrade-option school-${school} school-choice" style="--card-index:${SCHOOLS.indexOf(school)}" data-school="${school}" aria-label="选择${info.name}流派"><div class="school-preview" aria-hidden="true"><span class="preview-ground"></span><span class="preview-mage"><img class="preview-body" alt="" width="72" height="108"><img class="preview-staff" alt="" width="36" height="63"></span><span class="preview-target target-a"></span><span class="preview-target target-b"></span><span class="preview-target target-c"></span>${effect}</div><h3>${info.name}</h3><p>${info.description}</p><span class="school-record" data-record="${school}"></span><span class="school-pick">${info.spell} Lv.1 →</span></button>`;
     }).join('')}</div></section>`;

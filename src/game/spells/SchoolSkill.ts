@@ -88,7 +88,7 @@ export class SchoolSkill {
     const angle=Math.atan2(direction.y,direction.x);
     if(school==='ice'){
       this.iceZone?.reset();
-      this.iceZone=new IceZone(this.scene,enemies,x,y,direction,{radius:this.spec.radius,damage:this.spec.damage,duration:this.spec.duration,interval:300,fan:true,source:'spell',frost:0,freeze:0});
+      this.iceZone=new IceZone(this.scene,enemies,x,y,direction,{radius:this.spec.radius,damage:this.spec.damage,duration:this.spec.duration,interval:300,initialDamage:this.spec.initialDamage,fan:true,source:'spell',frost:0,freeze:0});
     }else{
       const reach=this.spec.reach;
       // Clip along the aim vector, preserving the direction near arena walls.

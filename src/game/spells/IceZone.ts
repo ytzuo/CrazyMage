@@ -4,7 +4,7 @@ import type { EnemySystem } from '../enemies/EnemySystem';
 import type { DamageSource } from '../ultimates/UltimateCharge';
 interface ZoneSpec {
   readonly radius:number; readonly damage:number; readonly duration:number;
-  readonly interval:number; readonly fan:boolean; readonly source:DamageSource;
+  readonly initialDamage?:number; readonly interval:number; readonly fan:boolean; readonly source:DamageSource;
   readonly frost:number; readonly freeze:number;
 }
 /** One bounded region. Damage and frost settle on a shared active-time tick. */
@@ -12,6 +12,7 @@ export class IceZone {
   private views:Phaser.GameObjects.Image[]=[];
   private elapsed=0;
   private wait=0;
+  private firstTick=true;
   private cleared:number;
   constructor(scene:Phaser.Scene,private enemies:EnemySystem,private x:number,private y:number,private aim:Direction,private spec:ZoneSpec) {
     this.cleared=enemies.waves.cleared;
@@ -34,13 +35,15 @@ export class IceZone {
     this.wait-=delta;
     if(this.wait>0)return true;
     this.wait+=this.spec.interval;
+    const damage=this.firstTick?(this.spec.initialDamage??this.spec.damage):this.spec.damage;
+    this.firstTick=false;
     for(const enemy of [...this.enemies.enemies]) {
       if(enemy.spawning>0||enemy.health.dead)continue;
       const dx=enemy.view.x-this.x,dy=enemy.view.y-this.y,d=Math.hypot(dx,dy);
       if(d>this.spec.radius+enemy.spec.radius)continue;
       if(this.spec.fan&&dx*this.aim.x+dy*this.aim.y<d*Math.cos(Math.PI*5/18)-enemy.spec.radius)continue;
       if(this.spec.frost)this.enemies.accumulateFrost(enemy,this.spec.frost,this.spec.freeze);
-      if(this.enemies.hit(enemy,this.spec.damage,{x:0,y:0},this.spec.source,null,true))
+      if(this.enemies.hit(enemy,damage,{x:0,y:0},this.spec.source,null,true))
         this.enemies.slow(enemy,0.65,this.spec.interval+200);
       if(this.enemies.waves.cleared!==this.cleared){this.reset();return false;}
     }

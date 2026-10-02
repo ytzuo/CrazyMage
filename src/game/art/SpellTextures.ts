@@ -44,6 +44,13 @@ function fireBurst(ctx:CanvasRenderingContext2D,nova:boolean):void {
   }
 }
 export function prepareIceTextures(scene:Phaser.Scene):void {
+  cached(scene,'ice-lance-detail',96,24,g=>{
+    polygon(g,[0,12,35,5,66,8,94,12,66,16,35,19],0x78cee9,.35);
+    polygon(g,[18,12,61,3,94,12,61,21],0x64aeca,.95);
+    polygon(g,[18,12,61,3,94,12],0xd9fcff,.95);
+    polygon(g,[37,12,65,8,94,12,65,16],0xf3ffff,.9);
+    g.lineStyle(1,0xc6faff,.8).lineBetween(4,12,36,12);
+  });
   material(scene,'ice-fan-ground',ctx=>{
     const glow=ctx.createRadialGradient(128,128,5,128,128,122);
     glow.addColorStop(0,'#a5eaff20');glow.addColorStop(.75,'#b9f5ff66');glow.addColorStop(1,'#c9faff00');

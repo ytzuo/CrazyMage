@@ -2,12 +2,12 @@ export type School = 'fire' | 'ice' | 'lightning';
 export const SCHOOLS: readonly School[] = ['fire', 'ice', 'lightning'];
 export const SCHOOL_INFO = {
   fire: {name:'火焰', spell:'火球', symbol:'✹', description:'定向火球，组合多发、穿透、爆炸、灼烧、火区与回旋。'},
-  ice: {name:'冰霜', spell:'冰环', symbol:'❄', description:'近身冰环减速怪群，组合范围、寒意、回响、碎冰与冻结。'},
+  ice: {name:'冰霜', spell:'冰矛', symbol:'❄', description:'远程穿透冰矛，组合贯穿、追袭、驻留冰棘、碎冰与冻结。'},
   lightning: {name:'闪电', spell:'连锁闪电', symbol:'ϟ', description:'定向电击在怪群中跳跃，强化连锁、距离与传导。'},
 } as const;
 export const isSchool = (value:string): value is School => SCHOOLS.includes(value as School);
 export type FireModule = 'damage' | 'multi' | 'pierce' | 'explosion' | 'burn' | 'rebound';
-export type IceModule = 'damage' | 'radius' | 'cold' | 'echo' | 'shards' | 'frost';
+export type IceModule = 'damage' | 'radius' | 'cold' | 'echo' | 'shards' | 'frost' | 'ground';
 export type LightningModule = 'damage' | 'chain' | 'range' | 'conduction';
 export type SpellModule = FireModule | IceModule | LightningModule;
 export type Passive = 'speed' | 'health' | 'shield' | 'cooldown';
@@ -32,12 +32,13 @@ export const UPGRADES: readonly UpgradeDefinition[] = [
   {id:'fire.rebound',name:'回旋焰弹',description:'火球达到命中或飞行上限后折返；回程只命中一名敌人，不触发穿透、爆炸或灼烧。',maxStacks:2,effect:{kind:'fire',module:'rebound'}},
   {id:'fire.burn',name:'灼烧蔓延',description:'火球命中点燃敌人，死亡传播火种并留下持续伤害火区。',maxStacks:2,effect:{kind:'fire',module:'burn'}},
   { id: 'fire.explosion', name: '冲击爆炸', description: '每枚首次命中产生范围溅射，之后仍可继续穿透；同次施法每个目标最多受到一次溅射。', maxStacks: 1, effect: { kind: 'fire', module: 'explosion' } },
+  {id:'ice.ground',name:'落地冰棘',description:'冰矛到达射程末端后驻留地面，持续伤害并减速附近敌人。',maxStacks:2,effect:{kind:'ice',module:'ground'}},
   {id:'ice.shards',name:'碎冰迸射',description:'寒霜中的敌人死亡时迸出冰片，打击并减速附近敌人。',maxStacks:2,effect:{kind:'ice',module:'shards'}},
-  {id:'ice.frost',name:'寒霜积压',description:'连续冰环命中积累寒霜，最终短暂冻结敌人；强化积累效率与冻结时间。',maxStacks:2,effect:{kind:'ice',module:'frost'}},
-  { id: 'ice.damage', name: '凛冬冲击', description: '按基础值增加冰环伤害 30%，保留寒意与回响。', maxStacks: 2, effect: { kind: 'ice', module: 'damage' } },
-  { id: 'ice.radius', name: '扩大冰环', description: '按基础值扩大冰环半径 25%，每次回响也生效。', maxStacks: 2, effect: { kind: 'ice', module: 'radius' } },
+  {id:'ice.frost',name:'寒霜积压',description:'连续冰矛命中积累寒霜，最终短暂冻结敌人；强化积累效率与冻结时间。',maxStacks:2,effect:{kind:'ice',module:'frost'}},
+  { id: 'ice.damage', name: '凛冬冲击', description: '提高冰矛伤害，保留穿透、寒意与追袭。', maxStacks: 2, effect: { kind: 'ice', module: 'damage' } },
+  { id: 'ice.radius', name: '贯穿冰矛', description: '冰矛额外贯穿两个敌人，追加冰矛同样生效。', maxStacks: 2, effect: { kind: 'ice', module: 'radius' } },
   { id: 'ice.cold', name: '深度寒霜', description: '减速增加 10 个百分点，持续时间增加 0.5 秒；重复命中刷新，不无限叠加。', maxStacks: 2, effect: { kind: 'ice', module: 'cold' } },
-  { id: 'ice.echo', name: '寒潮回响', description: '施放后 180 ms 在原地再释放一次冰环，每次伤害为强化后伤害的 75%。', maxStacks: 1, effect: { kind: 'ice', module: 'echo' } },
+  { id: 'ice.echo', name: '冰矛追袭', description: '短暂延迟后沿原方向追加一枚冰矛，每枚威力降低。', maxStacks: 1, effect: { kind: 'ice', module: 'echo' } },
   { id: 'lightning.damage', name: '电能增幅', description: '按基础值增加闪电伤害 30%，所有跳跃保留伤害增幅。', maxStacks: 2, effect: { kind: 'lightning', module: 'damage' } },
   { id: 'lightning.chain', name: '更多跳跃', description: '额外连锁 2 个不同目标，同次施法不重复命中。', maxStacks: 2, effect: { kind: 'lightning', module: 'chain' } },
   { id: 'lightning.range', name: '延伸电弧', description: '按基础值增加首击和连锁距离 25%。', maxStacks: 2, effect: { kind: 'lightning', module: 'range' } },
