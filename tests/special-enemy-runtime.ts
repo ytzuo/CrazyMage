@@ -17,6 +17,7 @@ function spawn(system:EnemySystem,kind:EnemyKind,x:number,y:number,variant:Enemy
 }
 function launch(scene:Phaser.Scene):void {
   game?.destroy(true);
+  game?.loop.wake();
   game=new Phaser.Game({type:Phaser.AUTO,parent:'test-game',width:900,height:540,scene,backgroundColor:'#17251f',audio:{noAudio:true}});
 }
 function finish(scene:Phaser.Scene,data:unknown):void {
@@ -159,6 +160,7 @@ function checks(preview=false):void {
           const kinds:EnemyKind[]=['bomber','bomber','priest','priest'];const variants:EnemyVariant[]=['normal','chain','normal','ward'];
           for(let i=0;i<4;i++) {
             const enemy=spawn(system,kinds[i],880+i*210,820,variants[i]);enemy.view.setAlpha(1);enemy.warning.setVisible(false);enemy.bar.setVisible(false);enemy.body.setScale(enemy.body.scaleX*1.8);
+            enemy.motion.apply(enemy.body,false);
             this.add.text(enemy.view.x,690,labels[i],{fontSize:'22px',color:'#e6e8dd'}).setOrigin(0.5);
           }
           player.view.setPosition(1200,1070);this.cameras.main.centerOn(1200,850);

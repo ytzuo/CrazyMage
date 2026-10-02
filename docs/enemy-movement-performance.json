@@ -1,0 +1,537 @@
+{
+  "date": "2026-10-02",
+  "baselineCommit": "abc2005",
+  "environment": {
+    "os": "macOS 26.6",
+    "architecture": "arm64",
+    "browser": "Codex in-app Chromium 154",
+    "server": "Vite 7.3.6 development",
+    "canvas": [
+      900,
+      540
+    ],
+    "dpr": 2,
+    "cachedScripts": true,
+    "activeGames": 1
+  },
+  "before": {
+    "passed": true,
+    "viewport": [
+      900,
+      540
+    ],
+    "dpr": 2,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "rows": [
+      {
+        "trial": 1,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.3458333651224772,
+          "p95": 0.6000003814697266,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.27310924369748,
+          "p95": 9.200000286102295,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.8099999944368999,
+          "p95": 1.1999998092651367,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.323529411764707,
+          "p95": 9.099999904632568,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.6708333611488342,
+          "p95": 1,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.327731092436975,
+          "p95": 9.299999713897705,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.2841666618982951,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.323529411764707,
+          "p95": 9.200000286102295,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.5116666197776795,
+          "p95": 0.7999997138977051,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.333613443775338,
+          "p95": 9,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.5600000421206156,
+          "p95": 0.8000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.331092433769163,
+          "p95": 9.400000095367432,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.24750001033147176,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.329411763103069,
+          "p95": 9.300000190734863,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.5183333635330201,
+          "p95": 0.7999997138977051,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.320168066425484,
+          "p95": 9.199999809265137,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.5533333261807759,
+          "p95": 0.8000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.330252098436116,
+          "p95": 9.300000190734863,
+          "over25": 0
+        }
+      }
+    ],
+    "note": "120 rendered frames per trial; CPU includes update and render submission, excludes GPU completion. Local fixed roster, no arena/HUD; not cold navigation or device certification."
+  },
+  "after": {
+    "passed": true,
+    "viewport": [
+      900,
+      540
+    ],
+    "dpr": 2,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "rows": [
+      {
+        "trial": 1,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.18250000874201458,
+          "p95": 0.3000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.301680669063279,
+          "p95": 8.600000381469727,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.3891666611035665,
+          "p95": 0.5999999046325684,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.310084030407818,
+          "p95": 8.699999809265137,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.3349999944368998,
+          "p95": 0.5,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.313445379754075,
+          "p95": 8.5,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.14250001509984334,
+          "p95": 0.3000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.327731092436975,
+          "p95": 8.600000381469727,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.28749997218449913,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.331092437776197,
+          "p95": 8.5,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.2958333094914754,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.331092437776197,
+          "p95": 8.5,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.12999997536341348,
+          "p95": 0.3000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.329411763103069,
+          "p95": 8.5,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.27583330472310386,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.331092437776197,
+          "p95": 8.5,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.27583333253860476,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.33025210244315,
+          "p95": 8.599999904632568,
+          "over25": 0
+        }
+      }
+    ],
+    "note": "120 rendered frames per trial; CPU includes update and render submission, excludes GPU completion. Local fixed roster, no arena/HUD; not cold navigation or device certification."
+  },
+  "excludedBuildOverlap": {
+    "reason": "Production build ran during part of this sampling series. Excluded from comparison; repeat collected without build work.",
+    "data": {
+      "passed": true,
+      "viewport": [
+        900,
+        540
+      ],
+      "dpr": 2,
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+      "rows": [
+        {
+          "trial": 1,
+          "mode": "startup",
+          "cpu": {
+            "mean": 0.23916668097178143,
+            "p95": 0.5,
+            "over25": 0
+          },
+          "frame": {
+            "mean": 8.27310924369748,
+            "p95": 9.199999809265137,
+            "over25": 0
+          }
+        },
+        {
+          "trial": 1,
+          "mode": "movement",
+          "cpu": {
+            "mean": 0.7741666515668233,
+            "p95": 1.4000000953674316,
+            "over25": 0
+          },
+          "frame": {
+            "mean": 8.332773108442291,
+            "p95": 8.900000095367432,
+            "over25": 0
+          }
+        },
+        {
+          "trial": 1,
+          "mode": "attack",
+          "cpu": {
+            "mean": 1.1308333317438761,
+            "p95": 1.6999998092651367,
+            "over25": 0
+          },
+          "frame": {
+            "mean": 8.323529411764707,
+            "p95": 9.299999713897705,
+            "over25": 0
+          }
+        },
+        {
+          "trial": 2,
+          "mode": "startup",
+          "cpu": {
+            "mean": 0.4049999912579854,
+            "p95": 0.5999999046325684,
+            "over25": 0
+          },
+          "frame": {
+            "mean": 8.329411767110104,
+            "p95": 8.900000095367432,
+            "over25": 0
+          }
+        },
+        {
+          "trial": 2,
+          "mode": "movement",
+          "cpu": {
+            "mean": 0.9399999936421712,
+            "p95": 1.4000000953674316,
+            "over25": 0
+          },
+          "frame": {
+            "mean": 8.331092437776197,
+            "p95": 9.099999904632568,
+            "over25": 0
+          }
+        },
+        {
+          "trial": 2,
+          "mode": "attack",
+          "cpu": {
+            "mean": 0.9399999817212422,
+            "p95": 1.4000000953674316,
+            "over25": 0
+          },
+          "frame": {
+            "mean": 8.326050417763847,
+            "p95": 9.300000190734863,
+            "over25": 0
+          }
+        },
+        {
+          "trial": 3,
+          "mode": "startup",
+          "cpu": {
+            "mean": 0.3950000087420146,
+            "p95": 0.6999998092651367,
+            "over25": 0
+          },
+          "frame": {
+            "mean": 8.33697478911456,
+            "p95": 9.100000381469727,
+            "over25": 0
+          }
+        },
+        {
+          "trial": 3,
+          "mode": "movement",
+          "cpu": {
+            "mean": 0.8225000103314718,
+            "p95": 1.0999999046325684,
+            "over25": 0
+          },
+          "frame": {
+            "mean": 8.332773108442291,
+            "p95": 9.099999904632568,
+            "over25": 0
+          }
+        },
+        {
+          "trial": 3,
+          "mode": "attack",
+          "cpu": {
+            "mean": 0.9083333174387614,
+            "p95": 1.5,
+            "over25": 0
+          },
+          "frame": {
+            "mean": 8.331092437776197,
+            "p95": 9.100000381469727,
+            "over25": 0
+          }
+        }
+      ],
+      "note": "120 rendered frames per trial; CPU includes update and render submission, excludes GPU completion. Local fixed roster, no arena/HUD; not cold navigation or device certification."
+    }
+  },
+  "checks": {
+    "passed": true,
+    "reports": [
+      "swift/normal: alternating limbs, unchanged speed, facing, zero time, freeze, thaw, hit",
+      "swift/dasher: alternating limbs, unchanged speed, facing, zero time, freeze, thaw, hit",
+      "brute/normal: alternating limbs, unchanged speed, facing, zero time, freeze, thaw, hit",
+      "brute/guardian: alternating limbs, unchanged speed, facing, zero time, freeze, thaw, hit",
+      "bomber/normal: alternating limbs, unchanged speed, facing, zero time, freeze, thaw, hit",
+      "bomber/chain: alternating limbs, unchanged speed, facing, zero time, freeze, thaw, hit",
+      "50% slow advances half the gait distance",
+      "idle settles; knockback never walks",
+      "dash and attack retain locked direction and original damage timing",
+      "ranged retreat faces movement",
+      "ten resets at 72 actors / 144 limbs return to baseline; shared textures reused"
+    ],
+    "baseline": 1,
+    "cachedKeys": 61
+  },
+  "pauseCycles": [
+    "false",
+    "true",
+    "false",
+    "true",
+    "false",
+    "true",
+    "false",
+    "true",
+    "false",
+    "true"
+  ],
+  "stress": {
+    "passed": true,
+    "seconds": 180,
+    "frames": 21609,
+    "max": {
+      "enemies": 72,
+      "shots": 28,
+      "projectiles": 26,
+      "shields": 6,
+      "wards": 1,
+      "blasts": 6,
+      "objects": 245
+    },
+    "objectsAfterReset": 1,
+    "countsAfterReset": {
+      "shields": 0,
+      "wards": 0,
+      "blasts": 0
+    },
+    "textures": 69,
+    "meanFrame": 8.330188425924682,
+    "p95Frame": 8.340000000002329,
+    "over25": 0,
+    "viewport": [
+      900,
+      540
+    ],
+    "dpr": 2,
+    "note": "Three minutes of rendered active time; replenished 72-enemy roster with 3 chain bombers, normal/ward priests and each school for 60 s. Healed player, boosted builds, test scene without arena/HUD. Not mobile, GPU or whole-run certification."
+  },
+  "attackChecks": {
+    "passed": true,
+    "reports": [
+      {
+        "check": "three schools cast, move simultaneously, face aim, freeze and reset",
+        "health": 120,
+        "intervals": [
+          550,
+          1100,
+          900
+        ]
+      },
+      {
+        "check": "windup, release, freeze, hit interruption",
+        "kind": "chaser"
+      },
+      {
+        "check": "windup, release, freeze, hit interruption",
+        "kind": "swift"
+      },
+      {
+        "check": "windup, release, freeze, hit interruption",
+        "kind": "ranged"
+      },
+      {
+        "check": "windup, release, freeze, hit interruption",
+        "kind": "brute"
+      },
+      {
+        "check": "ten resets return to baseline",
+        "objects": 1
+      }
+    ]
+  },
+  "productionSmoke": {
+    "url": "http://127.0.0.1:4173/",
+    "school": "fire",
+    "initialEnemies": 6,
+    "pauseResumeCycles": 5,
+    "canvasFullWindow": true,
+    "consoleErrors": 0,
+    "note": "Visual checks for opening combat and pause/resume; production has no diagnostic loop fields."
+  }
+}

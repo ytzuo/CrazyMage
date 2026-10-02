@@ -24,6 +24,7 @@ import { EnemyShots } from './EnemyShots';
 import type { DamageSource } from '../ultimates/UltimateCharge';
 import { CombatEffects } from '../effects/CombatEffects';
 import { prepareEnemyTextures, enemyTexture, enemyArtScale } from '../art/CharacterTextures';
+import { EnemyLocomotion } from './EnemyLocomotion';
 
 interface Burning { spec:BurnSpec; remaining:number; wait:number; spread:boolean; view:Phaser.GameObjects.Image }
 export interface Enemy {
@@ -46,6 +47,7 @@ export interface Enemy {
   aimLine: Phaser.GameObjects.Image;
   view: Phaser.GameObjects.Container;
   body: Phaser.GameObjects.Image;
+  motion: EnemyLocomotion;
   bar: Phaser.GameObjects.Rectangle;
   warning: Phaser.GameObjects.Image;
   health: Health;
@@ -114,11 +116,12 @@ export class EnemySystem {
     const background = this.scene.add.rectangle(0, -spec.radius - 18, spec.radius * 2, 5, 0x211d26).setStrokeStyle(1, 0x473843);
     const bar = this.scene.add.rectangle(-spec.radius, -spec.radius - 18, spec.radius * 2, 3, 0xe29a9c).setOrigin(0, 0.5);
     view.add([shadow, warning, aimLine, body, background, bar]).setAlpha(0.45);
+    const motion = new EnemyLocomotion(this.scene, view, body, shadow, spec.kind, this.nextId);
     if (spec.kind === 'boss') {
       bar.setFillStyle(0xffb36f);
       view.add(this.scene.add.image(0, -spec.radius - 42, 'boss-skull-mark').setDisplaySize(28, 28));
     }
-    this.enemies.push({ burn:null, iceShard:null,frostStacks:0,frostRemaining:0,frostProtection:0,frozenExecution:false, spec, variant, dashTime: 0, dashHit: false, burstRemaining: 0, burstWait: 0, blockCooldown: 0, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: warningTime, windup: 0, cooldown: 0, attackTime: 0, frozen: 0, icePrison: null, flash: 0, knockback: { x: 0, y: 0 } });
+    this.enemies.push({ burn:null, iceShard:null,frostStacks:0,frostRemaining:0,frostProtection:0,frozenExecution:false, spec, variant, dashTime: 0, dashHit: false, burstRemaining: 0, burstWait: 0, blockCooldown: 0, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, motion, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: warningTime, windup: 0, cooldown: 0, attackTime: 0, frozen: 0, icePrison: null, flash: 0, knockback: { x: 0, y: 0 } });
   }
 
   private attackRange(enemy: Enemy): number { return enemy.variant === 'dasher' ? VARIANTS.dashRange : enemy.spec.range; }
@@ -209,7 +212,7 @@ export class EnemySystem {
         actionDelta = Math.max(0, delta - enemy.frozen);
         enemy.frozen = Math.max(0, enemy.frozen - delta);
         if (enemy.frozen === 0) { enemy.frozenExecution=false; enemy.icePrison?.destroy(); enemy.icePrison = null; }
-        if (enemy.frozen > 0) { enemy.icePrison?.setAlpha(Math.min(1,enemy.frozen/250)); enemy.knockback.x = enemy.knockback.y = 0; enemy.body.setTint(0x80dfff); continue; }
+        if (enemy.frozen > 0) { enemy.icePrison?.setAlpha(Math.min(1,enemy.frozen/250)); enemy.knockback.x = enemy.knockback.y = 0; enemy.body.setTint(0x80dfff); enemy.motion.syncTint(enemy.body); continue; }
       }
       enemy.flash = Math.max(0, enemy.flash - delta);
       if (enemy.flash === 0) { if(enemy.slow.strength>0) enemy.body.setTint(0x91dafa); else enemy.body.clearTint(); }
@@ -219,6 +222,7 @@ export class EnemySystem {
       const dx = player.view.x - enemy.view.x;
       const dy = player.view.y - enemy.view.y;
       const distance = Math.hypot(dx, dy);
+      const oldX = enemy.view.x, oldY = enemy.view.y, dashing = enemy.dashTime > 0;
       if (spec.kind === 'boss') {
         this.bosses.update(enemy, delta, player);
         const margin = ARENA.inset + spec.radius;
@@ -294,6 +298,11 @@ export class EnemySystem {
         enemy.view.y += dy / distance * step;
       }
       const margin = ARENA.inset + spec.radius;
+      // Actual voluntary travel drives the feet; wall clamping and knockback never do.
+      const travelX = Phaser.Math.Clamp(enemy.view.x, margin, ARENA.width - margin) - oldX;
+      const travelY = Phaser.Math.Clamp(enemy.view.y, margin, ARENA.height - margin) - oldY;
+      const walking = !dashing && enemy.dashTime === 0 && enemy.windup === 0 && enemy.attackTime === 0;
+      enemy.motion.advance(actionDelta, walking ? travelX : 0, walking ? travelY : 0);
       enemy.view.x = Phaser.Math.Clamp(enemy.view.x + enemy.knockback.x * delta / 1000, margin, ARENA.width - margin);
       enemy.view.y = Phaser.Math.Clamp(enemy.view.y + enemy.knockback.y * delta / 1000, margin, ARENA.height - margin);
       const decay = Math.exp(-delta / 100);
@@ -314,6 +323,8 @@ export class EnemySystem {
     if (spec.kind === 'bomber') {
       const pulse = charge > 0 ? Math.sin(enemy.windup / 55) * 0.035 * charge : 0;
       body.setPosition(0, -3).setScale(base * (1 + charge * 0.2 + pulse)).setRotation(0);
+      body.setFlipX(enemy.motion.facing < 0);
+      enemy.motion.apply(body, enemy.windup > 0);
       return;
     }
     const ranged = spec.kind === 'ranged' || spec.kind === 'artillery' || spec.kind === 'priest', brute = spec.kind === 'brute';
@@ -321,7 +332,9 @@ export class EnemySystem {
     body.setPosition(aim.x * thrust, -3 + aim.y * thrust - charge * (brute ? 12 : 4));
     body.setScale(base * (1 - charge * 0.12 + strike * 0.12), base * (1 + charge * 0.12 - strike * 0.1));
     body.setRotation((aim.x < 0 ? -1 : 1) * (-charge * 0.16 + strike * (ranged ? -0.16 : 0.22)));
-    body.setFlipX(aim.x < 0);
+    const attacking = enemy.windup > 0 || enemy.attackTime > 0 || enemy.dashTime > 0;
+    body.setFlipX(attacking ? aim.x < 0 : enemy.motion.facing < 0);
+    enemy.motion.apply(body, attacking);
   }
 
   freeze(enemy: Enemy, duration: number, execution=true): void {
@@ -339,7 +352,7 @@ export class EnemySystem {
     enemy.attackTime = enemy.dashTime = enemy.burstRemaining = enemy.burstWait = 0;
     enemy.knockback.x = enemy.knockback.y = 0;
     enemy.warning.setVisible(false); enemy.aimLine.setVisible(false);
-    this.animate(enemy); enemy.body.setTint(0x80dfff);
+    this.animate(enemy); enemy.body.setTint(0x80dfff); enemy.motion.syncTint(enemy.body);
   }
 
   private applyIce(enemy:Enemy, effects:IceEffectsSpec):void {
@@ -408,7 +421,7 @@ export class EnemySystem {
     if (enemy.spawning > 0 || enemy.health.dead || !this.enemies.includes(enemy) || damage <= 0) return false;
     if (!periodic && enemy.variant === 'guardian' && enemy.frozen === 0 && enemy.blockCooldown === 0 && this.random() < VARIANTS.blockChance) {
       enemy.blockCooldown = VARIANTS.blockCooldown;
-      enemy.body.setTintFill(0xbcecff); enemy.flash = 180;
+      enemy.body.setTintFill(0xbcecff); enemy.motion.syncTint(enemy.body); enemy.flash = 180;
       this.effects.block(enemy.view.x, enemy.view.y, enemy.spec.radius);
       // Contact is settled even without damage: consume pierce/splash once, allow ice control.
       return true;
@@ -430,6 +443,7 @@ export class EnemySystem {
     this.areaAttacks.cancel(enemy.id);
     // A hit interrupts a pending contact attack, allowing a close-range escape.
     if (enemy.spec.kind !== 'boss' && enemy.spec.kind !== 'bomber') enemy.windup = enemy.attackTime = enemy.dashTime = enemy.burstRemaining = enemy.burstWait = 0;
+    enemy.motion.stop();
     this.animate(enemy);
     if (enemy.spec.kind !== 'boss') enemy.cooldown = Math.max(enemy.cooldown, 250);
     if (enemy.spec.kind !== 'bomber') enemy.warning.setVisible(false);

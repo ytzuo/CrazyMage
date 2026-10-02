@@ -1,5 +1,6 @@
 import { paintEnemyDetails, paintVariantDetails } from './EnemyModelDetails';
 import { prepareSpecialEnemyTextures } from './SpecialEnemyTextures';
+import { prepareEnemyLegTextures } from './EnemyLegTextures';
 import Phaser from 'phaser';
 import type { EnemyKind } from '../enemies/roster';
 import { SCHOOLS, type School } from '../upgrades/definitions';
@@ -232,4 +233,5 @@ export function prepareEnemyTextures(scene: Phaser.Scene): void {
     paintVariantDetails(ctx,variant);
     art.refresh();
   }
+  prepareEnemyLegTextures(scene);
 }
