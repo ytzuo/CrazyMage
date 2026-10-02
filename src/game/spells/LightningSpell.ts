@@ -8,7 +8,7 @@ import { chainTargets } from './chain';
 import type { DamageSource } from '../ultimates/UltimateCharge';
 interface Arc {view:Phaser.GameObjects.Image;age:number;duration:number;diameter?:number}
 type ChargeSpec=NonNullable<LightningSpec['charge']>;
-interface Charge {view:Phaser.GameObjects.Image;stacks:number;remaining:number;armed:{spec:ChargeSpec;source:DamageSource}|null}
+interface Charge {view:Phaser.GameObjects.Image;stacks:number;remaining:number;spec:ChargeSpec;source:DamageSource}
 /** Main chain, non-recursive forks and three-hit discharge share compiled parameters. */
 export class LightningSpell {
   private cooldown=0;
@@ -42,7 +42,7 @@ export class LightningSpell {
       charge.remaining-=delta;
       const enemy=alive.get(id);
       if(!enemy||enemy.health.dead||charge.remaining<=0){charge.view.destroy();this.charges.delete(id);continue;}
-      const size=charge.armed?44:22+charge.stacks*7;
+      const size=22+charge.stacks*7;
       charge.view.setPosition(enemy.view.x,enemy.view.y-enemy.spec.radius-20)
         .setDisplaySize(size,size).setAlpha(Math.min(1,charge.remaining/250)*(0.8+0.2*Math.cos(charge.remaining/100)**2));
     }
@@ -74,21 +74,26 @@ export class LightningSpell {
       if(this.charges.size>=72)return;
       const view=this.scene.add.image(enemy.view.x,enemy.view.y-enemy.spec.radius-20,'lightning-charge-mark')
         .setDisplaySize(29,29).setDepth(17).setBlendMode(Phaser.BlendModes.ADD);
-      charge={view,stacks:0,remaining:spec.duration,armed:null};this.charges.set(enemy.id,charge);
+      charge={view,stacks:0,remaining:spec.duration,spec,source};this.charges.set(enemy.id,charge);
     }
-    charge.stacks++;charge.remaining=spec.duration;
+    charge.stacks++;charge.remaining=spec.duration;charge.spec=spec;charge.source=source;
     if(charge.stacks<spec.threshold)return;
-    charge.stacks=0;charge.armed={spec,source};
-    charge.view.setDisplaySize(44,44).setTint(0xffe297);
+    this.removeCharge(enemy.id);
     this.discharge(enemy.id,enemy.view.x,enemy.view.y,enemies,spec,burstHits,source,enemy);
   }
   enemyDefeated(id:number,x:number,y:number,enemies:EnemySystem,source:DamageSource|null):void {
-    const mark=this.charges.get(id),armed=mark?.armed;
+    const mark=this.charges.get(id);
+    const validMark=mark&&mark.remaining>0?mark:undefined;
+    const spec=validMark?.spec??this.spec.charge;
+    const stacks=validMark?.stacks??0;
     this.removeCharge(id);
-    // Consume before damage; discharge deaths cannot create a recursive chain.
-    if(!armed||!mark||mark.remaining<=0||this.discharging>0)return;
-    this.discharge(id,x,y,enemies,armed.spec,new Set<number>(),source??armed.source);
+    // Uncharged deaths have a small burst; discharge deaths cannot recurse.
+    if(!spec||this.discharging>0)return;
+    const charge=Math.min(1,stacks/spec.threshold);
+    const deathSpec={...spec,damage:spec.damage*(1+stacks)/(1+spec.threshold),radius:spec.radius*(0.5+0.5*charge)};
+    this.discharge(id,x,y,enemies,deathSpec,new Set<number>(),source??validMark?.source??'spell');
   }
+
   private discharge(id:number,x:number,y:number,enemies:EnemySystem,spec:ChargeSpec,burstHits:Set<number>,source:DamageSource,primary?:Enemy):void {
     const targets=[...(primary?[primary]:[]),...enemies.enemies.filter(other=>other.id!==id&&!other.health.dead&&other.spawning===0&&!burstHits.has(other.id)&&
       (other.view.x-x)**2+(other.view.y-y)**2<=spec.radius**2)

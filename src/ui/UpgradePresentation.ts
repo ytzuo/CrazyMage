@@ -33,7 +33,7 @@ export const UPGRADE_PRESENTATION: Record<string, { symbol: string; summary: str
   'ice.cold': { symbol:'❅', summary:'敌人减速更明显，寒意持续更久。' },
   'ice.echo': { symbol:'◉', summary:'从角色当前位置追加较短射程冰矛，一次最多四根，移动可铺开落点。' },
   'lightning.fork': {symbol:'⋔',summary:'连锁分出较弱电弧，打击主链外的敌人；强化分叉覆盖与威力。'},
-  'lightning.charge': {symbol:'✺',summary:'普攻、贯雷和雷暴追猎共用雷印，蓄满放电，满电敌人死亡再次放电；强化放电威力与范围。'},
+  'lightning.charge': {symbol:'✺',summary:'普攻、贯雷和雷暴追猎共用雷印，蓄满放电；死亡也放电，剩余电荷越多，威力与范围越大。'},
   'lightning.damage': { symbol:'ϟ', summary:'增强电击威力，让每次跳跃更致命。' },
   'lightning.chain': { symbol:'⌁', summary:'闪电继续跳跃，连接更多敌人。' },
   'lightning.range': { symbol:'↗', summary:'电弧延伸更远，更容易连接怪群。' },
