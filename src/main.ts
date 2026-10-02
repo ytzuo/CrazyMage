@@ -198,7 +198,7 @@ panel = new BuildPanel(element('build-overlay'), (batch, id) => {
   }
 }, inspectBuild);
 
-picker = new SchoolPicker(element('school-overlay'), school => { if(scene.chooseSchool(school)) { notice.show(`${SCHOOL_INFO[school].name}流派`, `${SCHOOL_INFO[school].spell}已就绪`, school); syncPause(); } });
+picker = new SchoolPicker(element('school-overlay'), school => { if(scene.chooseSchool(school)) { notice.show(`${SCHOOL_INFO[school].name}流派`, `${SCHOOL_INFO[school].spell}已就绪`, school); syncPause(); } }, () => scene.schoolArtwork());
 
 game = new Phaser.Game({
   type: Phaser.AUTO,

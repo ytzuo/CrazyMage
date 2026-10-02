@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import type { EnemyKind } from '../enemies/roster';
+import { SCHOOLS, type School } from '../upgrades/definitions';
 import type { EnemyVariant } from '../enemies/variants';
 
 const ink = 0x252b35;
@@ -23,51 +24,69 @@ function eyes(g: Phaser.GameObjects.Graphics, y: number, color = 0xffdf93): void
   }
 }
 
+export const MAGE_PALETTES = {
+  fire: {robe:0xa54b3c,light:0xe18a59,dark:0x602e38,trim:0xffd19a,crystal:0xffae55},
+  ice: {robe:0x4c8ba7,light:0xa3d6dd,dark:0x2d526d,trim:0xe0faff,crystal:0x9deaff},
+  lightning: {robe:0x735aab,light:0xb59ace,dark:0x3f315f,trim:0xf6dfa0,crystal:0xffe77a},
+} as const;
+export const mageBodyTexture = (school:School):string => school==='fire'?'mage-body-detail':`mage-body-${school}-detail`;
+export const mageStaffTexture = (school:School):string => school==='fire'?'mage-staff-detail':`mage-staff-${school}-detail`;
+export type SchoolArtwork = Record<School,{body:string;staff:string}>;
+
 export function prepareMageTextures(scene: Phaser.Scene): void {
-  texture(scene, 'mage-body-detail', 128, 192, g => {
-    g.fillStyle(ink).fillRoundedRect(43, 162, 18, 17, 4).fillRoundedRect(67, 162, 18, 17, 4);
-    g.fillStyle(0x6b5550).fillRect(45, 167, 13, 4).fillRect(69, 167, 13, 4);
-    shape(g, [44,112,84,112,96,166,78,173,63,169,47,174,31,166], 0x47638e);
-    shape(g, [44,119,57,126,49,166,34,163], 0x7698bc, 0x47638e);
-    shape(g, [71,119,83,116,93,164,77,169], 0x304363, 0x304363);
-    g.lineStyle(2,0xa4c8d0).lineBetween(44,128,39,159).lineBetween(56,135,53,164);
-    g.lineStyle(2,0x263b5d).lineBetween(70,133,74,166).lineBetween(84,140,88,159);
-    shape(g, [43,113,32,125,30,145,41,148,49,123], 0x5779a3);
-    g.fillStyle(0xe3bf99).fillRoundedRect(30,141,11,10,4);
-    g.fillStyle(0x584839).fillRoundedRect(42,127,42,9,2);
-    g.lineStyle(2,0xb49765).strokeRect(59,127,10,9);
-    g.fillStyle(0x8a6248).fillRoundedRect(75,132,13,15,3);
-    g.lineStyle(1,0xc59464).lineBetween(77,137,86,137);
-    shape(g, [42,112,62,123,84,112,78,104,48,104], 0xb5c6d0);
-    shape(g, [49,112,63,119,56,128], 0x7695b7);
-    g.fillStyle(0xab785b).fillRoundedRect(46,91,36,26,8);
-    g.fillStyle(0xe6bf94).fillRoundedRect(47,89,32,24,8);
-    g.fillStyle(0xf8d9ad).fillEllipse(57,97,17,13);
-    g.fillStyle(0x674d40).fillTriangle(45,88,58,88,45,103).fillTriangle(79,88,70,89,80,103);
-    g.fillStyle(ink).fillRoundedRect(53,98,5,8,2).fillRoundedRect(69,98,5,8,2);
-    g.fillStyle(0xffffff).fillRect(54,98,2,2).fillRect(70,98,2,2);
-    g.lineStyle(1,0x9f6958).lineBetween(61,110,66,110);
-    shape(g, [34,88,52,41,63,36,67,51,84,88], 0x57749f);
-    shape(g, [37,86,53,44,59,42,53,85], 0x89abc8, 0x89abc8);
-    shape(g, [65,51,82,86,65,84], 0x364e78, 0x364e78);
-    g.lineStyle(1,0xb3d2db).lineBetween(49,64,45,77);
-    g.lineStyle(2,0xd6b77a).lineBetween(36,83,80,83);
-    g.fillStyle(0xa98553).fillRoundedRect(36,82,47,7,2);
-    g.fillStyle(0xebd59e).fillRect(59,82,8,7);
-    shape(g, [28,88,42,86,81,86,98,91,93,98,36,97,25,93], 0x3c567d);
-    g.lineStyle(2,0x9bbad0).lineBetween(29,89,48,91).lineBetween(48,91,91,91);
-    g.fillStyle(0xded8a5).fillCircle(61,64,2).fillCircle(66,74,1.5);
-  });
-  texture(scene, 'mage-staff-detail', 64, 112, g => {
-    shape(g,[40,19,47,19,46,97,41,97],0x6f4936);
-    g.lineStyle(2,0xbc8a56).lineBetween(42,27,42,91);
-    for(let y=48;y<70;y+=5)g.lineStyle(2,0xd4b880).lineBetween(40,y,47,y+2);
-    shape(g,[35,15,44,5,53,15,50,27,38,27],0xc79e55);
-    shape(g,[38,15,44,9,49,15,46,23,41,23],0xa6e1df,0xf2dca1);
-    g.fillStyle(0xffffff,0.8).fillTriangle(40,15,44,11,44,20);
-    g.fillStyle(0xe3bf99).fillRoundedRect(37,57,11,10,4);
-    g.lineStyle(1,0xaa7857).lineBetween(39,61,46,61).lineBetween(39,64,46,64);
-  });
+  for (const school of SCHOOLS) {
+    const palette = MAGE_PALETTES[school];
+    texture(scene, mageBodyTexture(school), 128, 192, g => {
+      g.fillStyle(ink).fillRoundedRect(43, 162, 18, 17, 4).fillRoundedRect(67, 162, 18, 17, 4);
+      g.fillStyle(0x6b5550).fillRect(45, 167, 13, 4).fillRect(69, 167, 13, 4);
+      shape(g, [44,112,84,112,96,166,78,173,63,169,47,174,31,166], palette.robe);
+      shape(g, [44,119,57,126,49,166,34,163], palette.light, palette.robe);
+      shape(g, [71,119,83,116,93,164,77,169], palette.dark, palette.dark);
+      g.lineStyle(2,palette.trim).lineBetween(44,128,39,159).lineBetween(56,135,53,164);
+      g.lineStyle(2,palette.dark).lineBetween(70,133,74,166).lineBetween(84,140,88,159);
+      shape(g, [43,113,32,125,30,145,41,148,49,123], palette.robe);
+      g.fillStyle(0xe3bf99).fillRoundedRect(30,141,11,10,4);
+      g.fillStyle(0x584839).fillRoundedRect(42,127,42,9,2);
+      g.lineStyle(2,0xb49765).strokeRect(59,127,10,9);
+      g.fillStyle(0x8a6248).fillRoundedRect(75,132,13,15,3);
+      g.lineStyle(1,0xc59464).lineBetween(77,137,86,137);
+      shape(g, [42,112,62,123,84,112,78,104,48,104], 0xb5c6d0);
+      shape(g, [49,112,63,119,56,128], palette.light);
+      g.fillStyle(0xab785b).fillRoundedRect(46,91,36,26,8);
+      g.fillStyle(0xe6bf94).fillRoundedRect(47,89,32,24,8);
+      g.fillStyle(0xf8d9ad).fillEllipse(57,97,17,13);
+      g.fillStyle(0x674d40).fillTriangle(45,88,58,88,45,103).fillTriangle(79,88,70,89,80,103);
+      g.fillStyle(ink).fillRoundedRect(53,98,5,8,2).fillRoundedRect(69,98,5,8,2);
+      g.fillStyle(0xffffff).fillRect(54,98,2,2).fillRect(70,98,2,2);
+      g.lineStyle(1,0x9f6958).lineBetween(61,110,66,110);
+      shape(g, [34,88,52,41,63,36,67,51,84,88], palette.robe);
+      shape(g, [37,86,53,44,59,42,53,85], palette.light, palette.light);
+      shape(g, [65,51,82,86,65,84], palette.dark, palette.dark);
+      g.lineStyle(1,0xb3d2db).lineBetween(49,64,45,77);
+      g.lineStyle(2,0xd6b77a).lineBetween(36,83,80,83);
+      g.fillStyle(0xa98553).fillRoundedRect(36,82,47,7,2);
+      g.fillStyle(0xebd59e).fillRect(59,82,8,7);
+      shape(g, [28,88,42,86,81,86,98,91,93,98,36,97,25,93], palette.dark);
+      g.lineStyle(2,palette.trim).lineBetween(29,89,48,91).lineBetween(48,91,91,91);
+      g.fillStyle(palette.crystal).fillCircle(61,64,2).fillCircle(66,74,1.5);
+      if(school==='fire') shape(g,[60,57,56,69,63,67,67,72,69,63,64,53],palette.crystal,palette.trim);
+      else if(school==='ice') g.lineStyle(2,palette.crystal).lineBetween(57,61,69,71).lineBetween(57,71,69,61).lineBetween(63,56,63,76);
+      else shape(g,[65,53,57,67,64,67,60,79,71,62,65,62],palette.crystal,palette.trim);
+    });
+    texture(scene, mageStaffTexture(school), 64, 112, g => {
+      shape(g,[40,19,47,19,46,97,41,97],0x6f4936);
+      g.lineStyle(2,0xbc8a56).lineBetween(42,27,42,91);
+      for(let y=48;y<70;y+=5)g.lineStyle(2,0xd4b880).lineBetween(40,y,47,y+2);
+      shape(g,[35,15,44,5,53,15,50,27,38,27],0xc79e55);
+      shape(g,[38,15,44,9,49,15,46,23,41,23],palette.crystal,0xf2dca1);
+      if(school==='fire') shape(g,[38,23,35,15,41,10,44,0,49,10,52,16,48,25],palette.crystal,palette.trim);
+      else if(school==='ice') g.lineStyle(2,palette.trim).lineBetween(33,15,55,15).lineBetween(44,4,44,27);
+      else shape(g,[47,2,36,17,44,16,40,29,53,12,46,13],palette.crystal,palette.trim);
+      g.fillStyle(0xffffff,0.8).fillTriangle(40,15,44,11,44,20);
+      g.fillStyle(0xe3bf99).fillRoundedRect(37,57,11,10,4);
+      g.lineStyle(1,0xaa7857).lineBetween(39,61,46,61).lineBetween(39,64,46,64);
+    });
+  }
 }
 
 export const enemyTexture = (kind: EnemyKind, variant: EnemyVariant = 'normal'): string => `enemy-${kind}-detail${variant === 'normal' ? '' : `-${variant}`}`;

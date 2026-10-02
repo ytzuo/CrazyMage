@@ -3,10 +3,13 @@ import { ARENA, PLAYER, type Direction } from '../config';
 import { Health } from '../combat/Health';
 import { SCHOOL_COLOR } from '../effects/CombatEffects';
 import type { School } from '../upgrades/definitions';
-import { prepareMageTextures } from '../art/CharacterTextures';
+import { prepareMageTextures, mageBodyTexture, mageStaffTexture } from '../art/CharacterTextures';
 
 export class Player {
   readonly view: Phaser.GameObjects.Container;
+  private mage: Phaser.GameObjects.Image;
+  private staff: Phaser.GameObjects.Image;
+  private school: School = 'fire';
   private figure: Phaser.GameObjects.Container;
   private shadow: Phaser.GameObjects.Ellipse;
   private aura: Phaser.GameObjects.Arc;
@@ -30,13 +33,23 @@ export class Player {
     this.shadow = scene.add.ellipse(0, 9, 40, 16, 0x000000, 0.35);
     this.figure = scene.add.container(0, -7);
     prepareMageTextures(scene);
-    const mage = scene.add.image(0, 0, 'mage-body-detail').setOrigin(0.5, 2 / 3).setScale(0.5);
+    this.mage = scene.add.image(0, 0, mageBodyTexture(this.school)).setOrigin(0.5, 2 / 3).setScale(0.5);
     this.wand = scene.add.container(12, 3);
-    const staff = scene.add.image(0, 0, 'mage-staff-detail').setScale(0.5);
+    this.staff = scene.add.image(0, 0, mageStaffTexture(this.school)).setScale(0.5);
     this.wandGlow = scene.add.circle(6, -23, 9, 0xffd99b, 0.2);
-    this.wand.add([this.wandGlow, staff]);
-    this.figure.add([mage, this.wand]);
+    this.wand.add([this.wandGlow, this.staff]);
+    this.figure.add([this.mage, this.wand]);
     this.view.add([this.aura, this.shadow, this.figure]);
+  }
+
+  setSchool(school: School): void {
+    if (this.school !== school) {
+      this.school = school;
+      this.mage.setTexture(mageBodyTexture(school));
+      this.staff.setTexture(mageStaffTexture(school));
+    }
+    this.wandGlow.setFillStyle(SCHOOL_COLOR[school]);
+    this.pose();
   }
 
   update(direction: Direction, delta: number, aim: Direction | null = null): void {
@@ -82,7 +95,7 @@ export class Player {
     this.shadow.scaleX = 1 + Math.abs(bob) * 0.035;
     this.aura.setAlpha(this.moving ? 0.7 : 1);
     this.figure.setAlpha(this.health.protected && Math.floor(this.flashTime / 75) % 2 === 0 ? 0.4 : 1);
-    this.aura.setStrokeStyle(this.health.protected ? 2 : 1, this.health.protected ? 0xffa18b : this.health.shield > 0 ? 0x82caf5 : 0x9be3b4, this.health.protected ? 0.85 : 0.25);
+    this.aura.setStrokeStyle(this.health.protected ? 2 : 1, this.health.protected ? 0xffa18b : this.health.shield > 0 ? 0x82caf5 : SCHOOL_COLOR[this.school], this.health.protected ? 0.85 : 0.25);
   }
 
   hurt(damage: number, sourceX: number, sourceY: number): boolean {
@@ -104,7 +117,7 @@ export class Player {
     this.health.reset();
     this.knockback.x = this.knockback.y = 0;
     this.flashTime = this.castTime = 0;
-    this.wandGlow.setFillStyle(0xffd99b);
+    this.wandGlow.setFillStyle(SCHOOL_COLOR[this.school]);
     this.update({ x: 0, y: 0 }, 0);
   }
 }

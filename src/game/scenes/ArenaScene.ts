@@ -3,12 +3,14 @@ import { ARENA, FIREBALL, type Direction, type MovementState } from '../config';
 import { Player } from '../entities/Player';
 import type { MovementInput } from '../input/MovementInput';
 import { SpellRunner } from '../spells/SpellRunner';
-import { isSchool, type School } from '../upgrades/definitions';
+import { SCHOOLS, isSchool, type School } from '../upgrades/definitions';
 import { EnemySystem } from '../enemies/EnemySystem';
 import { UltimateSpell } from '../ultimates/UltimateSpell';
+import { mageBodyTexture, mageStaffTexture, type SchoolArtwork } from '../art/CharacterTextures';
 import { BuildStore } from '../upgrades/BuildStore';
 
 export class ArenaScene extends Phaser.Scene {
+  private previewArt?: SchoolArtwork;
   private player!: Player;
   private spell!: SpellRunner;
   private ultimate!: UltimateSpell;
@@ -201,6 +203,14 @@ export class ArenaScene extends Phaser.Scene {
     return true;
   }
 
+  schoolArtwork(): SchoolArtwork | null {
+    if (!this.player) return null;
+    return this.previewArt ??= Object.fromEntries(SCHOOLS.map(school => [school, {
+      body: this.textures.getBase64(mageBodyTexture(school)),
+      staff: this.textures.getBase64(mageStaffTexture(school)),
+    }])) as SchoolArtwork;
+  }
+
   previewUpgrade(id: string) { return this.builds.preview(id); }
 
   chooseUpgrade(batchId: string, id: string): boolean {
@@ -214,6 +224,7 @@ export class ArenaScene extends Phaser.Scene {
 
   private applyBuild(): void {
     const effective = this.builds.effectiveBuild;
+    this.player.setSchool(effective.school);
     this.player.speed = effective.player.speed;
     this.player.health.configure(effective.player.maximum, effective.player.shield);
     this.spell.configure(effective);
