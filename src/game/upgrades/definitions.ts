@@ -3,12 +3,12 @@ export const SCHOOLS: readonly School[] = ['fire', 'ice', 'lightning'];
 export const SCHOOL_INFO = {
   fire: {name:'火焰', spell:'火球', symbol:'✹', description:'定向火球，组合多发、穿透、爆炸、灼烧、火区与回旋。'},
   ice: {name:'冰霜', spell:'冰矛', symbol:'❄', description:'远程冰矛自带穿透与寒霜积累，组合追袭、驻留冰棘和碎冰。'},
-  lightning: {name:'闪电', spell:'连锁闪电', symbol:'ϟ', description:'定向电击在怪群中跳跃，强化连锁、距离与传导。'},
+  lightning: {name:'闪电', spell:'连锁闪电', symbol:'ϟ', description:'定向电击在怪群中跳跃，组合分叉、蓄雷与稳定传导。'},
 } as const;
 export const isSchool = (value:string): value is School => SCHOOLS.includes(value as School);
 export type FireModule = 'damage' | 'multi' | 'pierce' | 'explosion' | 'burn' | 'rebound';
 export type IceModule = 'damage' | 'radius' | 'cold' | 'echo' | 'shards' | 'ground';
-export type LightningModule = 'damage' | 'chain' | 'range' | 'conduction';
+export type LightningModule = 'damage' | 'chain' | 'range' | 'conduction' | 'fork' | 'charge';
 export type SpellModule = FireModule | IceModule | LightningModule;
 export type Passive = 'speed' | 'health' | 'shield' | 'cooldown';
 export type SkillModule = 'power' | 'reach' | 'tempo';
@@ -38,6 +38,8 @@ export const UPGRADES: readonly UpgradeDefinition[] = [
   { id: 'ice.radius', name: '冰片迸发', description: '冰矛命中迸出冰片，并使落地冰棘半径增大 50%；继续强化冰片。', maxStacks: 2, effect: { kind: 'ice', module: 'radius' } },
   { id: 'ice.cold', name: '深度寒霜', description: '减速增加 10 个百分点，持续时间增加 0.5 秒；重复命中刷新，不无限叠加。', maxStacks: 2, effect: { kind: 'ice', module: 'cold' } },
   { id: 'ice.echo', name: '冰矛追袭', description: '从角色当前位置追加较短射程冰矛，一次最多四根，移动可铺开落点；每根威力降低。', maxStacks: 3, effect: { kind: 'ice', module: 'echo' } },
+  {id:'lightning.fork',name:'分叉电弧',description:'连锁命中时分出较弱电弧，打击主链以外的敌人；继续强化分叉覆盖与威力。',maxStacks:2,effect:{kind:'lightning',module:'fork'}},
+  {id:'lightning.charge',name:'蓄雷印记',description:'连续电击积累雷印，蓄满后引发范围放电；继续强化放电威力与范围。',maxStacks:2,effect:{kind:'lightning',module:'charge'}},
   { id: 'lightning.damage', name: '电能增幅', description: '按基础值增加闪电伤害 30%，所有跳跃保留伤害增幅。', maxStacks: 2, effect: { kind: 'lightning', module: 'damage' } },
   { id: 'lightning.chain', name: '更多跳跃', description: '额外连锁 2 个不同目标，同次施法不重复命中。', maxStacks: 2, effect: { kind: 'lightning', module: 'chain' } },
   { id: 'lightning.range', name: '延伸电弧', description: '按基础值增加首击和连锁距离 25%。', maxStacks: 2, effect: { kind: 'lightning', module: 'range' } },

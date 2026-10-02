@@ -32,6 +32,8 @@ export interface IceSpec {
   readonly slow:number; readonly duration:number; readonly pulses:number; readonly echoDelay:number;
 }
 export interface LightningSpec {
+  readonly fork?: Readonly<{multiplier:number;range:number;perHop:number;budget:number}> | null;
+  readonly charge?: Readonly<{damage:number;radius:number;targets:number;threshold:number;duration:number}> | null;
   readonly damage:number; readonly cooldown:number; readonly range:number;
   readonly jumpRange:number; readonly maxTargets:number; readonly falloff:number;
 }
@@ -95,7 +97,11 @@ export function compileBuild(build: BuildState): EffectiveBuild {
     shards:i.shards?Object.freeze({damage:iceDamage*0.6*(1+0.3*((i.shards??1)-1)),targets:Math.min(8,3+(i.shards??1)-1),radius:Math.min(600,240*(1+0.1*((i.shards??1)-1))),slow:Math.min(0.75,0.3+0.1*(i.cold??0)),duration:Math.min(6000,1500+500*(i.cold??0))}):null,
     frost:Object.freeze({gain:1,threshold:3,duration:1000}),
   }),damage:iceDamage,cooldown:Math.max(400,ICE.cooldown*(endless?1/(1+0.15*(p.cooldown??0)):1-0.1*(p.cooldown??0))),radius:Math.min(900,160*(1+0.25*(i.radius??0))),slow:Math.min(0.75,0.3+0.1*(i.cold??0)),duration:1500+500*(i.cold??0),pulses:Math.min(4,1+(i.echo??0)),echoDelay:180});
-  const lightning = Object.freeze({damage:growth*20*(1+0.3*(l.damage??0))*(1+0.2*Math.max(0,(l.conduction??0)-1)+0.1*Math.max(0,(l.chain??0)-17)),cooldown:Math.max(300,LIGHTNING.cooldown*(endless?1/(1+0.15*(p.cooldown??0)):1-0.1*(p.cooldown??0))),range:Math.min(3000,440*(1+0.25*(l.range??0))),jumpRange:Math.min(2400,180*(1+0.25*(l.range??0))),maxTargets:Math.min(36,3+2*(l.chain??0)),falloff:l.conduction?0.95:0.8});
+  const lightningDamage=growth*20*(1+0.3*(l.damage??0))*(1+0.2*Math.max(0,(l.conduction??0)-1)+0.1*Math.max(0,(l.chain??0)-17));
+  const lightning = Object.freeze({damage:lightningDamage,cooldown:Math.max(300,LIGHTNING.cooldown*(endless?1/(1+0.15*(p.cooldown??0)):1-0.1*(p.cooldown??0))),range:Math.min(3000,440*(1+0.25*(l.range??0))),jumpRange:Math.min(2400,180*(1+0.25*(l.range??0))),maxTargets:Math.min(36,3+2*(l.chain??0)),falloff:l.conduction?0.95:0.8,
+    fork:l.fork?Object.freeze({multiplier:0.4*(1+0.25*((l.fork??1)-1)),range:Math.min(480,180*(1+0.25*(l.range??0))+20*((l.fork??1)-1)),perHop:Math.min(2,l.fork),budget:8}):null,
+    charge:l.charge?Object.freeze({damage:lightningDamage*(1+0.35*((l.charge??1)-1)),radius:Math.min(420,150+25*((l.charge??1)-1)),targets:Math.min(8,4+(l.charge??1)-1),threshold:3,duration:4000}):null,
+  });
   return Object.freeze({ revision: build.revision, school:build.school, fireball, ice, lightning, skill:compileSkill(build), ultimate: compileUltimate(build,growth),
     player: Object.freeze({ speed: PLAYER.speed * (1 + (endless ? 0.8*(p.speed??0)/(10+(p.speed??0)) : 0.08*(p.speed??0))), maximum: PLAYER.health + 20 * (p.health ?? 0), shield: 20 * (p.shield ?? 0) }),
     breakdown: Object.freeze([...UPGRADES, ...ULTIMATE_UPGRADES].filter(card => stacks(build, card) > 0).map(card => `${card.name} ×${stacks(build, card)}：${card.description}`)),

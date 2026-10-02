@@ -219,3 +219,7 @@ IceSpec 统一编译冰矛射程、速度、穿透和 ground 配置，IceSpell �
 冰矛 frost 配置始终由 compileBuild 提供（gain=1、threshold=3、duration=1000），已移除 frost 模块与卡牌。命中半径也读取 IceSpec.hitRadius，手机瞄准和构筑详情使用统一缩短后的射程。Boss 冻结沿用非处决入口，不绕过生命值结算。
 
 冰片迸发由 IceEffectsSpec.hitShards 保存施法快照，与死亡触发的 shards 分开；冰矛命中调用 EnemySystem.burstIceOnHit，排除当前直接目标，复用非递归冰片结算。IceSpell 不再按 maxTargets 截断贯穿；每根独立记录仍在场的已命中 ID，防止重复命中并限制集合大小。落地冰棘读取同一编译结果中的半径，不在渲染时计算强化倍率。
+
+## 雷系分叉与蓄雷
+
+普通模块新增 fork 和 charge，统一由 compileBuild 生成 LightningSpec.fork 与 LightningSpec.charge，与增伤、跳跃、距离、传导兼容。LightningSpell 保存有期限的雷印和有上限的短暂视觉，同步施法使用主链/分叉目标集合及放电去重集合；派生伤害不调用积累或分叉入口，不递归。升级不触发已有印记，放电读取触发时的编译参数；清波立即中止结算并回收状态。收藏卡从同一模块定义显示，规则见 [雷系组合路线](lightning-routes.md)。

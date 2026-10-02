@@ -32,6 +32,8 @@ export const UPGRADE_PRESENTATION: Record<string, { symbol: string; summary: str
   'ice.radius': { symbol:'◎', summary:'命中迸出冰片，落地冰棘半径扩大一半；继续强化冰片。' },
   'ice.cold': { symbol:'❅', summary:'敌人减速更明显，寒意持续更久。' },
   'ice.echo': { symbol:'◉', summary:'从角色当前位置追加较短射程冰矛，一次最多四根，移动可铺开落点。' },
+  'lightning.fork': {symbol:'⋔',summary:'连锁分出较弱电弧，打击主链外的敌人；强化分叉覆盖与威力。'},
+  'lightning.charge': {symbol:'✺',summary:'连续命中积累雷印，蓄满引发范围放电；强化放电威力与范围。'},
   'lightning.damage': { symbol:'ϟ', summary:'增强电击威力，让每次跳跃更致命。' },
   'lightning.chain': { symbol:'⌁', summary:'闪电继续跳跃，连接更多敌人。' },
   'lightning.range': { symbol:'↗', summary:'电弧延伸更远，更容易连接怪群。' },

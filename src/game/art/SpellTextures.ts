@@ -166,6 +166,27 @@ export function prepareFireTextures(scene: Phaser.Scene): void {
   material(scene,'fire-nova-detail',ctx=>fireBurst(ctx,true));
 }
 export function prepareLightningTextures(scene: Phaser.Scene): void {
+  cached(scene,'lightning-charge-mark',64,64,g=>{
+    g.lineStyle(5,0x9874ff,0.25).strokeCircle(32,32,23);
+    g.lineStyle(1.5,0xc4ddff,0.9).strokeCircle(32,32,23);
+    polygon(g,[35,9,21,34,31,31,27,54,44,26,34,29],0xfff4bc);
+    g.fillStyle(0xd4e5ff,1);
+    for(let i=0;i<4;i++){const a=i*Math.PI/2;g.fillCircle(32+23*Math.cos(a),32+23*Math.sin(a),2);}
+  });
+  cached(scene,'lightning-discharge-detail',128,128,g=>{
+    g.fillStyle(0x9c79ef,0.08).fillCircle(64,64,60);
+    g.lineStyle(4,0x9cbaff,0.25).strokeCircle(64,64,49);
+    g.lineStyle(1.5,0xe1eaff,0.8).strokeCircle(64,64,49);
+    for(let i=0;i<10;i++){
+      const a=i*Math.PI/5,c=Math.cos(a),s=Math.sin(a);
+      for(const [width,color,alpha] of [[7,0x987aff,0.25],[2,0xfff5cc,1]]){
+        g.lineStyle(width,color,alpha).beginPath().moveTo(64+12*c,64+12*s)
+          .lineTo(64+29*c-7*s,64+29*s+7*c).lineTo(64+36*c+5*s,64+36*s-5*c)
+          .lineTo(64+59*c,64+59*s).strokePath();
+      }
+    }
+    g.fillStyle(0xfff8df,0.9).fillCircle(64,64,7);
+  });
   for(let variant=0;variant<3;variant++)cached(scene,`lightning-arc-detail-${variant}`,256,64,g=>{
     const points=[0,32,30,26+variant*3,49,39,71,16+variant*5,87,35,114,24,137,43-variant*4,158,25,183,38,204,20+variant*3,225,35,256,32];
     for(const [width,color,alpha] of [[14,0x8c75df,.13],[7,0x94caff,.45],[2.5,0xfff4ca,1]]) {
