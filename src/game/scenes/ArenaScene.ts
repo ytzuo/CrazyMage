@@ -5,6 +5,7 @@ import type { MovementInput } from '../input/MovementInput';
 import { SpellRunner } from '../spells/SpellRunner';
 import { SCHOOLS, isSchool, type School } from '../upgrades/definitions';
 import { EnemySystem } from '../enemies/EnemySystem';
+import { AimIndicator } from '../ui/AimIndicator';
 import { SchoolSkill } from '../spells/SchoolSkill';
 import { UltimateSpell } from '../ultimates/UltimateSpell';
 import { mageBodyTexture, mageStaffTexture, type SchoolArtwork } from '../art/CharacterTextures';
@@ -16,6 +17,7 @@ export class ArenaScene extends Phaser.Scene {
   private spell!: SpellRunner;
   private ultimate!: UltimateSpell;
   private skill!: SchoolSkill;
+  private aimIndicator!: AimIndicator;
   private selectingSchool = true;
   private paused = false;
   private hudElapsed = 0;
@@ -40,6 +42,7 @@ export class ArenaScene extends Phaser.Scene {
       this.builds.completeWave(wave, bossDefeated);
     }, (source, boss) => boss ? this.ultimate.charge.fill() : this.ultimate.charge.onKill(source));
     this.enemies.reset();
+    this.aimIndicator = new AimIndicator(this);
     this.cameras.main.setBounds(0, 0, ARENA.width, ARENA.height);
     this.cameras.main.startFollow(this.player.view, true, 0.12, 0.12);
     this.centerCamera();
@@ -50,6 +53,7 @@ export class ArenaScene extends Phaser.Scene {
       this.ultimate.reset();
       this.skill.reset();
       this.enemies.reset();
+      this.aimIndicator.destroy();
     });
     this.movement.setEnabled(false);
     this.publish();
@@ -140,6 +144,9 @@ export class ArenaScene extends Phaser.Scene {
     const step = Math.min(delta, 50);
     const attack = this.movement.readAttack() ?? this.touchAim();
     this.player.update(this.movement.read(), step, attack);
+    const basicAim = attack ?? this.player.aimDirection;
+    this.aimIndicator.update(this.player.view.x, this.player.view.y, this.builds.snapshot.build.school,
+      basicAim, this.skill.ready ? this.skillAim() : basicAim, this.skill.ready, this.enemies);
     this.skill.update(step);
     if (this.builds.pendingChoice) { this.movement.setEnabled(false); this.publish(); return; }
     this.ultimate.update(step);
@@ -297,6 +304,7 @@ export class ArenaScene extends Phaser.Scene {
 
   private publish(): void {
     if (!this.player) return;
+    if (this.paused || this.selectingSchool || this.builds.pendingChoice || this.player.health.dead) this.aimIndicator?.hide();
     this.onState({ skillEnergy: this.skill.energy, skillRemaining: this.skill.remainingMs, ultimateEnergy: this.ultimate.charge.energy, ultimateCasts: this.ultimate.casts, ultimateEffects: this.ultimate.effectCount, selectingSchool: this.selectingSchool, x: this.player.view.x, y: this.player.view.y, moving: this.player.moving && !this.paused, paused: this.paused, distance: this.player.distance, attacking: !this.paused && this.movement.readAttack() !== null, casts: this.spell.casts, health: this.player.health.current, maxHealth: this.player.health.maximum, shield: this.player.health.shield, waveRemaining: this.enemies.waves.remaining(this.enemies.waveClock.wave), progression: this.builds.snapshot, dead: this.player.health.dead, enemies: this.enemies.enemies.length, kills: this.enemies.kills, objects: this.children.list.length, projectiles: this.spell.projectileCount, impacts: this.spell.impactCount, enemyPositions: this.enemies.enemies.map(enemy => ({ id: enemy.id, x: enemy.view.x, y: enemy.view.y })), wave: this.enemies.waveClock.wave, nextWaveIn: this.enemies.waveClock.remaining, elapsedTime: this.enemies.waveClock.elapsedTime });
   }
 }

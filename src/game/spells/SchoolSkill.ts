@@ -12,6 +12,13 @@ export const SCHOOL_SKILLS = {
 } as const;
 interface Visual {view:Phaser.GameObjects.Image; age:number; size:number; line:boolean; thickness:number; life:number}
 interface Release {school:'fire'|'lightning'; x:number; y:number; tx:number; ty:number; aim:Direction; age:number; enemies:EnemySystem; view:Phaser.GameObjects.Image}
+/** Shared by release and its ground preview so map edges preserve the same aim. */
+export function skillEndpoint(x:number,y:number,direction:Direction,reach:number):{x:number;y:number} {
+  const availableX=direction.x>0?(ARENA.width-ARENA.inset-x)/direction.x:direction.x<0?(ARENA.inset-x)/direction.x:Infinity;
+  const availableY=direction.y>0?(ARENA.height-ARENA.inset-y)/direction.y:direction.y<0?(ARENA.inset-y)/direction.y:Infinity;
+  const distance=Math.max(0,Math.min(reach,availableX,availableY));
+  return {x:x+direction.x*distance,y:y+direction.y*distance};
+}
 /** One time charge; bounded cosmetic images, all advanced by active game time. */
 export class SchoolSkill {
   private school:School='fire';
@@ -83,12 +90,10 @@ export class SchoolSkill {
     }else{
       const reach=this.school==='fire'?190:560;
       // Clip along the aim vector, preserving the direction near arena walls.
-      const availableX=direction.x>0?(ARENA.width-ARENA.inset-x)/direction.x:direction.x<0?(ARENA.inset-x)/direction.x:Infinity;
-      const availableY=direction.y>0?(ARENA.height-ARENA.inset-y)/direction.y:direction.y<0?(ARENA.inset-y)/direction.y:Infinity;
-      const distance=Math.max(0,Math.min(reach,availableX,availableY));
+      const endpoint=skillEndpoint(x,y,direction,reach), distance=Math.hypot(endpoint.x-x,endpoint.y-y);
       const view=this.school==='fire'?this.visual(x,y,'fireball-detail',78,false,angle,36,300):this.visual(x,y,'lightning-arc-detail-0',distance,true,angle,8,180);
       if(this.school==='fire')view.setOrigin(64/96,0.5).setDisplaySize(78,46);
-      this.release={school:this.school,x,y,tx:x+direction.x*distance,ty:y+direction.y*distance,aim:direction,age:0,enemies,view};
+      this.release={school:this.school,x,y,tx:endpoint.x,ty:endpoint.y,aim:direction,age:0,enemies,view};
     }
     enemies.effects.cast(x,y,this.school,direction);
     return true;
