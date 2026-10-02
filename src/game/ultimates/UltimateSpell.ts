@@ -1,8 +1,7 @@
-import { prepareFireTextures, prepareLightningTextures } from '../art/SpellTextures';
+import { prepareFireTextures, prepareLightningTextures, prepareIceTextures } from '../art/SpellTextures';
 import Phaser from 'phaser';
 import type { EnemySystem } from '../enemies/EnemySystem';
 import type { School } from '../upgrades/definitions';
-import { SCHOOL_COLOR } from '../effects/CombatEffects';
 import { UltimateCharge } from './UltimateCharge';
 import { ultimateSpec, type UltimateSpec } from './definitions';
 interface Visual { view:Phaser.GameObjects.Image; age:number; life:number; size:number; ring:boolean }
@@ -14,7 +13,7 @@ export class UltimateSpell {
   casts=0;
   get effectCount():number{return this.visuals.length;}
   constructor(private scene:Phaser.Scene){
-    prepareFireTextures(scene);prepareLightningTextures(scene);
+    prepareFireTextures(scene);prepareLightningTextures(scene);prepareIceTextures(scene);
     if(scene.textures.exists('ultimate-ring'))return;
     const g=scene.make.graphics({},false);
     g.fillStyle(0xffffff,0.035).fillCircle(128,128,122);
@@ -29,7 +28,7 @@ export class UltimateSpell {
   configure(school:School,level:number):void{this.spec=ultimateSpec(school,level);}
   private visual(x:number,y:number,size:number,ring:boolean,life=800,texture?:string):void {
     if(this.visuals.length>=40)this.visuals.shift()!.view.destroy();
-    const view=this.scene.add.image(x,y,texture ?? (ring?(this.spec.school==='fire'?'fire-nova-detail':'ultimate-ring'):'lightning-bolt-detail')).setTint(this.spec.school==='ice'?SCHOOL_COLOR.ice:this.spec.school==='lightning'&&ring?0xb8caff:0xffffff).setDepth(ring?8:14);
+    const view=this.scene.add.image(x,y,texture ?? (ring?(this.spec.school==='fire'?'fire-nova-detail':this.spec.school==='ice'?'ice-frost-detail':'ultimate-ring'):'lightning-bolt-detail')).setTint(this.spec.school==='lightning'&&ring?0xb8caff:0xffffff).setDepth(ring?8:14);
     if(ring)view.setDisplaySize(size,size);else view.setOrigin(0.5,1).setDisplaySize(64,size).setBlendMode(Phaser.BlendModes.ADD);
     this.visuals.push({view,age:0,life,size,ring});
   }

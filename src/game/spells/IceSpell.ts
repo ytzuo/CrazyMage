@@ -1,3 +1,4 @@
+import { prepareIceTextures } from '../art/SpellTextures';
 import Phaser from 'phaser';
 import type { Direction } from '../config';
 import type { EnemySystem } from '../enemies/EnemySystem';
@@ -14,21 +15,12 @@ export class IceSpell {
   get projectileCount():number{return 0;}
   get impactCount():number{return this.rings.length;}
   constructor(private scene:Phaser.Scene,private spec:IceSpec) {
-    if(scene.textures.exists('ice-ring'))return;
-    const g=scene.make.graphics({},false);
-    g.fillStyle(0x7bdcf2,0.07).fillCircle(128,128,122);
-    g.lineStyle(3,0xbbefff,0.85).strokeCircle(128,128,120);
-    g.lineStyle(1,0x75c9ec,0.6).strokeCircle(128,128,104);
-    for(let i=0;i<12;i++) {
-      const angle=i*Math.PI/6,x=128+Math.cos(angle)*112,y=128+Math.sin(angle)*112;
-      g.lineStyle(2,0xd8f7ff,0.8).lineBetween(x-4,y-4,x+4,y+4).lineBetween(x-4,y+4,x+4,y-4);
-    }
-    g.generateTexture('ice-ring',256,256);g.destroy();
+    prepareIceTextures(scene);
   }
   configure(spec:IceSpec):void{this.cooldown=preserveCooldown(this.cooldown,this.spec.cooldown,spec.cooldown);this.spec=spec;}
   private pulse(x:number,y:number,spec:IceSpec,enemies:EnemySystem):void {
     if(this.rings.length>=8)this.rings.shift()!.view.destroy();
-    const view=this.scene.add.image(x,y,'ice-ring').setDepth(8).setDisplaySize(spec.radius*2,spec.radius*2);
+    const view=this.scene.add.image(x,y,'ice-frost-detail').setDepth(8).setDisplaySize(spec.radius*2,spec.radius*2);
     this.rings.push({view,age:0,radius:spec.radius});
     for(const enemy of [...enemies.enemies]) {
       if((enemy.view.x-x)**2+(enemy.view.y-y)**2>(spec.radius+enemy.spec.radius)**2)continue;
@@ -52,7 +44,7 @@ export class IceSpell {
     for(let i=this.rings.length-1;i>=0;i--) {
       const ring=this.rings[i];ring.age+=delta;
       if(ring.age>=300){ring.view.destroy();this.rings.splice(i,1);}
-      else ring.view.setDisplaySize(ring.radius*2*(0.85+0.15*ring.age/300),ring.radius*2*(0.85+0.15*ring.age/300)).setAlpha(1-ring.age/300);
+      else ring.view.setDisplaySize(ring.radius*2*(0.85+0.15*ring.age/300),ring.radius*2*(0.85+0.15*ring.age/300)).setAlpha((1-ring.age/300)**0.8);
     }
   }
   reset(_runId=0):void{for(const ring of this.rings)ring.view.destroy();this.rings.length=0;this.echoes.length=0;this.casts=this.cooldown=0;}
