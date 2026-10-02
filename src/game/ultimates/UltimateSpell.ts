@@ -1,4 +1,5 @@
 import { IceZone } from '../spells/IceZone';
+import type { LightningChargeHit } from '../combat/LightningChargeHit';
 import { prepareFireTextures, prepareLightningTextures, prepareIceTextures } from '../art/SpellTextures';
 import Phaser from 'phaser';
 import type { EnemySystem } from '../enemies/EnemySystem';
@@ -18,7 +19,7 @@ export class UltimateSpell {
   spec:UltimateSpec=ultimateSpec('fire',1);
   casts=0;
   get effectCount():number{return this.visuals.length+Number(!!this.iceZone);}
-  constructor(private scene:Phaser.Scene){
+  constructor(private scene:Phaser.Scene,private onLightningHit?:LightningChargeHit){
     prepareFireTextures(scene);prepareLightningTextures(scene);prepareIceTextures(scene);
     if(scene.textures.exists('ultimate-ring'))return;
     const g=scene.make.graphics({},false);
@@ -65,15 +66,22 @@ export class UltimateSpell {
   }
   private pulse(seq:Sequence):void {
     const {x,y,spec,enemies}=seq;
+    const cleared=enemies.waves.cleared,burstHits=new Set<number>();
     const targets=spec.school==='fire'?[]:this.targets(seq);
     for(const enemy of [...targets]){
+      if(enemy.health.dead)continue;
       const tx=enemy.view.x,ty=enemy.view.y,dx=tx-x,dy=ty-y,d=Math.hypot(dx,dy)||1;
-      enemies.hit(enemy,spec.damage,{x:dx/d,y:dy/d},'ultimate');
+      const before=enemy.health.current+enemy.health.shield;
+      const hit=enemies.hit(enemy,spec.damage,{x:dx/d,y:dy/d},'ultimate');
 
       if(spec.school==='lightning'){
         this.visual(tx,ty,260,false,400);this.visual(tx,ty,70,true,400);
         enemies.effects.spellHit(tx,ty,'lightning',{x:dx/d,y:dy/d});
+        if(enemies.waves.cleared!==cleared){this.sequence=null;return;}
+        if(hit&&enemy.health.current+enemy.health.shield<before)
+          this.onLightningHit?.(enemy,enemies,burstHits,'ultimate');
       }
+      if(enemies.waves.cleared!==cleared){this.sequence=null;return;}
     }
     if(spec.school==='fire'){
       const heading=Math.atan2(seq.aim.y,seq.aim.x);

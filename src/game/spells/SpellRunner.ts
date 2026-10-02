@@ -5,6 +5,7 @@ import type { EffectiveBuild } from '../upgrades/build';
 import { FireballSpell } from './FireballSpell';
 import { IceSpell } from './IceSpell';
 import { LightningSpell } from './LightningSpell';
+import type { LightningChargeHit } from '../combat/LightningChargeHit';
 /** Exactly one active school per run; switching releases every old spell object. */
 export class SpellRunner {
   private active:FireballSpell|IceSpell|LightningSpell;
@@ -20,6 +21,9 @@ export class SpellRunner {
     else if(this.active instanceof IceSpell)this.active.configure(effective.ice);
     else this.active.configure(effective.lightning);
   }
+  readonly accumulateLightning:LightningChargeHit=(enemy,enemies,burstHits,source)=>{
+    if(this.active instanceof LightningSpell)this.active.accumulateCharge(enemy,enemies,burstHits,source);
+  };
   update(delta:number,enemies:EnemySystem,origin?:Direction){if(this.active instanceof FireballSpell||this.active instanceof IceSpell)this.active.update(delta,enemies,origin);else this.active.update(delta,enemies);}
   cast(x:number,y:number,aim:Direction,enemies:EnemySystem){
     const cast=this.active instanceof FireballSpell?this.active.cast(x,y,aim):this.active.cast(x,this.active instanceof IceSpell?y-12:y,aim,enemies);

@@ -1,4 +1,5 @@
 import { IceZone } from './IceZone';
+import type { LightningChargeHit } from '../combat/LightningChargeHit';
 import Phaser from 'phaser';
 import { ARENA, type Direction } from '../config';
 import type { School } from '../upgrades/definitions';
@@ -25,7 +26,7 @@ export class SchoolSkill {
   private visuals:Visual[]=[];
   private release:Release|null=null;
   private iceZone:IceZone|null=null;
-  constructor(private scene:Phaser.Scene){prepareFireTextures(scene);prepareIceTextures(scene);prepareLightningTextures(scene);}
+  constructor(private scene:Phaser.Scene,private onLightningHit?:LightningChargeHit){prepareFireTextures(scene);prepareIceTextures(scene);prepareLightningTextures(scene);}
   get ready():boolean{return this.remaining===0;}
   get remainingMs():number{return this.remaining;}
   get energy():number{return Math.floor(100*(1-this.remaining/this.spec.cooldown));}
@@ -101,7 +102,7 @@ export class SchoolSkill {
     return true;
   }
   private damage(spec:SkillSpec,x:number,y:number,tx:number,ty:number,direction:Direction,enemies:EnemySystem):void {
-    const school=spec.school;
+    const school=spec.school,cleared=enemies.waves.cleared,burstHits=new Set<number>();
     for(const enemy of [...enemies.enemies]){
       if(enemy.spawning>0||enemy.health.dead)continue;
       const ex=enemy.view.x,ey=enemy.view.y;
@@ -110,10 +111,15 @@ export class SchoolSkill {
         :segmentCircleHit(x,y,tx,ty,ex,ey,enemy.spec.radius+spec.width/2)!==null;
       if(!hit)continue;
       const dx=ex-(school==='fire'?tx:x),dy=ey-(school==='fire'?ty:y),d=Math.hypot(dx,dy)||1;
+      const before=enemy.health.current+enemy.health.shield;
       if(enemies.hit(enemy,spec.damage,school==='lightning'?direction:{x:dx/d,y:dy/d})){
         if(school==='ice')enemies.slow(enemy,spec.slow,spec.duration);
         enemies.effects.spellHit(ex,ey,school,direction);
+        if(enemies.waves.cleared!==cleared)return;
+        if(school==='lightning'&&enemy.health.current+enemy.health.shield<before)
+          this.onLightningHit?.(enemy,enemies,burstHits,'spell');
       }
+      if(enemies.waves.cleared!==cleared)return;
     }
   }
   configure(spec:SkillSpec):void {

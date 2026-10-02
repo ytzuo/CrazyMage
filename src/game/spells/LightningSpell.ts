@@ -5,6 +5,7 @@ import type { Enemy, EnemySystem } from '../enemies/EnemySystem';
 import type { LightningSpec } from '../upgrades/build';
 import { preserveCooldown } from '../combat/DamageResolver';
 import { chainTargets } from './chain';
+import type { DamageSource } from '../ultimates/UltimateCharge';
 interface Arc {view:Phaser.GameObjects.Image;age:number;duration:number;diameter?:number}
 interface Charge {view:Phaser.GameObjects.Image;stacks:number;remaining:number}
 /** Main chain, non-recursive forks and three-hit discharge share compiled parameters. */
@@ -58,9 +59,14 @@ export class LightningSpell {
   private removeCharge(id:number):void {
     const charge=this.charges.get(id);if(charge)charge.view.destroy();this.charges.delete(id);
   }
-  private charge(enemy:Enemy,enemies:EnemySystem,burstHits:Set<number>):void {
+  accumulateCharge(enemy:Enemy,enemies:EnemySystem,burstHits:Set<number>,source:DamageSource):void {
+    this.syncWave(enemies);
+    this.charge(enemy,enemies,burstHits,source);
+    this.syncWave(enemies);
+  }
+  private charge(enemy:Enemy,enemies:EnemySystem,burstHits:Set<number>,source:DamageSource='spell'):void {
     const spec=this.spec.charge;
-    if(!spec||enemy.health.dead)return;
+    if(!spec||enemy.health.dead||enemy.spawning>0||!enemies.enemies.includes(enemy))return;
     let charge=this.charges.get(enemy.id);
     if(!charge){
       if(this.charges.size>=72)return;
@@ -84,7 +90,7 @@ export class LightningSpell {
       burstHits.add(target.id);
       const tx=target.view.x,ty=target.view.y,dx=tx-x,dy=ty-y,d=Math.hypot(dx,dy)||1;
       // Periodic entry avoids extra knockback; no lightning callbacks are installed on hit().
-      if(enemies.hit(target,spec.damage,{x:dx/d,y:dy/d},'spell',null,true)){
+      if(enemies.hit(target,spec.damage,{x:dx/d,y:dy/d},source,null,true)){
         enemies.effects.spellHit(tx,ty,'lightning',{x:dx/d,y:dy/d});
         if(target.id!==enemy.id)this.arc(x,y,tx,ty,true);
       }

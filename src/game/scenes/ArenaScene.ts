@@ -39,8 +39,8 @@ export class ArenaScene extends Phaser.Scene {
     this.player = new Player(this);
     this.spell = new SpellRunner(this, this.builds.effectiveBuild);
     this.spell.reset(this.builds.snapshot.build.runId);
-    this.ultimate = new UltimateSpell(this);
-    this.skill = new SchoolSkill(this);
+    this.ultimate = new UltimateSpell(this,this.spell.accumulateLightning);
+    this.skill = new SchoolSkill(this,this.spell.accumulateLightning);
     this.enemies = new EnemySystem(this, (wave, bossDefeated) => {
       this.player.health.heal(PLAYER.waveHealing);
       if(this.mode==='race' && this.enemies.waves.cleared===RACE_WAVES) {

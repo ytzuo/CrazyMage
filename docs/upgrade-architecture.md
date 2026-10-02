@@ -223,3 +223,5 @@ IceSpec 统一编译冰矛射程、速度、穿透和 ground 配置，IceSpell �
 ## 雷系分叉与蓄雷
 
 普通模块新增 fork 和 charge，统一由 compileBuild 生成 LightningSpec.fork 与 LightningSpec.charge，与增伤、跳跃、距离、传导兼容。LightningSpell 保存有期限的雷印和有上限的短暂视觉，同步施法使用主链/分叉目标集合及放电去重集合；派生伤害不调用积累或分叉入口，不递归。升级不触发已有印记，放电读取触发时的编译参数；清波立即中止结算并回收状态。收藏卡从同一模块定义显示，规则见 [雷系组合路线](lightning-routes.md)。
+
+E/Q 通过 LightningChargeHit 显式回调接入 SpellRunner.accumulateLightning，复用唯一 LightningSpell 雷印状态；SchoolSkill 在贯雷有效伤害后调用，UltimateSpell 在每轮落雷有效伤害后调用。每次贯雷/每轮落雷各持有独立放电去重集合，完成波次立即停止当前结算。回调传递伤害来源，Q 派生放电仍为 ultimate，避免重新给自身充能；放电不经过积累回调，不递归。升级与构筑卡描述同步说明三种攻击共享电荷。
