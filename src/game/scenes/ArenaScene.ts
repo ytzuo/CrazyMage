@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { ARENA, FIREBALL, type Direction, type MovementState } from '../config';
+import { ARENA, FIREBALL, PLAYER, type Direction, type MovementState } from '../config';
 import { Player } from '../entities/Player';
 import type { MovementInput } from '../input/MovementInput';
 import { SpellRunner } from '../spells/SpellRunner';
@@ -32,7 +32,10 @@ export class ArenaScene extends Phaser.Scene {
     this.spell = new SpellRunner(this, this.builds.effectiveBuild);
     this.spell.reset(this.builds.snapshot.build.runId);
     this.ultimate = new UltimateSpell(this);
-    this.enemies = new EnemySystem(this, (wave, bossDefeated) => this.builds.completeWave(wave, bossDefeated), (source, boss) => boss ? this.ultimate.charge.fill() : this.ultimate.charge.onKill(source));
+    this.enemies = new EnemySystem(this, (wave, bossDefeated) => {
+      this.player.health.heal(PLAYER.waveHealing);
+      this.builds.completeWave(wave, bossDefeated);
+    }, (source, boss) => boss ? this.ultimate.charge.fill() : this.ultimate.charge.onKill(source));
     this.enemies.reset();
     this.cameras.main.setBounds(0, 0, ARENA.width, ARENA.height);
     this.cameras.main.startFollow(this.player.view, true, 0.12, 0.12);

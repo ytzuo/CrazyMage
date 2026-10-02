@@ -9,6 +9,13 @@ export class Health {
   constructor(maximum: number) { this.maximum = maximum; this.current = maximum; }
   get dead(): boolean { return this.current <= 0; }
   get protected(): boolean { return this.protection > 0; }
+  /** Healing does not revive, grant protection or reset shield recovery. */
+  heal(amount: number): number {
+    if (this.dead || !Number.isFinite(amount) || amount <= 0) return 0;
+    const previous = this.current;
+    this.current = Math.min(this.maximum, this.current + amount);
+    return this.current - previous;
+  }
   update(delta: number): void {
     this.protection = Math.max(0, this.protection - delta);
     this.sinceHit = Math.min(10000, this.sinceHit + delta);

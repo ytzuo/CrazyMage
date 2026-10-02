@@ -1,6 +1,6 @@
 import type { BuildSnapshot } from './upgrades/BuildStore';
 export const ARENA = { width: 2400, height: 1800, inset: 96, tile: 80 } as const;
-export const PLAYER = { speed: 300, radius: 18, health: 120, invulnerability: 900 } as const;
+export const PLAYER = { speed: 300, radius: 18, health: 120, waveHealing: 15, invulnerability: 900 } as const;
 export const FIREBALL = { speed: 560, cooldown: 550, lifetime: 1400, damage: 20, radius: 10, maxProjectiles: 64 } as const;
 export const ICE = { cooldown: 1100 } as const;
 export const LIGHTNING = { cooldown: 900 } as const;
