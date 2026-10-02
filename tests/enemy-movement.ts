@@ -50,7 +50,7 @@ function checks():void {
       const fresh=()=>{system.reset();player.reset();system.waveClock.wave=13;system.waveClock.scheduleNext(1e9);};
       const pose=(e:Enemy)=>JSON.stringify([e.body.x,e.body.y,e.body.rotation,e.body.scaleX,e.body.scaleY,e.motion.phase,...e.motion.legs.flatMap(l=>[l.x,l.y,l.rotation])]);
       try {
-        for(const [kind,variant] of [['swift','normal'],['swift','dasher'],['brute','normal'],['brute','guardian'],['bomber','normal'],['bomber','chain']] as const) {
+        for(const [kind,variant] of [['chaser','normal'],['chaser','splitter'],['swift','normal'],['swift','dasher'],['brute','normal'],['brute','guardian'],['bomber','normal'],['bomber','chain']] as const) {
           fresh();const enemy=spawn(system,kind,variant),x=enemy.view.x;
           check(enemy.motion.legs.every(l=>l.y>0&&l.scaleX===enemy.body.scaleX),'spawn had unposed limbs');
           system.update(100,player);

@@ -124,18 +124,26 @@ export function prepareEnemyTextures(scene: Phaser.Scene): void {
       if(kind==='chaser') {
         shape(g,[27,41,15,7,44,30],0x9a6575);shape(g,[85,31,113,7,102,45],0x9a6575);
         shape(g,[26,30,22,15,38,31],0xe4b7a6);shape(g,[91,31,107,15,101,34],0xe4b7a6);
-        g.fillStyle(ink).fillRoundedRect(19,30,91,79,28);
-        g.fillStyle(0x9e617a).fillRoundedRect(22,32,85,74,26);
-        g.fillStyle(0xc68c9b).fillEllipse(59,53,70,48);
+        // Two exposed shins and wide clawed feet sit below the shorter torso.
+        for(const x of [37,74]) {
+          shape(g,[x,89,x+18,89,x+16,113,x+21,120,x-6,122,x-3,113],0x825269);
+          shape(g,[x+3,94,x+12,94,x+10,112,x+1,115],0xbe8392);
+          g.fillStyle(0xd8a5a5).fillEllipse(x+6,105,12,9);
+          for(let i=0;i<3;i++)shape(g,[x-3+i*7,116,x-5+i*7,124,x+2+i*7,120],0xe8d3b0);
+        }
+        g.fillStyle(ink).fillRoundedRect(23,29,83,66,25);
+        g.fillStyle(0x9e617a).fillRoundedRect(26,31,77,61,23);
+        g.fillStyle(0xc68c9b).fillEllipse(59,51,68,43);
         g.fillStyle(0xe0afaf,0.7).fillEllipse(48,42,36,16);
-        g.fillStyle(0x774b65).fillEllipse(99,75,14,37).fillEllipse(64,96,52,17);
-        eyes(g,61);
+        g.fillStyle(0x774b65).fillEllipse(97,68,13,30).fillEllipse(64,85,46,12);
+        eyes(g,56);
         g.lineStyle(3,0x75465c).lineBetween(37,46,51,49).lineBetween(77,49,90,44);
-        g.fillStyle(0x54384a).fillEllipse(63,83,31,12);
-        shape(g,[51,80,56,89,60,80],0xf6dfb5);shape(g,[68,80,72,89,77,80],0xf6dfb5);
-        g.fillStyle(0xd3a1a5).fillEllipse(30,84,13,20).fillEllipse(98,85,13,20);
-        for(const x of [29,35,91,97])g.lineStyle(2,0xf0cbb2).lineBetween(x,96,x+1,101);
-        for(const [x,y] of [[37,65],[89,70],[41,91],[83,94]])g.fillStyle(0x81546d,0.55).fillCircle(x,y,2);
+        g.fillStyle(0x54384a).fillEllipse(63,76,31,12);
+        shape(g,[51,73,56,82,60,73],0xf6dfb5);shape(g,[68,73,72,82,77,73],0xf6dfb5);
+        g.fillStyle(ink).fillEllipse(22,80,18,28).fillEllipse(108,81,18,28);
+        g.fillStyle(0xd3a1a5).fillEllipse(22,78,14,24).fillEllipse(108,79,14,24);
+        for(const x of [17,23,102,108])shape(g,[x,86,x-1,96,x+4,90],0xf0cbb2);
+        for(const [x,y] of [[37,62],[89,66],[41,83],[83,86]])g.fillStyle(0x81546d,0.55).fillCircle(x,y,2);
       } else if(kind==='swift') {
         shape(g,[27,74,11,106,40,94,64,105,91,94,116,108,101,72,67,16],0x39594b);
         shape(g,[26,85,52,28,66,13,81,36,101,90,71,102,43,98],0x72964f);
@@ -234,7 +242,7 @@ export function prepareEnemyTextures(scene: Phaser.Scene): void {
     if (variant === 'splitter') {
       ctx.fillStyle = '#76dac6';
       for (const x of [39,88]) { ctx.beginPath();ctx.arc(x,23,12,0,Math.PI*2);ctx.fill();ctx.stroke(); }
-      ctx.strokeStyle='#bcffdb';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(63,33);ctx.lineTo(58,55);ctx.lineTo(70,73);ctx.lineTo(63,102);ctx.stroke();
+      ctx.strokeStyle='#bcffdb';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(63,33);ctx.lineTo(58,55);ctx.lineTo(70,73);ctx.lineTo(63,92);ctx.stroke();
     } else if (variant === 'dasher') {
       ctx.fillStyle='#ed875b';ctx.beginPath();ctx.moveTo(47,29);ctx.lineTo(64,0);ctx.lineTo(82,30);ctx.closePath();ctx.fill();ctx.stroke();
       ctx.strokeStyle='#ffd2a0';ctx.lineWidth=5;

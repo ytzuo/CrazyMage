@@ -31,11 +31,10 @@ export function paintEnemyDetails(g:Graphics,kind:EnemyKind):void {
     g.lineStyle(1,0xffdcd1).lineBetween(38,46,53,49).lineBetween(76,48,89,43);
     g.fillStyle(0x6d4155).fillEllipse(64,77,12,9);
     g.fillStyle(0xc88f99).fillEllipse(61,74,8,4);
-    g.lineStyle(2,0x683e50).lineBetween(50,94,65,97).lineBetween(65,97,80,93);
-    for(const [x,y] of [[30,93],[95,94]])for(let i=0;i<3;i++)plate(g,[x+i*4,y,x+i*4+1,y+9,x+i*4+4,y+1],0xe5d6b8);
-    g.lineStyle(2,0x713f58).lineBetween(83,80,88,91);
-    g.lineStyle(1,0xf3c2bc).lineBetween(79,83,88,81).lineBetween(82,87,91,85);
-    for(const [x,y,r] of [[43,37,3],[85,40,2],[34,79,2.5],[87,98,2],[57,102,2]]){
+    g.lineStyle(2,0x683e50).lineBetween(50,86,65,89).lineBetween(65,89,80,85);
+    g.lineStyle(2,0x713f58).lineBetween(83,72,88,83);
+    g.lineStyle(1,0xf3c2bc).lineBetween(79,75,88,73).lineBetween(82,79,91,77);
+    for(const [x,y,r] of [[43,37,3],[85,40,2],[34,79,2.5],[87,86,2],[57,89,2]]){
       g.fillStyle(0x74485e,0.65).fillCircle(x,y,r);g.fillStyle(0xe5b2ae,0.6).fillCircle(x-0.7,y-1,r*0.45);
     }
   }else if(kind==='swift') {
@@ -149,9 +148,10 @@ export function paintVariantDetails(ctx:CanvasRenderingContext2D,variant:EnemyVa
       ctx.fillStyle=glow;ctx.beginPath();ctx.arc(x,23,9,0,Math.PI*2);ctx.fill();
       ctx.strokeStyle='#37776c';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-3,18);ctx.lineTo(x+1,23);ctx.lineTo(x-2,28);ctx.stroke();
     }
-    ctx.strokeStyle='#254c48';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(62,37);ctx.lineTo(59,54);ctx.lineTo(68,73);ctx.lineTo(63,100);ctx.stroke();
+    ctx.strokeStyle='#254c48';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(62,37);ctx.lineTo(59,54);ctx.lineTo(68,73);ctx.lineTo(63,92);ctx.stroke();
     ctx.strokeStyle='#a5f5cf';ctx.lineWidth=2;ctx.stroke();
-    for(const [x,y] of [[58,53],[67,74],[63,92]]){ctx.strokeStyle='#e2ffd8';ctx.beginPath();ctx.moveTo(x-5,y-3);ctx.lineTo(x+5,y+3);ctx.stroke();}
+    for(const [x,y] of [[58,53],[67,74],[63,86]]){ctx.strokeStyle='#e2ffd8';ctx.beginPath();ctx.moveTo(x-5,y-3);ctx.lineTo(x+5,y+3);ctx.stroke();}
+    for(const [x,y] of [[45,106],[82,107]]){ctx.fillStyle='#83d3bd';ctx.beginPath();ctx.ellipse(x,y,5,3,0,0,Math.PI*2);ctx.fill();}
   }else if(variant==='dasher') {
     ctx.fillStyle='#ffe0ad';ctx.beginPath();ctx.moveTo(56,24);ctx.lineTo(64,5);ctx.lineTo(72,24);ctx.closePath();ctx.fill();
     ctx.strokeStyle='#875539';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(49,29);ctx.lineTo(64,33);ctx.lineTo(80,29);ctx.stroke();
