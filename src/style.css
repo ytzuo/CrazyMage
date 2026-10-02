@@ -460,3 +460,22 @@ button:disabled { opacity: 0.45; cursor: default; }
 @media (max-height: 500px) and (min-width: 600px) { .skill-button { bottom: calc(var(--edge-bottom) + 172px); } }
 
 .skill-kind { position: absolute; top: -9px; right: 9px; padding: 2px 7px; border: 1px solid #9fae8066; border-radius: 12px; color: var(--ultimate-color); background: #17271f; font-size: 10px; white-space: nowrap; }
+
+/* Make Q visibly larger as a complete control while E stays compact. */
+#ultimate { width: 260px; padding: 16px 20px; gap: 14px; }
+#ultimate .ultimate-key { width: 46px; height: 46px; font-size: 26px; }
+#ultimate .ultimate-content strong { font-size: 19px; }
+#ultimate .ultimate-content small { font-size: 14px; }
+#ultimate .ultimate-track { height: 7px; }
+#skill { width: 200px; bottom: calc(var(--edge-bottom) + 108px); }
+.skill-kind { width: 24px; height: 24px; display: grid; place-items: center; padding: 0; font-size: 17px; top: -12px; }
+@media (max-width: 760px) {
+  #ultimate { width: 174px; padding: 12px; gap: 10px; }
+  #ultimate .ultimate-key { width: 36px; height: 38px; font-size: 23px; }
+  #ultimate .ultimate-content strong { font-size: 16px; }
+  #ultimate .ultimate-content small { font-size: 12px; }
+  #skill { width: 152px; bottom: calc(var(--edge-bottom) + 224px); }
+}
+@media (max-height: 500px) and (min-width: 600px) {
+  #skill { bottom: calc(var(--edge-bottom) + 204px); }
+}
