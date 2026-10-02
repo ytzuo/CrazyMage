@@ -17,6 +17,7 @@ export interface BuildState {
 }
 export interface FireFieldSpec {readonly damage:number;readonly radius:number;readonly duration:number}
 export interface FireballSpec {
+  readonly rebound?: Readonly<{damageMultiplier:number;lifetime:number}> | null;
   readonly field?: FireFieldSpec | null;
   readonly burn?: BurnSpec | null;
   readonly damage: number; readonly cooldown: number; readonly count: number;
@@ -76,6 +77,7 @@ export function compileBuild(build: BuildState): EffectiveBuild {
   const m = build.school === 'fire' ? build.modules : {}, i = build.school === 'ice' ? build.modules : {}, l = build.school === 'lightning' ? build.modules : {}, p = build.passives;
   const fireDamage = growth * FIREBALL.damage * (1 + 0.3 * (m.damage ?? 0)) * (1 + (endless ? 0.15 * Math.max(0,(m.multi??0)-4) + 0.1 * Math.max(0,(m.pierce??0)-35) : 0)) * (m.multi ? 0.65 : 1);
   const fireball = Object.freeze({
+    rebound: m.rebound ? Object.freeze({damageMultiplier:0.8*(1+0.25*((m.rebound??1)-1)),lifetime:2200}) : null,
     field: m.embers ? Object.freeze({damage:fireDamage*0.18*(1+0.3*((m.embers??1)-1)),radius:Math.min(420,Math.max(90,m.explosion?Math.min(600,80*(1+0.15*((m.explosion??1)-1)))*1.25:90)*(1+0.15*((m.embers??1)-1))),duration:Math.min(6000,3000+500*((m.embers??1)-1))}) : null,
     burn: m.burn ? Object.freeze({damage:fireDamage*0.25*(1+0.35*((m.burn??1)-1)),duration:Math.min(6000,3000+500*((m.burn??1)-1)),radius:Math.min(300,140+20*((m.burn??1)-1)),targets:Math.min(8,3+(m.burn??1)-1)}) : null,
     damage: fireDamage,

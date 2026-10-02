@@ -165,7 +165,7 @@ export class ArenaScene extends Phaser.Scene {
       this.castSkill();
       if (this.won || this.builds.pendingChoice) return;
     }
-    this.spell.update(step, this.enemies);
+    this.spell.update(step, this.enemies, {x:this.player.view.x,y:this.player.view.y-12});
     if (this.won || this.builds.pendingChoice) { this.movement.setEnabled(false); this.publish(); return; }
     this.enemies.update(step, this.player);
     if(this.won || this.builds.pendingChoice) {this.movement.setEnabled(false);this.publish();return;}

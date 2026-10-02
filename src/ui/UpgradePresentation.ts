@@ -20,6 +20,7 @@ export const UPGRADE_PRESENTATION: Record<string, { symbol: string; summary: str
   'ultimate.lightning.power': {symbol:'ϟ', summary:'每次落雷的威力更强。'},
   'ultimate.lightning.reach': {symbol:'↗', summary:'雷暴锁定更远处的敌人。'},
   'ultimate.lightning.mastery': {symbol:'⌁', summary:'追加一轮追猎落雷。'},
+  'fire.rebound': {symbol:'↶',summary:'火球折返追随角色，回程可再次命中；强化回程威力，爆炸与火区仍只触发一次。'},
   'fire.embers': {symbol:'♒',summary:'首次命中留下持续灼烧的火区，爆炸强化扩大覆盖；重叠火区不重复叠伤。'},
   'fire.burn': {symbol:'♨',summary:'火球点燃敌人，死亡传播火种；强化燃烧威力与持续时间。'},
   'fire.damage': { symbol:'✹', summary:'让每一枚火球更有威力。' },
