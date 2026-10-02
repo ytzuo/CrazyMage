@@ -66,7 +66,7 @@ export class FireballSpell {
           const target = enemies.enemies.find(enemy => enemy.id === event.targetId);
           if (!target) return false;
           const tx = target.view.x, ty = target.view.y;
-          const settled = enemies.hit(target, event.damage, projectile.direction);
+          const settled = enemies.hit(target, event.damage, projectile.direction, 'spell', event.source==='direct'?spec.burn:null);
           if (settled && event.source === 'direct') enemies.effects.spellHit(tx, ty, 'fire', projectile.direction);
           return settled;
         });

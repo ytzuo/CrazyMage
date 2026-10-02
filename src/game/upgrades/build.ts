@@ -1,3 +1,4 @@
+import type { BurnSpec } from '../combat/BurnSpec';
 import type { GameMode } from '../modes';
 import { skillSpec, type SkillSpec } from '../spells/skillDefinitions.ts';
 import { ultimateSpec, type UltimateSpec } from '../ultimates/definitions.ts';
@@ -15,6 +16,7 @@ export interface BuildState {
   readonly passives: Readonly<Partial<Record<Passive, number>>>;
 }
 export interface FireballSpec {
+  readonly burn?: BurnSpec | null;
   readonly damage: number; readonly cooldown: number; readonly count: number;
   readonly maxTargets: number; readonly speed: number; readonly lifetime: number;
   readonly explosion: Readonly<{ radius: number; multiplier: number }> | null;
@@ -70,8 +72,10 @@ export function compileBuild(build: BuildState): EffectiveBuild {
   // Every endless choice adds lasting power even after coverage/object limits are reached.
   const growth = endless ? 1+0.02*build.revision : 1;
   const m = build.school === 'fire' ? build.modules : {}, i = build.school === 'ice' ? build.modules : {}, l = build.school === 'lightning' ? build.modules : {}, p = build.passives;
+  const fireDamage = growth * FIREBALL.damage * (1 + 0.3 * (m.damage ?? 0)) * (1 + (endless ? 0.15 * Math.max(0,(m.multi??0)-4) + 0.1 * Math.max(0,(m.pierce??0)-35) : 0)) * (m.multi ? 0.65 : 1);
   const fireball = Object.freeze({
-    damage: growth * FIREBALL.damage * (1 + 0.3 * (m.damage ?? 0)) * (1 + (endless ? 0.15 * Math.max(0,(m.multi??0)-4) + 0.1 * Math.max(0,(m.pierce??0)-35) : 0)) * (m.multi ? 0.65 : 1),
+    burn: m.burn ? Object.freeze({damage:fireDamage*0.25*(1+0.35*((m.burn??1)-1)),duration:Math.min(6000,3000+500*((m.burn??1)-1)),radius:Math.min(300,140+20*((m.burn??1)-1)),targets:Math.min(8,3+(m.burn??1)-1)}) : null,
+    damage: fireDamage,
     cooldown: Math.max(150, FIREBALL.cooldown * (endless ? 1/(1+0.15*(p.cooldown??0)) : 1 - 0.1 * (p.cooldown ?? 0))),
     count: Math.min(9,1 + 2 * (m.multi ?? 0)), maxTargets: Math.min(36,1 + (m.pierce ?? 0)),
     speed: FIREBALL.speed, lifetime: FIREBALL.lifetime,

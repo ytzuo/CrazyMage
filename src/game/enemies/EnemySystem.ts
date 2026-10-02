@@ -1,3 +1,4 @@
+import type { BurnSpec } from '../combat/BurnSpec';
 import { RACE_WAVES, type GameMode } from '../modes';
 import Phaser from 'phaser';
 import { ARENA, ENEMY, PLAYER, type Direction } from '../config';
@@ -11,7 +12,7 @@ import { WaveTracker } from './WaveTracker';
 import { enemyCapacity, waveDifficulty } from './difficulty';
 import { enemyKind, enemySpec, type EnemyKind, type EnemySpec } from './roster';
 import { VARIANTS, rollVariant, fragmentSpec, type EnemyVariant } from './variants';
-import { prepareIcePrisonTexture } from '../art/SpellTextures';
+import { prepareIcePrisonTexture, prepareFireTextures } from '../art/SpellTextures';
 import { segmentCircleHit } from '../combat/collision';
 import { SlowStatus } from '../combat/SlowStatus';
 import { EnemyShots } from './EnemyShots';
@@ -19,7 +20,9 @@ import type { DamageSource } from '../ultimates/UltimateCharge';
 import { CombatEffects } from '../effects/CombatEffects';
 import { prepareEnemyTextures, enemyTexture, enemyArtScale } from '../art/CharacterTextures';
 
+interface Burning { spec:BurnSpec; remaining:number; wait:number; spread:boolean; view:Phaser.GameObjects.Image }
 export interface Enemy {
+  burn: Burning | null;
   id: number;
   wave: number;
   spec: EnemySpec;
@@ -63,8 +66,9 @@ export class EnemySystem {
   private pendingSpawns: {wave:number; index:number; remaining:number} | null = null;
   private spawnIndex = 0;
   private nextId = 0;
+  private clearedDuringUpdate = false;
 
-  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.bosses = new BossCombat(scene); this.areaAttacks = new AreaAttacks(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
+  constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random) { prepareEnemyTextures(scene); prepareFireTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.bosses = new BossCombat(scene); this.areaAttacks = new AreaAttacks(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
 
   private spawn(player: Player, wave: number, kind: EnemyKind): boolean {
     if (this.enemies.length >= this.capacity - Number(kind !== 'boss')) return false;
@@ -97,7 +101,7 @@ export class EnemySystem {
       bar.setFillStyle(0xffb36f);
       view.add(this.scene.add.image(0, -spec.radius - 42, 'boss-skull-mark').setDisplaySize(28, 28));
     }
-    this.enemies.push({ spec, variant, dashTime: 0, dashHit: false, burstRemaining: 0, burstWait: 0, blockCooldown: 0, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: warningTime, windup: 0, cooldown: 0, attackTime: 0, frozen: 0, icePrison: null, flash: 0, knockback: { x: 0, y: 0 } });
+    this.enemies.push({ burn:null, spec, variant, dashTime: 0, dashHit: false, burstRemaining: 0, burstWait: 0, blockCooldown: 0, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: warningTime, windup: 0, cooldown: 0, attackTime: 0, frozen: 0, icePrison: null, flash: 0, knockback: { x: 0, y: 0 } });
   }
 
   private attackRange(enemy: Enemy): number { return enemy.variant === 'dasher' ? VARIANTS.dashRange : enemy.spec.range; }
@@ -150,6 +154,9 @@ export class EnemySystem {
 
   update(delta: number, player: Player): void {
     this.effects.update(delta);
+    this.clearedDuringUpdate=false;
+    this.updateBurns(delta);
+    if(this.clearedDuringUpdate) return;
     this.replenish(player);
     const canAdvance = !this.pendingSpawns && this.enemies.length < enemyCapacity(this.waveClock.wave+1)-1 && (this.mode==='endless' || this.waveClock.wave<RACE_WAVES);
     // One advance per update prevents a large delta from replacing a pending batch.
@@ -293,21 +300,63 @@ export class EnemySystem {
     if(enemy.spawning===0&&!enemy.health.dead&&this.enemies.includes(enemy)) enemy.slow.apply(strength,duration);
   }
 
+  private ignite(enemy: Enemy, spec: BurnSpec, spread: boolean): void {
+    if(enemy.spawning>0 || enemy.health.dead) return;
+    if(enemy.burn) {
+      if(spec.damage > enemy.burn.spec.damage) enemy.burn.spec=spec;
+      enemy.burn.remaining=Math.max(enemy.burn.remaining,spec.duration);
+      enemy.burn.spread ||= spread;
+      return;
+    }
+    const view=this.scene.add.image(0,-5,'fireball-detail').setRotation(-Math.PI/2)
+      .setDisplaySize(enemy.spec.radius*2.2,enemy.spec.radius*1.25).setAlpha(0.65);
+    enemy.view.add(view);
+    enemy.burn={spec,remaining:spec.duration,wait:500,spread,view};
+  }
+
+  private spreadBurn(enemy: Enemy): void {
+    const burn=enemy.burn;
+    if(!burn?.spread) return;
+    const targets=this.enemies.filter(other=>other!==enemy && other.spawning===0 && !other.health.dead &&
+      (other.view.x-enemy.view.x)**2+(other.view.y-enemy.view.y)**2<=burn.spec.radius**2)
+      .sort((a,b)=>(a.view.x-enemy.view.x)**2+(a.view.y-enemy.view.y)**2-((b.view.x-enemy.view.x)**2+(b.view.y-enemy.view.y)**2))
+      .slice(0,burn.spec.targets);
+    const spec=Object.freeze({...burn.spec,damage:burn.spec.damage*0.6});
+    for(const other of targets) this.ignite(other,spec,false);
+  }
+
+  private updateBurns(delta: number): void {
+    for(const enemy of [...this.enemies]) {
+      const burn=enemy.burn;
+      if(!burn || enemy.health.dead) continue;
+      burn.remaining-=delta;burn.wait-=delta;
+      burn.view.setAlpha(0.45+0.2*Math.sin(burn.remaining/110));
+      if(burn.wait<=0) {
+        burn.wait+=500;
+        this.hit(enemy,burn.spec.damage,{x:0,y:0},'spell',null,true);
+        if(this.clearedDuringUpdate) return;
+      }
+      if(!enemy.health.dead && burn.remaining<=0) {burn.view.destroy();enemy.burn=null;}
+    }
+  }
+
   /** True means contact settled, including a block; callers must not retry the same hit. */
-  hit(enemy: Enemy, damage: number, direction: Direction, source: DamageSource = 'spell'): boolean {
+  hit(enemy: Enemy, damage: number, direction: Direction, source: DamageSource = 'spell', burn?: BurnSpec | null, periodic = false): boolean {
     if (enemy.spawning > 0 || enemy.health.dead || !this.enemies.includes(enemy) || damage <= 0) return false;
-    if (enemy.variant === 'guardian' && enemy.frozen === 0 && enemy.blockCooldown === 0 && this.random() < VARIANTS.blockChance) {
+    if (!periodic && enemy.variant === 'guardian' && enemy.frozen === 0 && enemy.blockCooldown === 0 && this.random() < VARIANTS.blockChance) {
       enemy.blockCooldown = VARIANTS.blockCooldown;
       enemy.body.setTintFill(0xbcecff); enemy.flash = 180;
       this.effects.block(enemy.view.x, enemy.view.y, enemy.spec.radius);
       // Contact is settled even without damage: consume pierce/splash once, allow ice control.
       return true;
     }
+    if(burn) this.ignite(enemy,burn,true);
     const shatter=enemy.frozen>0;
     if(shatter)this.effects.shatter(enemy.view.x,enemy.view.y,enemy.spec.radius);
     if (!enemy.health.hurt(shatter?enemy.health.current+enemy.health.shield:damage)) return false;
-    this.effects.hit(enemy.view.x, enemy.view.y, direction);
+    if(!periodic) this.effects.hit(enemy.view.x, enemy.view.y, direction);
     enemy.bar.scaleX = enemy.health.current / enemy.health.maximum;
+    if(!periodic) {
     enemy.body.setTintFill(0xffe1b6);
     enemy.flash = 120;
     enemy.knockback.x = direction.x * enemy.spec.knockback;
@@ -319,7 +368,9 @@ export class EnemySystem {
     if (enemy.spec.kind !== 'boss') enemy.cooldown = Math.max(enemy.cooldown, 250);
     enemy.warning.setVisible(false);
     enemy.aimLine.setVisible(false);
+    }
     if (enemy.health.dead) {
+      this.spreadBurn(enemy);
       this.kills++;
       this.onKill(source, enemy.spec.kind === 'boss');
       this.bosses.cancel(enemy.id); this.areaAttacks.cancel(enemy.id);
@@ -333,6 +384,7 @@ export class EnemySystem {
       if (this.enemies.length === 0) { this.waveClock.scheduleNext(ENEMY.clearDelay); this.shots.reset(); this.areaAttacks.reset(); this.effects.clear(x, y); }
       if (this.waves.defeat(enemy.wave)) {
         const bossDefeated = this.bossWaves.delete(enemy.wave);
+        this.clearedDuringUpdate=true;
         this.onWaveClear(enemy.wave, bossDefeated);
       }
     }

@@ -20,6 +20,7 @@ export const UPGRADE_PRESENTATION: Record<string, { symbol: string; summary: str
   'ultimate.lightning.power': {symbol:'ϟ', summary:'每次落雷的威力更强。'},
   'ultimate.lightning.reach': {symbol:'↗', summary:'雷暴锁定更远处的敌人。'},
   'ultimate.lightning.mastery': {symbol:'⌁', summary:'追加一轮追猎落雷。'},
+  'fire.burn': {symbol:'♨',summary:'火球点燃敌人，死亡传播火种；强化燃烧威力与持续时间。'},
   'fire.damage': { symbol:'✹', summary:'让每一枚火球更有威力。' },
   'fire.multi': { symbol:'⋔', summary:'同时射出更多火球，单枚威力降低。' },
   'fire.pierce': { symbol:'➶', summary:'火球贯穿敌人，继续击中后方目标。' },
