@@ -1,6 +1,6 @@
 import './style.css';
 import Phaser from 'phaser';
-import { CATALOG, type DemoMode } from './catalog';
+import { CATALOG, demoModes, hasSpecialMechanic, type DemoMode } from './catalog';
 import { enemySpec } from '../game/enemies/roster';
 import type { GameMode } from '../game/modes';
 import { PreviewScene, type PreviewSelection } from './PreviewScene';
@@ -34,28 +34,39 @@ function renderList():void {
 }
 function renderEntry():void {
   const {entry,form}=selection();
+  const modes=demoModes(entry,form),special=hasSpecialMechanic(entry,form),combined=!modes.includes('attack');
+  if(!modes.includes(demo))demo=modes[1];
+  const chosenMove=entry.moves?.find(m=>m.id===move)??entry.moves?.[0];
+  if(chosenMove)move=chosenMove.id;
   $('entry-number').textContent=`NO. ${String(entryIndex+1).padStart(2,'0')}`;
   $('entry-role').textContent=entry.role;$('enemy-name').textContent=form.name;$('enemy-summary').textContent=form.summary;
   document.title=`${form.name} · 敌人图鉴`;
   const forms=$('forms');forms.replaceChildren();
   entry.forms.forEach((f,i)=>{const button=document.createElement('button');button.textContent=f.label;button.setAttribute('aria-pressed',String(i===formIndex));
     button.onclick=()=>{formIndex=i;renderEntry();};forms.append(button);});
-  const attacks=form.half?[...entry.forms[0].attack,...form.attack]:form.attack;
-  for(const [id,paragraphs] of [['attack-notes',attacks],['mechanic-notes',form.mechanics],['counter-notes',form.counter]] as const) {
+  const moveNotes=chosenMove?[chosenMove.description,...(form.half&&chosenMove.halfDescription?[chosenMove.halfDescription]:[])]:[];
+  const attacks=chosenMove?moveNotes:special?form.attack:[...form.attack,...form.mechanics];
+  $('attack-section').hidden=combined;$('mechanic-section').hidden=!special;
+  document.querySelector('.notes')!.classList.toggle('two-columns',combined||!special);
+  for(const [id,paragraphs] of [['attack-notes',attacks],['mechanic-notes',combined?[...form.attack,...form.mechanics]:form.mechanics],['counter-notes',form.counter]] as const) {
     $(id).replaceChildren(...paragraphs.map(text=>{const p=document.createElement('p');p.textContent=text;return p;}));
   }
   const spec=enemySpec(entry.kind,wave,growth);
   $('stat-health').textContent=String(spec.health);$('stat-damage').textContent=spec.damage?String(spec.damage):'支援';
   $('stat-speed').textContent=String(Math.round(spec.speed));$('stat-wave').textContent=`第 ${entry.firstWave} 波`;
   $('wave-value').textContent=String(wave);$<HTMLInputElement>('wave').value=String(wave);
-  const picker=$<HTMLSelectElement>('move-picker');picker.replaceChildren();
-  for(const attack of entry.moves??[]) {const option=new Option(attack.label,attack.id);picker.add(option);}
-  picker.value=move;$('move-picker-label').hidden=!entry.moves||demo==='movement';
-  $('mechanic-action').hidden=!form.action||demo==='movement';$('mechanic-action').textContent=form.action??'';
+  $('boss-attacks').hidden=!entry.moves;
+  $('move-buttons').replaceChildren(...(entry.moves??[]).map(attack=>{
+    const button=document.createElement('button');button.textContent=attack.label;button.dataset.move=attack.id;
+    button.setAttribute('aria-pressed',String(demo==='attack'&&move===attack.id));
+    button.onclick=()=>{move=attack.id;demo='attack';renderEntry();};return button;
+  }));
+  $('move-description').textContent=demo==='movement'?'选择一项招式，查看完整预警、出手与恢复过程。':moveNotes.join(' ');
+  $('mechanic-action').hidden=!form.action||demo!=='mechanic';$('mechanic-action').textContent=form.action??'';
   $('hit').hidden=$('freeze').hidden=demo==='movement';
   $('stage-hint').textContent=demo==='movement'?'近看真实步态；切换形态可以比较腿部与漂浮动作。':
     demo==='mechanic'?'自动演示关键机制；也可以用右侧按钮尝试命中和冻结。':'拖动法师演示靶，观察预警锁定和攻击范围。';
-  document.querySelectorAll<HTMLButtonElement>('[data-demo]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.demo===demo)));
+  document.querySelectorAll<HTMLButtonElement>('[data-demo]').forEach(button=>{button.hidden=!modes.includes(button.dataset.demo as DemoMode);button.setAttribute('aria-pressed',String(button.dataset.demo===demo));});
   scene.configure(selection());
 }
 $<HTMLInputElement>('search').oninput=renderList;
@@ -64,7 +75,6 @@ $('play').onclick=()=>{if(scene.manualPause)scene.resume();else scene.pause();};
 $('replay').onclick=()=>{scene.resetEncounter();scene.redraw();};
 $('hit').onclick=()=>scene.hit();$('freeze').onclick=()=>scene.freeze();$('mechanic-action').onclick=()=>scene.mechanicAction();
 $<HTMLSelectElement>('speed').onchange=()=>scene.speed=Number($<HTMLSelectElement>('speed').value);
-$<HTMLSelectElement>('move-picker').onchange=()=>{move=$<HTMLSelectElement>('move-picker').value;scene.configure(selection());};
 $<HTMLInputElement>('wave').oninput=()=>{wave=Number($<HTMLInputElement>('wave').value);renderEntry();};
 $<HTMLSelectElement>('growth').onchange=()=>{
   growth=$<HTMLSelectElement>('growth').value as GameMode;$<HTMLInputElement>('wave').max=growth==='race'?'20':'100';

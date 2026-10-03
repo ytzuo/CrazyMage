@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { CATALOG, type DemoMode } from './catalog';
+import { CATALOG, demoModes, type DemoMode } from './catalog';
 import { enemySpec } from '../game/enemies/roster';
 import type { PreviewScene } from './PreviewScene';
 const modes:DemoMode[]=['movement','attack','mechanic'];
@@ -20,7 +20,7 @@ export function installVerification(scene:PreviewScene,host:HTMLElement,restore:
   checkButton.onclick=()=>{
     if(!begin())return;scene.pause();scene.validating=true;scene.clearForCheck();const baseline=scene.diagnostics(),reports:string[]=[];
     try {
-      for(const entry of CATALOG)for(const form of entry.forms)for(const demo of modes) {
+      for(const entry of CATALOG)for(const form of entry.forms)for(const demo of demoModes(entry,form)) {
         for(const move of demo==='movement'?['']:(entry.moves?.map(m=>m.id)??[''])) {
           scene.configure({entry,form,demo,move,wave:entry.firstWave,growth:'race'});
           const spec=enemySpec(entry.kind,entry.firstWave);if(!Number.isFinite(spec.health)||spec.health<=0)throw Error('Invalid stats');

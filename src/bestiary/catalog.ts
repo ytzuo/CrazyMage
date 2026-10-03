@@ -6,7 +6,7 @@ export interface Form {
   label:string;name:string;variant:EnemyVariant;half?:boolean;summary:string;
   attack:string[];mechanics:string[];counter:string[];action?:string;
 }
-export interface Entry {kind:EnemyKind;name:string;role:string;firstWave:number;forms:Form[];moves?:{id:string;label:string}[]}
+export interface Entry {kind:EnemyKind;name:string;role:string;firstWave:number;forms:Form[];moves?:{id:string;label:string;description:string;halfDescription?:string}[]}
 const form=(name:string,summary:string,attack:string[],mechanics:string[],counter:string[],variant:EnemyVariant='normal',action?:string):Form=>
   ({label:variant==='normal'?'普通形态':'特殊形态',name,summary,attack,mechanics,counter,variant,action});
 export const CATALOG:Entry[]=[
@@ -73,7 +73,7 @@ export const CATALOG:Entry[]=[
       ['蓄力 1 秒后在自身位置展开半径 140 的结界，维持时停步。','结界固定在施法位置，最长持续 4 秒。'],
       ['结界内其他普通怪物减伤 30%；祭司、Boss 不受保护，重叠不叠加。','冻结或击杀祭司立即解除结界。'],
       ['把同伴引出结界，或者先冻结祭司。','拖出结界的怪物立即失去减伤。'],'ward','移出同伴 · 看结界') ]},
-  {kind:'boss',name:'魔核守卫',role:'Boss · 重装近战',firstWave:5,moves:[{id:'sweep',label:'重拳横扫'},{id:'stomp',label:'魔核重踏'},{id:'charge',label:'锁向冲撞'},{id:'rupture',label:'地脉连爆'}],forms:[
+  {kind:'boss',name:'魔核守卫',role:'Boss · 重装近战',firstWave:5,moves:[{id:'sweep',label:'重拳横扫',description:'预警 1.1 秒后挥出半径 180、120° 的扇形重拳；绕到侧后方躲避。',halfDescription:'第一拳后追加一次转过 60° 的横扫，继续看第二段预警。'},{id:'stomp',label:'魔核重踏',description:'原地蓄力 1.3 秒后重踏，再向外延伸三条裂纹；裂纹各预警 1 秒后爆发。'},{id:'charge',label:'锁向冲撞',description:'用 1.3 秒预警锁定直线方向，随后最多冲出 520；横向离开冲撞路线。',halfDescription:'冲撞结束后追加一次重踏，整套结束才进入休息与露核。'},{id:'rupture',label:'地脉连爆',description:'三个固定落点由近到远依次爆发，首段预警 1.4 秒、后续间隔 0.45 秒。',halfDescription:'落点增加为四个；沿侧向移动，避开整条连爆路线。'}],forms:[
     form('魔核守卫','双臂护住魔核，以重拳和地面裂纹压迫近身空间。',
       ['横扫：1.1 秒预警，半径 180、120° 扇形；重踏：1.3 秒预警后再亮三条裂纹，各预警 1 秒。','冲撞：1.3 秒锁向预警后冲出，最长 520；连爆：三个固定落点由近到远，首段 1.4 秒，间隔 0.45 秒。'],
       ['每套攻击后休息至少 5 秒，前 1.8 秒原地打开胸甲；露核时所受伤害 ×1.3。','第 5、15、25……波出现；普通命中不取消招式，冻结可以取消。'],
@@ -82,7 +82,7 @@ export const CATALOG:Entry[]=[
       ['横扫追加一次转过 60° 的横扫；冲撞后追加一次重踏。','地脉连爆从三个落点变为四个，后续招式保留完整预警。'],
       ['生命低于一半时显露破甲外观。','攻击后仍休息 5 秒，露核窗口延长为 2.2 秒，所受伤害仍 ×1.3。'],
       ['第一击结束后继续看后续预警，别急着贴近。','等整套结束再利用更长的露核窗口。']),label:'半血 · 破甲',half:true} ]},
-  {kind:'weaver',name:'裂隙织主',role:'Boss · 换位封路',firstWave:10,moves:[{id:'teleport',label:'裂隙换位'},{id:'lines',label:'织界切线'},{id:'orbs',label:'魔核回收'}],forms:[
+  {kind:'weaver',name:'裂隙织主',role:'Boss · 换位封路',firstWave:10,moves:[{id:'teleport',label:'裂隙换位',description:'落点轮廓预警 0.8 秒后瞬移，落地停顿 0.8 秒；瞬移本身没有接触伤害。',halfDescription:'原位置留下残影，补一条预警 1 秒、生效 1.4 秒的切线；主身停顿延长到 1.2 秒，残影结束后才开始休息。'},{id:'lines',label:'织界切线',description:'两条切线同时预警 1 秒，再成为持续 1.4 秒的伤害带；预警时穿过，生效后避开。'},{id:'orbs',label:'魔核回收',description:'三枚魔核预警 1 秒，飞出 2 秒、停顿 0.55 秒，再用 2 秒原路返回；去程和返程都要躲避。'}],forms:[
     form('裂隙织主','四臂牵引裂隙，脚下碎片漂浮，以换位和封路改变走位。',
       ['换位：落点轮廓预警 0.8 秒后瞬移，落地停顿 0.8 秒。','双切线：1 秒预警，伤害带生效 1.4 秒；魔核：1 秒预警，2 秒飞出、停顿 0.55 秒、2 秒原路返回。'],
       ['换位 → 双切线 → 三枚魔核循环，每套结束后休息 5 秒。','第 10、20、30……波出现；生命约同波守卫的 75%，始终可受伤，瞬移不造成接触伤害。'],
@@ -92,3 +92,13 @@ export const CATALOG:Entry[]=[
       ['等残影切线结束，才开始整套攻击后的 5 秒休息。','主身始终可受伤，其他招式预警不缩短；冻结取消当前招式与残影。'],
       ['看主身落点的同时注意原位置残影，不要在切线上追击。','用冻结清掉残影招式，或等整套结束集中输出。']),label:'半血 · 断界',half:true} ]},
 ];
+
+/** Only offer distinct demonstrations; attack-like abilities share the mechanism view. */
+export function demoModes(entry:Entry,form:Form):DemoMode[] {
+  if(entry.kind==='priest'||['dasher','volley','triple'].includes(form.variant))return ['movement','mechanic'];
+  if(entry.kind==='bomber'||['splitter','guardian'].includes(form.variant))return ['movement','attack','mechanic'];
+  return ['movement','attack'];
+}
+export function hasSpecialMechanic(entry:Entry,form:Form):boolean {
+  return !!entry.moves||entry.kind==='bomber'||entry.kind==='priest'||form.variant!=='normal';
+}
