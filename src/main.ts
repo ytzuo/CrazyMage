@@ -52,7 +52,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <div id="school-overlay" class="launch-page" role="dialog" aria-modal="true" aria-label="启动页面" hidden></div>
     <div id="build-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="法术构筑与升级" hidden></div>
     <div id="pause-overlay" class="pause-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
-      <div class="pause-card"><h2 id="pause-title">已暂停</h2><p id="death-duration" hidden></p><button id="resume">继续 <span>→</span></button><button id="back-launch" class="back-launch">返回启动页</button></div>
+      <div class="pause-card"><h2 id="pause-title">已暂停</h2><p id="death-duration" hidden></p><button id="resume">继续 <span>→</span></button><button id="back-launch" class="back-launch">返回主菜单</button></div>
     </div>
   </main>
 `;
