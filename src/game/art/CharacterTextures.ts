@@ -1,3 +1,4 @@
+import { prepareWeaverTextures } from './WeaverTextures';
 import { prepareGuardianTextures } from './GuardianTextures';
 import { paintEnemyDetails, paintVariantDetails } from './EnemyModelDetails';
 import { prepareSpecialEnemyTextures } from './SpecialEnemyTextures';
@@ -124,6 +125,7 @@ export const enemyTexture = (kind: EnemyKind, variant: EnemyVariant = 'normal'):
 export const enemyArtScale = (kind: EnemyKind, radius: number): number => radius / (kind === 'brute' ? 58 : 40);
 export function prepareEnemyTextures(scene: Phaser.Scene): void {
   prepareSpecialEnemyTextures(scene);
+  prepareWeaverTextures(scene);
   for (const kind of ['chaser','swift','ranged','brute'] as EnemyKind[]) {
     texture(scene, enemyTexture(kind), 128, 128, g => {
       if(kind==='chaser') {

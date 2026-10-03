@@ -1,8 +1,12 @@
 import { GUARDIAN } from './GuardianRules.ts';
+import { WEAVER } from './WeaverRules.ts';
 import type { GameMode } from '../modes';
 import { SPECIAL_ENEMIES } from './specialConfig.ts';
 import { waveDifficulty } from './difficulty.ts';
-export type EnemyKind = 'chaser' | 'ranged' | 'brute' | 'swift' | 'boss' | 'artillery' | 'bomber' | 'priest';
+export type EnemyKind = 'chaser' | 'ranged' | 'brute' | 'swift' | 'boss' | 'weaver' | 'artillery' | 'bomber' | 'priest';
+export const isBoss = (kind: EnemyKind): boolean => kind === 'boss' || kind === 'weaver';
+/** Alternate every five waves, including endless waves beyond twenty. */
+export const bossKind = (wave: number): EnemyKind | null => wave % 5 === 0 ? (wave % 10 === 0 ? 'weaver' : 'boss') : null;
 export interface EnemySpec {
   readonly kind: EnemyKind;
   readonly speed: number;
@@ -19,6 +23,7 @@ export const ENEMY_TYPES: Readonly<Record<EnemyKind, EnemySpec>> = {
   priest: {kind:'priest',speed:66,radius:15,health:28,damage:0,range:520,windup:1000,cooldown:4200,knockback:280},
   artillery: {kind:'artillery',speed:62,radius:18,health:32,damage:14,range:620,windup:1100,cooldown:3200,knockback:260},
   boss: {kind:'boss',speed:64,radius:54,health:900,damage:30,range:210,windup:GUARDIAN.sweepWindup,cooldown:GUARDIAN.rest,knockback:15},
+  weaver: {kind:'weaver',speed:76,radius:42,health:675,damage:26,range:720,windup:WEAVER.lineWarning,cooldown:WEAVER.rest,knockback:15},
   chaser: {kind:'chaser',speed:88,radius:20,health:40,damage:10,range:50,windup:300,cooldown:1200,knockback:240},
   swift: {kind:'swift',speed:160,radius:14,health:18,damage:6,range:40,windup:350,cooldown:1000,knockback:280},
   ranged: {kind:'ranged',speed:72,radius:16,health:24,damage:8,range:520,windup:700,cooldown:2000,knockback:260},

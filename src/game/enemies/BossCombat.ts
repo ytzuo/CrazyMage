@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { WeaverCombat } from './WeaverCombat';
 import { prepareEnemyAttackTextures } from '../art/EnemyAttackTextures';
 import { prepareGuardianTextures } from '../art/GuardianTextures';
 import { ARENA, PLAYER } from '../config';
@@ -16,14 +17,16 @@ interface Fight {
 }
 /** Six attacks can reserve four zones each. Rest starts after the final impact. */
 export class BossCombat {
+  readonly weavers:WeaverCombat;
   private fights=new Map<number,Fight>();
   private reserved=0;
   static readonly maximumZones=24;
-  constructor(private scene:Phaser.Scene) {prepareEnemyAttackTextures(scene);prepareGuardianTextures(scene);}
+  constructor(private scene:Phaser.Scene) {prepareEnemyAttackTextures(scene);prepareGuardianTextures(scene);this.weavers=new WeaverCombat(scene);}
   get zoneCount():number {let count=0;for(const fight of this.fights.values())count+=fight.zones.length;return count;}
-  get rigCount():number {return this.fights.size;}
+  get rigCount():number {return this.fights.size+this.weavers.rigCount;}
   get reservedCount():number {return this.reserved;}
   attach(enemy:Enemy):void {
+    if(enemy.spec.kind==='weaver'){this.weavers.attach(enemy);return;}
     if(this.fights.has(enemy.id))return;
     const fight:Fight={enemy,rig:new GuardianRig(this.scene,enemy),zones:[],move:null,last:null,stage:0,enraged:false,phase:'idle',exposure:0,
       angle:0,originX:0,originY:0,endX:0,endY:0,dashTime:0,dashHit:false,reservation:0,
@@ -37,6 +40,7 @@ export class BossCombat {
   }
   damageMultiplier(id:number):number {return (this.fights.get(id)?.exposure??0)>0?GUARDIAN.exposedDamage:1;}
   update(enemy:Enemy,delta:number,player:Player):void {
+    if(enemy.spec.kind==='weaver'){this.weavers.update(enemy,delta,player);return;}
     const f=this.fights.get(enemy.id);if(!f||delta<=0)return;
     const oldX=enemy.view.x,oldY=enemy.view.y;
     if(f.phase==='recover') {
@@ -147,6 +151,7 @@ export class BossCombat {
     for(let i=f.zones.length-1;i>=0;i--){const z=f.zones[i];if(!z.resolved)continue;z.wait-=delta;z.view.setAlpha(Math.max(0,1+z.wait/GUARDIAN.feedback));if(z.wait<=-GUARDIAN.feedback){z.view.destroy();f.zones.splice(i,1);}}
   }
   pose(enemy:Enemy):void {
+    if(enemy.spec.kind==='weaver'){this.weavers.pose(enemy);return;}
     const f=this.fights.get(enemy.id);if(!f)return;
     const active=f.zones.find(z=>!z.resolved);const p=f.pose;
     p.move=f.move==='charge'&&f.stage===1?'stomp':f.move;p.charge=active&&f.phase==='attack'?Math.max(0,Math.min(1,1-active.wait/active.total)):0;
@@ -154,13 +159,14 @@ export class BossCombat {
     p.dashing=f.phase==='dash';p.exposed=f.exposure>0;p.enraged=enemy.health.current<enemy.health.maximum/2;
     f.rig.pose(p);
   }
-  syncTint(enemy:Enemy):void {this.fights.get(enemy.id)?.rig.syncTint();}
+  syncTint(enemy:Enemy):void {this.fights.get(enemy.id)?.rig.syncTint();this.weavers.syncTint(enemy);}
   cancel(id:number):void {
+    this.weavers.cancel(id);
     const f=this.fights.get(id);if(!f)return;this.clearZones(f);this.release(f);
     f.move=null;f.dashTime=0;f.phase=f.exposure>0?'recover':'idle';f.enemy.windup=0;f.enemy.cooldown=Math.max(f.enemy.cooldown,GUARDIAN.rest);
   }
   private clearZones(f:Fight):void {for(const zone of f.zones)zone.view.destroy();f.zones.length=0;}
   private release(f:Fight):void {this.reserved-=f.reservation;f.reservation=0;}
-  remove(id:number):void {const f=this.fights.get(id);if(!f)return;this.cancel(id);f.rig.destroy();this.fights.delete(id);}
-  reset():void {for(const id of this.fights.keys())this.remove(id);}
+  remove(id:number):void {this.weavers.remove(id);const f=this.fights.get(id);if(!f)return;this.cancel(id);f.rig.destroy();this.fights.delete(id);}
+  reset():void {this.weavers.reset();for(const id of this.fights.keys())this.remove(id);}
 }

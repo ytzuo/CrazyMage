@@ -15,7 +15,7 @@ import { BossCombat } from './BossCombat';
 import { WaveClock } from './WaveClock';
 import { WaveTracker } from './WaveTracker';
 import { enemyCapacity, waveDifficulty } from './difficulty';
-import { enemyKind, enemySpec, type EnemyKind, type EnemySpec } from './roster';
+import { bossKind, isBoss, enemyKind, enemySpec, type EnemyKind, type EnemySpec } from './roster';
 import { VARIANTS, rollVariant, fragmentSpec, type EnemyVariant } from './variants';
 import { prepareIcePrisonTexture, prepareFireTextures } from '../art/SpellTextures';
 import { segmentCircleHit } from '../combat/collision';
@@ -88,11 +88,11 @@ export class EnemySystem {
   constructor(private scene: Phaser.Scene, private onWaveClear: (wave: number, bossDefeated: boolean) => void = () => {}, private onKill: (source: DamageSource, boss: boolean) => void = () => {}, private random: () => number = Math.random, private onDefeat: (id:number,x:number,y:number,source:DamageSource|null)=>void = () => {}) { prepareEnemyTextures(scene); prepareFireTextures(scene); prepareIcePrisonTexture(scene); prepareEnemyAttackTextures(scene); this.special = new SpecialEnemyCombat(scene); this.bosses = new BossCombat(scene); this.areaAttacks = new AreaAttacks(scene); this.fireFields=new FireFields(scene); this.iceShards=new IceShards(scene); this.shots = new EnemyShots(scene); this.effects = new CombatEffects(scene); }
 
   private spawn(player: Player, wave: number, kind: EnemyKind): boolean {
-    if (this.enemies.length >= this.capacity - Number(kind !== 'boss')) return false;
+    if (this.enemies.length >= this.capacity - Number(!isBoss(kind))) return false;
     // A capped special slot becomes a chaser, retaining the registered wave size.
     if ((kind === 'bomber' || kind === 'priest') && this.enemies.filter(enemy => enemy.spec.kind === kind).length >= SPECIAL_ENEMIES[kind].maximum) kind = 'chaser';
     const spec = enemySpec(kind, wave, this.mode);
-    const variant = kind === 'boss' ? 'normal' : rollVariant(kind, this.random, wave);
+    const variant = isBoss(kind) ? 'normal' : rollVariant(kind, this.random, wave);
     // Rotate through the arena's four edges, retaining a safe distance near walls.
     const firstEdge = this.spawnIndex++ % 4;
     for (let attempt = 0; attempt < 8; attempt++) {
@@ -117,12 +117,12 @@ export class EnemySystem {
     const bar = this.scene.add.rectangle(-spec.radius, -spec.radius - 18, spec.radius * 2, 3, 0xe29a9c).setOrigin(0, 0.5);
     view.add([shadow, warning, aimLine, body, background, bar]).setAlpha(0.45);
     const motion = new EnemyLocomotion(this.scene, view, body, shadow, spec.kind, this.nextId);
-    if (spec.kind === 'boss') {
+    if (isBoss(spec.kind)) {
       background.setY(-spec.radius - 42);bar.setY(-spec.radius - 42).setFillStyle(0xffb36f);
       view.add(this.scene.add.image(0, -spec.radius - 68, 'boss-skull-mark').setDisplaySize(28, 28));
     }
     this.enemies.push({ burn:null, iceShard:null,frostStacks:0,frostRemaining:0,frostProtection:0,frozenExecution:false, spec, variant, dashTime: 0, dashHit: false, burstRemaining: 0, burstWait: 0, blockCooldown: 0, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, motion, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: warningTime, windup: 0, cooldown: 0, attackTime: 0, frozen: 0, icePrison: null, flash: 0, knockback: { x: 0, y: 0 } });
-    if (spec.kind === 'boss') this.bosses.attach(this.enemies[this.enemies.length - 1]);
+    if (isBoss(spec.kind)) this.bosses.attach(this.enemies[this.enemies.length - 1]);
   }
 
   private attackRange(enemy: Enemy): number { return enemy.variant === 'dasher' ? VARIANTS.dashRange : enemy.spec.range; }
@@ -157,7 +157,8 @@ export class EnemySystem {
   }
 
   private spawnWave(player: Player, wave = this.waveClock.wave): void {
-    const boss = wave % 5 === 0 && this.spawn(player, wave, 'boss');
+    const kind = bossKind(wave);
+    const boss = kind !== null && this.spawn(player, wave, kind);
     if(boss) this.bossWaves.add(wave);
     const count = waveDifficulty(wave,this.mode).count;
     // Register the whole wave before replenishing; its final reserved spawn must also die.
@@ -217,14 +218,14 @@ export class EnemySystem {
       }
       enemy.flash = Math.max(0, enemy.flash - delta);
       if (enemy.flash === 0) { if(enemy.slow.strength>0) enemy.body.setTint(0x91dafa); else enemy.body.clearTint(); }
-      if (spec.kind !== 'boss') enemy.cooldown = Math.max(0, enemy.cooldown - delta);
+      if (!isBoss(spec.kind)) enemy.cooldown = Math.max(0, enemy.cooldown - delta);
       enemy.blockCooldown = Math.max(0, enemy.blockCooldown - delta);
       enemy.attackTime = Math.max(0, enemy.attackTime - delta);
       const dx = player.view.x - enemy.view.x;
       const dy = player.view.y - enemy.view.y;
       const distance = Math.hypot(dx, dy);
       const oldX = enemy.view.x, oldY = enemy.view.y, dashing = enemy.dashTime > 0;
-      if (spec.kind === 'boss') {
+      if (isBoss(spec.kind)) {
         this.bosses.update(enemy, actionDelta, player);
         const margin = ARENA.inset + spec.radius;
         enemy.view.x = Phaser.Math.Clamp(enemy.view.x, margin, ARENA.width - margin);
@@ -318,7 +319,7 @@ export class EnemySystem {
   /** Pose only moves the sprite inside its container; collision and warning stay fixed. */
   private animate(enemy: Enemy): void {
     const {spec, body, aim} = enemy;
-    if (spec.kind === 'boss') { this.bosses.pose(enemy); return; }
+    if (isBoss(spec.kind)) { this.bosses.pose(enemy); return; }
     const base = enemyArtScale(spec.kind, spec.radius);
     const charge = enemy.windup > 0 ? 1 - enemy.windup / this.attackWindup(enemy) : 0;
     const strike = enemy.attackTime > 0 ? Math.sin((1 - enemy.attackTime / 230) * Math.PI) : 0;
@@ -368,7 +369,7 @@ export class EnemySystem {
     enemy.frostStacks+=gain;enemy.frostRemaining=4000;
     if(enemy.frostStacks>=3){
       enemy.frostStacks=0;enemy.frostRemaining=0;
-      const duration=freeze*(enemy.spec.kind==='boss'?0.35:1);
+      const duration=freeze*(isBoss(enemy.spec.kind)?0.35:1);
       enemy.frostProtection=duration+2500;
       this.freeze(enemy,duration,false);
     }
@@ -432,7 +433,7 @@ export class EnemySystem {
       // Contact is settled even without damage: consume pierce/splash once, allow ice control.
       return true;
     }
-    if (enemy.spec.kind === 'boss') damage *= this.bosses.damageMultiplier(enemy.id);
+    if (isBoss(enemy.spec.kind)) damage *= this.bosses.damageMultiplier(enemy.id);
     if(deriveEffects && ice)this.applyIce(enemy,ice);
     if(deriveEffects && burn) this.ignite(enemy,burn,true);
     const shatter=deriveEffects && enemy.frozen>0 && enemy.frozenExecution;
@@ -449,10 +450,10 @@ export class EnemySystem {
     enemy.knockback.y = direction.y * enemy.spec.knockback;
     this.areaAttacks.cancel(enemy.id);
     // A hit interrupts a pending contact attack, allowing a close-range escape.
-    if (enemy.spec.kind !== 'boss' && enemy.spec.kind !== 'bomber') enemy.windup = enemy.attackTime = enemy.dashTime = enemy.burstRemaining = enemy.burstWait = 0;
+    if (!isBoss(enemy.spec.kind) && enemy.spec.kind !== 'bomber') enemy.windup = enemy.attackTime = enemy.dashTime = enemy.burstRemaining = enemy.burstWait = 0;
     enemy.motion.stop();
     this.animate(enemy);
-    if (enemy.spec.kind !== 'boss') enemy.cooldown = Math.max(enemy.cooldown, 250);
+    if (!isBoss(enemy.spec.kind)) enemy.cooldown = Math.max(enemy.cooldown, 250);
     if (enemy.spec.kind !== 'bomber') enemy.warning.setVisible(false);
     enemy.aimLine.setVisible(false);
     }
@@ -470,10 +471,10 @@ export class EnemySystem {
   private defeat(enemy: Enemy, source: DamageSource | null, ice?: IceEffectsSpec | null, shard=false, deriveEffects=true): void {
     if(deriveEffects && source && enemy.burn?.spec.field) this.fireFields.add(enemy.view.x,enemy.view.y,enemy.burn.spec.field);
     if (deriveEffects && source) this.spreadBurn(enemy);
-    if (source) { this.kills++; this.onKill(source, enemy.spec.kind === 'boss'); }
+    if (source) { this.kills++; this.onKill(source, isBoss(enemy.spec.kind)); }
     this.special.onDeath(enemy, source);
     this.bosses.remove(enemy.id); this.areaAttacks.cancel(enemy.id);
-    const color = enemy.variant === 'splitter' ? 0x76dac6 : { bomber:0xffa56a, priest:0x87e4c5, artillery:0xac91de, boss:0xff9568, chaser:0xd39b96, ranged:0xc4a0ec, brute:0xe6ba78, swift:0xc6dc79 }[enemy.spec.kind];
+    const color = enemy.variant === 'splitter' ? 0x76dac6 : { bomber:0xffa56a, priest:0x87e4c5, artillery:0xac91de, boss:0xff9568, weaver:0xc9a0ff, chaser:0xd39b96, ranged:0xc4a0ec, brute:0xe6ba78, swift:0xc6dc79 }[enemy.spec.kind];
     this.effects.death(enemy.view.x, enemy.view.y, color, enemy.spec.radius);
     const x = enemy.view.x, y = enemy.view.y;
     enemy.view.destroy();

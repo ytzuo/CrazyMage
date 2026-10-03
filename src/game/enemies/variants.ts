@@ -19,7 +19,7 @@ export const VARIANTS = {
   sigilInterval: 450,
 } as const;
 const byKind: Record<EnemyKind, EnemyVariant> = {
-  bomber: 'chain', priest: 'ward', artillery: 'triple', boss: 'normal', chaser: 'splitter', swift: 'dasher', ranged: 'volley', brute: 'guardian',
+  bomber: 'chain', priest: 'ward', artillery: 'triple', boss: 'normal', weaver: 'normal', chaser: 'splitter', swift: 'dasher', ranged: 'volley', brute: 'guardian',
 };
 /** Roll once at spawn; offspring are explicitly normal and cannot recursively split. */
 export function variantChance(wave: number): number {

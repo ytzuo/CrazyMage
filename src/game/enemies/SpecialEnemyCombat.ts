@@ -1,3 +1,4 @@
+import { isBoss } from './roster';
 import type Phaser from 'phaser';
 import { PLAYER } from '../config';
 import type { Player } from '../entities/Player';
@@ -85,7 +86,7 @@ export class SpecialEnemyCombat {
   }
 
   private eligible(owner:Enemy,target:Enemy):boolean {
-    return target!==owner&&target.spec.kind!=='priest'&&target.spec.kind!=='boss'&&target.spawning===0&&!target.health.dead&&
+    return target!==owner&&target.spec.kind!=='priest'&&!isBoss(target.spec.kind)&&target.spawning===0&&!target.health.dead&&
       distanceSquared(owner,target)<=CONFIG.priest.wardRadius**2;
   }
   private hasAlly(owner:Enemy,system:EnemySystem):boolean {
@@ -113,7 +114,7 @@ export class SpecialEnemyCombat {
   protect(enemy:Enemy,damage:number):number {
     if(enemy.frozen>0)return damage;
     for(const ward of this.wards.values()) {
-      if(enemy.spec.kind==='boss'||enemy.spec.kind==='priest')break;
+      if(isBoss(enemy.spec.kind)||enemy.spec.kind==='priest')break;
       if((enemy.view.x-ward.view.x)**2+(enemy.view.y-ward.view.y)**2<=CONFIG.priest.wardRadius**2) {
         damage*=1-CONFIG.priest.reduction;break;
       }
