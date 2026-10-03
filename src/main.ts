@@ -46,7 +46,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     </button>
     <button id="ultimate" class="ultimate-button" type="button" disabled hidden>
       <span class="ready-aura" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
-      <span class="ultimate-key" aria-hidden="true">Q</span><span class="ultimate-content"><strong id="ultimate-name"></strong><span id="ultimate-kind" class="skill-kind"></span><small id="ultimate-charge">0 / 20 击杀</small><span class="ultimate-track" aria-hidden="true"><span id="ultimate-fill"></span></span></span>
+      <span class="ultimate-key" aria-hidden="true">Q</span><span class="ultimate-content"><strong id="ultimate-name"></strong><span id="ultimate-kind" class="skill-kind"></span><small id="ultimate-charge">0 / 15 击杀</small><span class="ultimate-track" aria-hidden="true"><span id="ultimate-fill"></span></span></span>
     </button>
     <div id="battle-notice" class="battle-notice" role="status" aria-live="polite" hidden></div>
     <div id="school-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="选择开局流派" hidden></div>
@@ -120,7 +120,8 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
     button.disabled = !ready || state.paused || selectingSchool || state.dead || state.won || !!state.progression.choice;
     button.dataset.schoolTone = school;
     button.classList.toggle('ready', ready);
-    button.title = `${describeUltimate(spec)}。每 ${state.ultimateKillsRequired} 次普通法术击杀充满，大招击杀不回充；击杀 Boss 立即充满。范围内无目标时不消耗。`;
+    const chargeRule = school === 'fire' ? '普通法术和火墙爆炸击杀可充能，火墙直接击杀不回充' : '普通法术击杀可充能，大招击杀不回充';
+    button.title = `${describeUltimate(spec)}。${state.ultimateKillsRequired} 次击杀充满；${chargeRule}；击杀 Boss 立即充满。范围内无目标时不消耗。`;
     button.setAttribute('aria-label', `${spec.name}，${state.ultimateKills} / ${state.ultimateKillsRequired} 击杀${ready ? '，已就绪，按 Q 或点击释放' : ''}`);
     element('ultimate-name').textContent = spec.name;
     element('ultimate-kind').textContent = school === 'fire' ? '➶' : '◎';

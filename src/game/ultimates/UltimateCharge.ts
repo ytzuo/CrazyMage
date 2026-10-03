@@ -1,4 +1,4 @@
-export type DamageSource = 'spell' | 'ultimate';
+export type DamageSource = 'spell' | 'ultimate' | 'ultimate-explosion';
 /** Count whole kills; percentage is derived only for the visual progress bar. */
 export class UltimateCharge {
   static readonly maximum = 100;
@@ -15,7 +15,7 @@ export class UltimateCharge {
   get energy(): number { return this.value/this.killsRequired*UltimateCharge.maximum; }
   get ready(): boolean { return this.value === this.killsRequired; }
   onKill(source: DamageSource = 'spell'): void {
-    if (source === 'spell') this.value = Math.min(this.killsRequired, this.value + 1);
+    if (source === 'spell' || source === 'ultimate-explosion') this.value = Math.min(this.killsRequired, this.value + 1);
   }
   fill(): void { this.value = this.killsRequired; }
   consume(): boolean {

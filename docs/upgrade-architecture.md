@@ -226,6 +226,8 @@ IceSpec 统一编译冰矛射程、速度、穿透和 ground 配置，IceSpell �
 
 E/Q 通过 LightningChargeHit 显式回调接入 SpellRunner.accumulateLightning，复用唯一 LightningSpell 雷印状态；SchoolSkill 在贯雷有效伤害后调用，UltimateSpell 在每轮落雷有效伤害后调用。每次贯雷/每轮落雷各持有独立放电去重集合，完成波次立即停止当前结算。回调传递伤害来源，Q 派生放电仍为 ultimate，避免重新给自身充能；放电不经过积累回调，不递归。升级与构筑卡描述同步说明三种攻击共享电荷。
 
-大招的 killsRequired 由流派定义统一提供（火 20、冰 10、雷 15）；UltimateCharge 保存整数击杀数，百分比仅用于进度条。MovementState 发布实际计数与需求，HUD 文案及无障碍说明直接读取同一份值；不从百分比反推击杀数。Boss 补满、释放和重开的状态统一走同一充能对象。
+大招的 killsRequired 由流派定义统一提供（火 15、冰 10、雷 15）；UltimateCharge 保存整数击杀数，百分比仅用于进度条。MovementState 发布实际计数与需求，HUD 文案及无障碍说明直接读取同一份值；不从百分比反推击杀数。Boss 补满、释放和重开的状态统一走同一充能对象。
 
 蓄雷在三层主动放电后清空印记。取得蓄雷后，所有非放电击杀的敌人死亡都触发一次放电，有效印记保存当前层数与最后命中快照，无印记或过期按零电荷结算。伤害按 (1+层数)/(1+阈值)、半径按 0.5+0.5×层数/阈值缩放。EnemySystem.defeat 移除实体并产生分裂后，传入稳定 ID 与死亡位置，由 SpellRunner 转给雷系运行器；先移除印记，再按快照同步放电。放电执行深度保护抑制派生死亡再放电，致死来源传递至放电结算，Q 不循环充能。快照在死亡前后不读取已销毁显示对象。
+
+火墙命中爆炸由统一 ultimateSpec.explosion 快照提供半径与伤害倍率，威力/范围强化同时作用于火墙和爆炸。每轮独立 fireBlastHits 集合共享该轮所有爆炸去重，最多 36 个目标、六轮；爆炸不调用火墙命中逻辑，不产生递归爆炸。伤害来源 ultimate-explosion 允许击杀回充，ultimate 直接击杀仍不回充，Boss 补满行为保持。

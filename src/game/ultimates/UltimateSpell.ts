@@ -7,7 +7,7 @@ import type { Direction } from '../config';
 import type { School } from '../upgrades/definitions';
 import { UltimateCharge } from './UltimateCharge';
 import { ultimateSpec, type UltimateSpec } from './definitions';
-interface Sequence { spec:UltimateSpec; x:number; y:number; enemies:EnemySystem; elapsed:number; next:number; aim:Direction; fireHits:number[][] }
+interface Sequence { spec:UltimateSpec; x:number; y:number; enemies:EnemySystem; elapsed:number; next:number; aim:Direction; fireHits:number[][]; fireBlastHits:Set<number>[] }
 interface Motion { x:number; y:number; dx:number; dy:number; reach:number }
 interface Visual { motion?:Motion; view:Phaser.GameObjects.Image; age:number; life:number; size:number; ring:boolean }
 /** One bounded sequence at a time; snapshots and timers advance only with active game time. */
@@ -50,7 +50,7 @@ export class UltimateSpell {
   cast(x:number,y:number,enemies:EnemySystem,aim:Direction={x:1,y:0}):boolean {
     if(!this.charge.ready || this.sequence || this.iceZone)return false;
     const length=Math.hypot(aim.x,aim.y);
-    const seq:Sequence={spec:this.spec,x,y,enemies,elapsed:0,next:1,aim:length>0?{x:aim.x/length,y:aim.y/length}:{x:1,y:0},fireHits:Array.from({length:this.spec.pulses},()=>[])};
+    const seq:Sequence={spec:this.spec,x,y,enemies,elapsed:0,next:1,aim:length>0?{x:aim.x/length,y:aim.y/length}:{x:1,y:0},fireHits:Array.from({length:this.spec.pulses},()=>[]),fireBlastHits:Array.from({length:this.spec.pulses},()=>new Set<number>())};
     if(!this.targets(seq).length)return false;
     this.charge.consume();this.casts++;
     if(seq.spec.school==='ice'){
@@ -98,6 +98,8 @@ export class UltimateSpell {
     return dx*seq.aim.x+dy*seq.aim.y>=d*Math.cos(Math.PI*5/18)-radius;
   }
   private fireDamage(seq:Sequence):void {
+    if(this.sequence!==seq)return;
+    const cleared=seq.enemies.waves.cleared;
     for(let wave=0;wave<seq.spec.pulses;wave++){
       const age=seq.elapsed-wave*seq.spec.interval;
       if(age<0||age>seq.spec.interval)continue;
@@ -109,9 +111,31 @@ export class UltimateSpell {
         if(enemy.spawning>0||enemy.health.dead||d>seq.spec.radius+enemy.spec.radius||seq.fireHits[wave].includes(enemy.id)||Math.abs(d-front)>55+enemy.spec.radius||!this.inFan(seq,enemy.view.x,enemy.view.y,enemy.spec.radius))continue;
         seq.fireHits[wave].push(enemy.id);
         const tx=enemy.view.x,ty=enemy.view.y;
-        if(seq.enemies.hit(enemy,seq.spec.damage,{x:dx/(d||1),y:dy/(d||1)},'ultimate'))seq.enemies.effects.spellHit(tx,ty,'fire',seq.aim);
+        if(seq.enemies.hit(enemy,seq.spec.damage,{x:dx/(d||1),y:dy/(d||1)},'ultimate')){
+          seq.enemies.effects.spellHit(tx,ty,'fire',seq.aim);
+          this.fireExplosion(seq,wave,tx,ty,cleared);
+        }
+        if(seq.enemies.waves.cleared!==cleared){this.sequence=null;return;}
       }
       if(!seq.enemies.enemies.length){this.sequence=null;return;}
+    }
+  }
+  private fireExplosion(seq:Sequence,wave:number,x:number,y:number,cleared:number):void {
+    const explosion=seq.spec.explosion;
+    if(!explosion)return;
+    this.visual(x,y,explosion.radius*2,true,280,'fire-nova-detail');
+    this.visual(x,y,explosion.radius*1.4,true,220,'fire-impact-detail');
+    if(seq.enemies.waves.cleared!==cleared)return;
+    const hits=seq.fireBlastHits[wave];
+    // Each wall can splash a target once; splash never creates another explosion.
+    for(const enemy of [...seq.enemies.enemies]){
+      if(hits.size>=seq.spec.targets)break;
+      if(enemy.spawning>0||enemy.health.dead||hits.has(enemy.id))continue;
+      const dx=enemy.view.x-x,dy=enemy.view.y-y,d=Math.hypot(dx,dy);
+      if(d>explosion.radius+enemy.spec.radius)continue;
+      hits.add(enemy.id);
+      seq.enemies.hit(enemy,seq.spec.damage*explosion.multiplier,{x:dx/(d||1),y:dy/(d||1)},'ultimate-explosion',null,true);
+      if(seq.enemies.waves.cleared!==cleared)return;
     }
   }
   update(delta:number,origin?:Direction):void {
