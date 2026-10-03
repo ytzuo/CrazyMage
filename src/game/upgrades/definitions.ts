@@ -29,7 +29,7 @@ export const UPGRADES: readonly UpgradeDefinition[] = [
   { id: 'fire.damage', name: '灼热增幅', description: '按基础伤害增加 30%，保留其他火球能力。', maxStacks: 2, effect: { kind: 'fire', module: 'damage' } },
   { id: 'fire.multi', name: '多重火球', description: '增加 2 枚扇形弹丸，最多 9 枚；每枚使用强化后伤害的 65%。', maxStacks: 4, effect: { kind: 'fire', module: 'multi' } },
   { id: 'fire.pierce', name: '穿透火球', description: '每枚火球可额外命中 1 个不同目标。', maxStacks: 2, effect: { kind: 'fire', module: 'pierce' } },
-  {id:'fire.rebound',name:'回旋焰弹',description:'火球达到命中或飞行上限后折返；回程只命中一名敌人，不触发穿透、爆炸或灼烧。',maxStacks:2,effect:{kind:'fire',module:'rebound'}},
+  {id:'fire.rebound',name:'回旋焰弹',description:'火球达到命中或飞行上限后折返；回程继承去程贯穿能力，不触发爆炸或灼烧。',maxStacks:2,effect:{kind:'fire',module:'rebound'}},
   {id:'fire.burn',name:'灼烧蔓延',description:'火球命中点燃敌人，死亡传播火种并留下持续伤害火区。',maxStacks:2,effect:{kind:'fire',module:'burn'}},
   { id: 'fire.explosion', name: '冲击爆炸', description: '每枚首次命中产生范围溅射，之后仍可继续穿透；同次施法每个目标最多受到一次溅射。', maxStacks: 1, effect: { kind: 'fire', module: 'explosion' } },
   {id:'ice.ground',name:'落地冰棘',description:'冰矛到达射程末端后驻留地面，持续伤害并减速附近敌人。',maxStacks:2,effect:{kind:'ice',module:'ground'}},

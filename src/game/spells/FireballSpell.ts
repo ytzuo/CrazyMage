@@ -92,9 +92,9 @@ export class FireballSpell {
       this.hits.length = 0;
       const finished=projectile.context.directTargets.size>=spec.maxTargets || fraction<1 || projectile.age>=lifetime;
       if(!projectile.returning && finished && spec.rebound) {
-        // The return leg only settles one direct hit; no inherited spell effects.
+        // The return leg inherits piercing, with its own hit set and no derived spell effects.
         const returnSpec=Object.freeze({...spec,damage:spec.damage*spec.rebound.damageMultiplier,
-          maxTargets:1,explosion:null,burn:null});
+          explosion:null,burn:null});
         projectile.context={...projectile.context,spec:returnSpec,directTargets:new Set<number>()};
         projectile.returning=true;projectile.age=0;projectile.view.setTint(0xffe1a0);
         this.impact(projectile.view.x,projectile.view.y);
