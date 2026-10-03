@@ -24,7 +24,7 @@ run.onclick = async () => {
     check(combat().selectingSchool&&combat().enemies===0&&combat().elapsedTime===0,'school selection started combat early');
     check(loop()==='false','school selection did not sleep loop');
     await delay(200);check(combat().elapsedTime===0,'selection advanced time');
-    const pick=()=>doc.querySelector<HTMLButtonElement>(`[data-school="${school.value}"]`)!.click();
+    const pick=()=>{doc.querySelector<HTMLButtonElement>(`[data-school="${school.value}"]`)!.click();click('start-run');};
     pick();const selectedRun=combat().runId;pick();
     check(combat().school===school.value&&!combat().selectingSchool&&combat().enemies===6&&combat().runId===selectedRun,'school pick did not start once');
     check(get('battle-notice').textContent!.includes('已就绪'),'school ready feedback missing');
@@ -99,7 +99,7 @@ run.onclick = async () => {
     for(let i=0;i<10;i++){click('reset');check(combat().selectingSchool&&combat().enemies===0&&combat().elapsedTime===0,'restart did not return to selection');pick();counts.push(combat().objects);check(combat().revision===0&&combat().completedWaves===0&&combat().waveRemaining===6,'restart retained progression');}
     check(counts.every(n=>n===counts[0]),'restart object count accumulates');
     click('reset');const nextSchool=school.value==='ice'?'lightning':'ice';
-    doc.querySelector<HTMLButtonElement>(`[data-school="${nextSchool}"]`)!.click();
+    doc.querySelector<HTMLButtonElement>(`[data-school="${nextSchool}"]`)!.click();click('start-run');
     check(combat().school===nextSchool&&combat().revision===0&&combat().enemies===6&&combat().elapsedTime===0,'restart did not allow a different school');
     click('pause');reports.push({check:'five pause cycles and ten complete restarts',counts});
     result.textContent=JSON.stringify({passed:true,reports},null,2);

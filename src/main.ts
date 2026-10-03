@@ -14,7 +14,7 @@ import { SCHOOL_INFO, definition } from './game/upgrades/definitions';
 import type { BuildSnapshot } from './game/upgrades/BuildStore';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <main class="arena" aria-label="魔法试验场操控原型">
+  <main class="arena launching" aria-label="魔法试验场操控原型">
     <div id="game" role="application" tabindex="0" aria-label="WASD 移动，方向键施法，Q 释放大招；左下角摇杆可移动"></div>
     <nav class="arena-tools" aria-label="试验场控制">
       <button id="build" class="icon-button" title="查看构筑 (U)" aria-label="查看构筑">✦</button>
@@ -49,10 +49,10 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       <span class="ultimate-key" aria-hidden="true">Q</span><span class="ultimate-content"><strong id="ultimate-name"></strong><span id="ultimate-kind" class="skill-kind"></span><small id="ultimate-charge">0 / 15 击杀</small><span class="ultimate-track" aria-hidden="true"><span id="ultimate-fill"></span></span></span>
     </button>
     <div id="battle-notice" class="battle-notice" role="status" aria-live="polite" hidden></div>
-    <div id="school-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="选择开局流派" hidden></div>
+    <div id="school-overlay" class="launch-page" role="dialog" aria-modal="true" aria-label="启动页面" hidden></div>
     <div id="build-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="法术构筑与升级" hidden></div>
     <div id="pause-overlay" class="pause-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
-      <div class="pause-card"><h2 id="pause-title">已暂停</h2><p id="death-duration" hidden></p><button id="resume">继续 <span>→</span></button></div>
+      <div class="pause-card"><h2 id="pause-title">已暂停</h2><p id="death-duration" hidden></p><button id="resume">继续 <span>→</span></button><button id="back-launch" class="back-launch">返回启动页</button></div>
     </div>
   </main>
 `;
@@ -307,6 +307,7 @@ function restart(): void {
 }
 element('resume').addEventListener('click', () => dead ? restart() : setPaused(false), listenerOptions);
 element('reset').addEventListener('click', restart, listenerOptions);
+element('back-launch').addEventListener('click', restart, listenerOptions);
 window.addEventListener('keydown', (event) => {
   if (selectingSchool) return;
   if (!['Escape', 'Space', 'KeyU'].includes(event.code) || event.repeat) return;
