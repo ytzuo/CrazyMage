@@ -1,0 +1,286 @@
+{
+  "date": "2026-10-03",
+  "environment": "macOS, Codex in-app browser, warm Vite dev, 1280×720 iframe, DPR 2; other game previews paused or closed",
+  "before": {
+    "passed": true,
+    "rows": [
+      {
+        "trial": 1,
+        "mode": "startup",
+        "readyMs": 136,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.22,
+        "meanFrameMs": 8.32,
+        "p95FrameMs": 9.4,
+        "first20RenderMs": 0.23
+      },
+      {
+        "trial": 1,
+        "mode": "movement",
+        "readyMs": 148.90000009536743,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.18,
+        "meanFrameMs": 8.2,
+        "p95FrameMs": 9.2,
+        "first20RenderMs": 0.21
+      },
+      {
+        "trial": 1,
+        "mode": "attack",
+        "readyMs": 146.30000019073486,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.19,
+        "meanFrameMs": 8.19,
+        "p95FrameMs": 9.6,
+        "first20RenderMs": 0.35
+      },
+      {
+        "trial": 2,
+        "mode": "startup",
+        "readyMs": 134.09999990463257,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.2,
+        "meanFrameMs": 8.2,
+        "p95FrameMs": 9.3,
+        "first20RenderMs": 0.19
+      },
+      {
+        "trial": 2,
+        "mode": "movement",
+        "readyMs": 144.40000009536743,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.21,
+        "meanFrameMs": 8.23,
+        "p95FrameMs": 9.2,
+        "first20RenderMs": 0.18
+      },
+      {
+        "trial": 2,
+        "mode": "attack",
+        "readyMs": 139.09999990463257,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.23,
+        "meanFrameMs": 8.21,
+        "p95FrameMs": 9.3,
+        "first20RenderMs": 0.18
+      },
+      {
+        "trial": 3,
+        "mode": "startup",
+        "readyMs": 138.90000009536743,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.25,
+        "meanFrameMs": 8.19,
+        "p95FrameMs": 9,
+        "first20RenderMs": 0.21
+      },
+      {
+        "trial": 3,
+        "mode": "movement",
+        "readyMs": 136.10000038146973,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.19,
+        "meanFrameMs": 8.19,
+        "p95FrameMs": 9,
+        "first20RenderMs": 0.21
+      },
+      {
+        "trial": 3,
+        "mode": "attack",
+        "readyMs": 126.90000009536743,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.19,
+        "meanFrameMs": 8.22,
+        "p95FrameMs": 9.1,
+        "first20RenderMs": 0.23
+      }
+    ],
+    "note": "Warm Vite dev, iframe 1280x720, DPR 2. Shared PRE_RENDER to POST_RENDER CPU sample, excludes update/GPU. Ready time includes iframe load and 20ms polling. Nine loads, 120 render frames per row; not cold startup or full battle."
+  },
+  "after": {
+    "passed": true,
+    "rows": [
+      {
+        "trial": 1,
+        "mode": "startup",
+        "readyMs": 138.5,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.18,
+        "meanFrameMs": 8.2,
+        "p95FrameMs": 9.2,
+        "first20RenderMs": 0.2
+      },
+      {
+        "trial": 1,
+        "mode": "movement",
+        "readyMs": 145.39999961853027,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.19,
+        "meanFrameMs": 8.23,
+        "p95FrameMs": 8.9,
+        "first20RenderMs": 0.31
+      },
+      {
+        "trial": 1,
+        "mode": "attack",
+        "readyMs": 138.90000009536743,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.18,
+        "meanFrameMs": 8.18,
+        "p95FrameMs": 8.7,
+        "first20RenderMs": 0.23
+      },
+      {
+        "trial": 2,
+        "mode": "startup",
+        "readyMs": 141.80000019073486,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.23,
+        "meanFrameMs": 8.21,
+        "p95FrameMs": 9.4,
+        "first20RenderMs": 0.34
+      },
+      {
+        "trial": 2,
+        "mode": "movement",
+        "readyMs": 152.19999980926514,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.26,
+        "meanFrameMs": 8.23,
+        "p95FrameMs": 9.4,
+        "first20RenderMs": 0.23
+      },
+      {
+        "trial": 2,
+        "mode": "attack",
+        "readyMs": 148.19999980926514,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.25,
+        "meanFrameMs": 8.17,
+        "p95FrameMs": 9.2,
+        "first20RenderMs": 0.25
+      },
+      {
+        "trial": 3,
+        "mode": "startup",
+        "readyMs": 150.5,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.23,
+        "meanFrameMs": 8.17,
+        "p95FrameMs": 9,
+        "first20RenderMs": 0.24
+      },
+      {
+        "trial": 3,
+        "mode": "movement",
+        "readyMs": 149.2999997138977,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.25,
+        "meanFrameMs": 8.19,
+        "p95FrameMs": 9.1,
+        "first20RenderMs": 0.24
+      },
+      {
+        "trial": 3,
+        "mode": "attack",
+        "readyMs": 149.90000009536743,
+        "background": "cached-textures",
+        "viewport": [
+          1280,
+          720
+        ],
+        "frames": 120,
+        "meanRenderMs": 0.26,
+        "meanFrameMs": 8.19,
+        "p95FrameMs": 9.1,
+        "first20RenderMs": 0.22
+      }
+    ],
+    "note": "Warm Vite dev, iframe 1280x720, DPR 2. Shared PRE_RENDER to POST_RENDER CPU sample, excludes update/GPU. Ready time includes iframe load and 20ms polling. Nine loads, 120 render frames per row; not cold startup or full battle."
+  }
+}
