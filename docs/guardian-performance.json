@@ -1,0 +1,609 @@
+{
+  "environment": {
+    "date": "2026-10-03",
+    "os": "macOS 26.6 arm64",
+    "browser": "Codex Chromium 154",
+    "vite": "7.3.6 dev",
+    "viewport": [
+      900,
+      540
+    ],
+    "dpr": 2,
+    "cache": "warm local scripts",
+    "scope": "One sampled guardian fixture; existing task tabs not profiled. Update through render submission; excludes GPU/cold navigation/full arena/HUD."
+  },
+  "before": {
+    "passed": true,
+    "viewport": [
+      900,
+      540
+    ],
+    "dpr": 2,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "rows": [
+      {
+        "trial": 1,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.21416663726170856,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.289075631053509,
+          "p95": 9.299999713897705,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.5591667016347249,
+          "p95": 0.9000000953674316,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.326890757103929,
+          "p95": 9.5,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.5525000095367432,
+          "p95": 0.8000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.329411763103069,
+          "p95": 8.700000286102295,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.2641666928927104,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.33445378311542,
+          "p95": 9.200000286102295,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.4200000007947286,
+          "p95": 0.5999999046325684,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.323529411764707,
+          "p95": 9.199999809265137,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.43833332856496177,
+          "p95": 0.6000003814697266,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.331092433769163,
+          "p95": 9.299999713897705,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.24333335161209108,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.34201680912691,
+          "p95": 9.299999713897705,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.4400000095367432,
+          "p95": 0.6999998092651367,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.330252098436116,
+          "p95": 9.300000190734863,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.3966666698455811,
+          "p95": 0.5,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.333613447782373,
+          "p95": 9.399999618530273,
+          "over25": 0
+        }
+      }
+    ],
+    "note": "120 rendered frames per trial. One boss plus 5/35 normal enemies, invulnerable fixture health. CPU: update through render submission, excludes GPU. Cached dev load, no arena/HUD; not cold startup or full fight."
+  },
+  "afterInitial": {
+    "passed": true,
+    "viewport": [
+      900,
+      540
+    ],
+    "dpr": 2,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "rows": [
+      {
+        "trial": 1,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.14833333889643352,
+          "p95": 0.3000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.305042018409537,
+          "p95": 9.700000286102295,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.6516666809717814,
+          "p95": 1.200000286102295,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.309243699081806,
+          "p95": 10.200000286102295,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.8291666587193807,
+          "p95": 1.299999713897705,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.326050421770882,
+          "p95": 9.699999809265137,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.33083335558573407,
+          "p95": 0.5999999046325684,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.327731092436975,
+          "p95": 10,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.6658333381017049,
+          "p95": 1.1999998092651367,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.336134453781513,
+          "p95": 9.699999809265137,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.8116666515668233,
+          "p95": 1.1999998092651367,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.328571427770022,
+          "p95": 9.699999809265137,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.42500001986821495,
+          "p95": 0.5999999046325684,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.331932773109244,
+          "p95": 10,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.5966666460037231,
+          "p95": 0.9000000953674316,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.329411767110104,
+          "p95": 9.900000095367432,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.5950000007947286,
+          "p95": 1,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.310084034414853,
+          "p95": 9.900000095367432,
+          "over25": 0
+        }
+      }
+    ],
+    "note": "120 rendered frames per trial. One boss plus 5/35 normal enemies, invulnerable fixture health. CPU: update through render submission, excludes GPU. Cached dev load, no arena/HUD; not cold startup or full fight."
+  },
+  "after": {
+    "passed": true,
+    "modelEnabled": true,
+    "viewport": [
+      900,
+      540
+    ],
+    "dpr": 2,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "rows": [
+      {
+        "trial": 1,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.16249996026357014,
+          "p95": 0.3000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.312605040413994,
+          "p95": 10.100000381469727,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.4174999952316284,
+          "p95": 0.5999999046325684,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.315966385753216,
+          "p95": 10.200000286102295,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.5891666531562805,
+          "p95": 1,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.315966385753216,
+          "p95": 9.899999618530273,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.21333333253860473,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.332773112449326,
+          "p95": 9.699999809265137,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.4808333396911621,
+          "p95": 0.8000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.329411767110104,
+          "p95": 9,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.48083333174387616,
+          "p95": 0.8000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.339495799120735,
+          "p95": 9.900000095367432,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.2716666420300802,
+          "p95": 0.5,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.330252098436116,
+          "p95": 10,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.4066666841506958,
+          "p95": 0.6000003814697266,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.33025210244315,
+          "p95": 10,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.47916667064030966,
+          "p95": 0.7000002861022949,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.337815124447607,
+          "p95": 9.699999809265137,
+          "over25": 0
+        }
+      }
+    ],
+    "note": "120 rendered frames per trial. One boss plus 5/35 normal enemies, invulnerable fixture health. CPU: update through render submission, excludes GPU. Cached dev load, no arena/HUD; not cold startup or full fight."
+  },
+  "staticRigControl": {
+    "passed": true,
+    "modelEnabled": false,
+    "viewport": [
+      900,
+      540
+    ],
+    "dpr": 2,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "rows": [
+      {
+        "trial": 1,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.16249999205271404,
+          "p95": 0.3000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.29243697639273,
+          "p95": 9.699999809265137,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.4883333166440328,
+          "p95": 0.9000000953674316,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.33697478911456,
+          "p95": 9.299999713897705,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 1,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.4458333492279053,
+          "p95": 0.8000001907348633,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.329411763103069,
+          "p95": 9.100000381469727,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.18666662375132242,
+          "p95": 0.40000009536743164,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.329411763103069,
+          "p95": 9.699999809265137,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.4741666118303935,
+          "p95": 0.7000002861022949,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.335294118448466,
+          "p95": 9.900000095367432,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 2,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.5233333309491476,
+          "p95": 0.9000000953674316,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.331932773109244,
+          "p95": 9.900000095367432,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "startup",
+        "cpu": {
+          "mean": 0.234166677792867,
+          "p95": 0.5,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.32016807043252,
+          "p95": 9.5,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "movement",
+        "cpu": {
+          "mean": 0.4141666491826375,
+          "p95": 0.6999998092651367,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.337815128454642,
+          "p95": 9.900000095367432,
+          "over25": 0
+        }
+      },
+      {
+        "trial": 3,
+        "mode": "attack",
+        "cpu": {
+          "mean": 0.41166666348775227,
+          "p95": 0.6000003814697266,
+          "over25": 0
+        },
+        "frame": {
+          "mean": 8.339495799120735,
+          "p95": 9.599999904632568,
+          "over25": 0
+        }
+      }
+    ],
+    "note": "120 rendered frames per trial. One boss plus 5/35 normal enemies, invulnerable fixture health. CPU: update through render submission, excludes GPU. Cached dev load, no arena/HUD; not cold startup or full fight."
+  },
+  "investigation": "Initial after samples exceeded 20% CPU change. Removed per-pose closure creation and redundant tint/texture calls. Final and static-rig control samples overlap; no single cause confirmed and no claimed performance improvement. Initial samples retained.",
+  "stress": {
+    "passed": true,
+    "seconds": 180.0049559999925,
+    "frames": 21596,
+    "maxZones": 10,
+    "maxObjects": 260,
+    "maxShots": 18,
+    "maxUltimates": 40,
+    "attacks": [
+      "sweep",
+      "rupture",
+      "stomp",
+      "charge"
+    ],
+    "objectsAfterReset": 1,
+    "frame": {
+      "mean": 8.38530678396894,
+      "p95": 10,
+      "over25": 4
+    },
+    "viewport": [
+      900,
+      540
+    ],
+    "dpr": 2,
+    "scope": "Four bosses (two half health) + 68 normal enemies, 9 piercing/burning/exploding fireballs and repeated fire Q. Fixture health prevents deaths; active time 180s. No arena/HUD, GPU or mobile measurement."
+  },
+  "pauseCycles": [
+    "false",
+    "true",
+    "false",
+    "true",
+    "false",
+    "true",
+    "false",
+    "true",
+    "false",
+    "true"
+  ]
+}

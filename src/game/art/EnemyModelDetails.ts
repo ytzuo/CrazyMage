@@ -102,40 +102,6 @@ export function paintEnemyDetails(g:Graphics,kind:EnemyKind):void {
     g.lineStyle(1,0xd2c0eb).lineBetween(52,63,62,72).lineBetween(62,72,76,62);
     jewel(g,63,78,7,0xb5a0e3);
     for(const [x,y] of [[44,63],[85,63],[63,98]])g.fillStyle(0xedcda2).fillCircle(x,y,2);
-  }else if(kind==='boss') {
-    // Floating obsidian guardian: crown, mask, rib armour, molten heart and split arms.
-    for(const side of [-1,1]) {
-      const x=64+side*39;
-      plate(g,[x-side*10,38,x+side*6,30,x+side*16,45,x+side*13,71,x-side*7,76,x-side*13,60],0x3c354e);
-      plate(g,[x-side*4,39,x+side*7,36,x+side*12,46,x+side*8,60,x-side*5,62],0x68536a);
-      plate(g,[x-side*8,78,x+side*13,75,x+side*14,94,x+side*6,107,x-side*9,96],0x3d344b);
-      g.lineStyle(2,0xd67c60).lineBetween(x-side*5,44,x+side*6,48).lineBetween(x+side*6,48,x+side*2,61);
-      g.lineStyle(2,0xffc88d).lineBetween(x-side*5,81,x+side*5,81);
-      for(let i=0;i<3;i++)plate(g,[x+side*(i*6-6),95,x+side*(i*6-5),110,x+side*(i*6),99],0x927363);
-      jewel(g,x,55,6,0xf48b60);
-    }
-    plate(g,[31,38,46,29,81,29,98,40,92,80,76,98,51,98,34,78],0x252334);
-    plate(g,[34,42,48,34,54,54,39,68],0x67516a);
-    plate(g,[78,34,94,43,89,68,75,55],0x514159);
-    plate(g,[43,51,63,44,85,52,80,83,64,98,46,81],0x3b3044);
-    for(const side of [-1,1])for(let i=0;i<3;i++) {
-      const y=57+i*10;
-      plate(g,[64+side*12,y,64+side*23,y-6,64+side*22,y+2,64+side*12,y+7],i===0?0x826273:0x5c465d);
-    }
-    g.fillStyle(0xff8758,0.18).fillEllipse(64,70,39,54);
-    jewel(g,64,69,23,0xf0784c);
-    g.fillStyle(0xffd17c).fillEllipse(62,67,8,22);
-    g.lineStyle(2,0xe99666).lineBetween(38,43,42,53).lineBetween(42,53,36,65).lineBetween(84,86,89,76);
-    plate(g,[46,17,57,12,76,15,86,29,80,44,68,51,52,43,43,28],0x786071);
-    plate(g,[49,24,59,20,78,24,74,38,65,44,53,37],0x332b40);
-    g.lineStyle(3,0xffd899).lineBetween(51,29,60,33).lineBetween(69,33,78,28);
-    plate(g,[64,33,68,40,61,40],0xcaa48b);
-    plate(g,[42,22,36,4,54,16,64,0,75,15,96,5,86,25,65,18],0x957659);
-    g.lineStyle(2,0xffd19a).lineBetween(42,10,51,20).lineBetween(64,5,64,14).lineBetween(88,12,79,22);
-    jewel(g,64,16,6,0xffac69);
-    plate(g,[48,93,63,103,80,93,76,110,64,121,52,110],0x4f3c54);
-    g.lineStyle(2,0xbe806a).lineBetween(53,102,64,111).lineBetween(64,111,73,102);
-    g.fillStyle(0xffc084).fillCircle(64,123,3);
   }
 }
 

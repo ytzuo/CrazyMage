@@ -118,10 +118,11 @@ export class EnemySystem {
     view.add([shadow, warning, aimLine, body, background, bar]).setAlpha(0.45);
     const motion = new EnemyLocomotion(this.scene, view, body, shadow, spec.kind, this.nextId);
     if (spec.kind === 'boss') {
-      bar.setFillStyle(0xffb36f);
-      view.add(this.scene.add.image(0, -spec.radius - 42, 'boss-skull-mark').setDisplaySize(28, 28));
+      background.setY(-spec.radius - 42);bar.setY(-spec.radius - 42).setFillStyle(0xffb36f);
+      view.add(this.scene.add.image(0, -spec.radius - 68, 'boss-skull-mark').setDisplaySize(28, 28));
     }
     this.enemies.push({ burn:null, iceShard:null,frostStacks:0,frostRemaining:0,frostProtection:0,frozenExecution:false, spec, variant, dashTime: 0, dashHit: false, burstRemaining: 0, burstWait: 0, blockCooldown: 0, aim: { x: 0, y: 0 }, aimLine, id: this.nextId++, wave, view, body, motion, bar, warning, health: new Health(spec.health), slow: new SlowStatus(), spawning: warningTime, windup: 0, cooldown: 0, attackTime: 0, frozen: 0, icePrison: null, flash: 0, knockback: { x: 0, y: 0 } });
+    if (spec.kind === 'boss') this.bosses.attach(this.enemies[this.enemies.length - 1]);
   }
 
   private attackRange(enemy: Enemy): number { return enemy.variant === 'dasher' ? VARIANTS.dashRange : enemy.spec.range; }
@@ -212,11 +213,11 @@ export class EnemySystem {
         actionDelta = Math.max(0, delta - enemy.frozen);
         enemy.frozen = Math.max(0, enemy.frozen - delta);
         if (enemy.frozen === 0) { enemy.frozenExecution=false; enemy.icePrison?.destroy(); enemy.icePrison = null; }
-        if (enemy.frozen > 0) { enemy.icePrison?.setAlpha(Math.min(1,enemy.frozen/250)); enemy.knockback.x = enemy.knockback.y = 0; enemy.body.setTint(0x80dfff); enemy.motion.syncTint(enemy.body); continue; }
+        if (enemy.frozen > 0) { enemy.icePrison?.setAlpha(Math.min(1,enemy.frozen/250)); enemy.knockback.x = enemy.knockback.y = 0; enemy.body.setTint(0x80dfff); enemy.motion.syncTint(enemy.body); this.bosses.syncTint(enemy); continue; }
       }
       enemy.flash = Math.max(0, enemy.flash - delta);
       if (enemy.flash === 0) { if(enemy.slow.strength>0) enemy.body.setTint(0x91dafa); else enemy.body.clearTint(); }
-      enemy.cooldown = Math.max(0, enemy.cooldown - delta);
+      if (spec.kind !== 'boss') enemy.cooldown = Math.max(0, enemy.cooldown - delta);
       enemy.blockCooldown = Math.max(0, enemy.blockCooldown - delta);
       enemy.attackTime = Math.max(0, enemy.attackTime - delta);
       const dx = player.view.x - enemy.view.x;
@@ -224,7 +225,7 @@ export class EnemySystem {
       const distance = Math.hypot(dx, dy);
       const oldX = enemy.view.x, oldY = enemy.view.y, dashing = enemy.dashTime > 0;
       if (spec.kind === 'boss') {
-        this.bosses.update(enemy, delta, player);
+        this.bosses.update(enemy, actionDelta, player);
         const margin = ARENA.inset + spec.radius;
         enemy.view.x = Phaser.Math.Clamp(enemy.view.x, margin, ARENA.width - margin);
         enemy.view.y = Phaser.Math.Clamp(enemy.view.y, margin, ARENA.height - margin);
@@ -317,6 +318,7 @@ export class EnemySystem {
   /** Pose only moves the sprite inside its container; collision and warning stay fixed. */
   private animate(enemy: Enemy): void {
     const {spec, body, aim} = enemy;
+    if (spec.kind === 'boss') { this.bosses.pose(enemy); return; }
     const base = enemyArtScale(spec.kind, spec.radius);
     const charge = enemy.windup > 0 ? 1 - enemy.windup / this.attackWindup(enemy) : 0;
     const strike = enemy.attackTime > 0 ? Math.sin((1 - enemy.attackTime / 230) * Math.PI) : 0;
@@ -352,7 +354,7 @@ export class EnemySystem {
     enemy.attackTime = enemy.dashTime = enemy.burstRemaining = enemy.burstWait = 0;
     enemy.knockback.x = enemy.knockback.y = 0;
     enemy.warning.setVisible(false); enemy.aimLine.setVisible(false);
-    this.animate(enemy); enemy.body.setTint(0x80dfff); enemy.motion.syncTint(enemy.body);
+    this.animate(enemy); enemy.body.setTint(0x80dfff); enemy.motion.syncTint(enemy.body); this.bosses.syncTint(enemy);
   }
 
   private applyIce(enemy:Enemy, effects:IceEffectsSpec):void {
@@ -430,6 +432,7 @@ export class EnemySystem {
       // Contact is settled even without damage: consume pierce/splash once, allow ice control.
       return true;
     }
+    if (enemy.spec.kind === 'boss') damage *= this.bosses.damageMultiplier(enemy.id);
     if(deriveEffects && ice)this.applyIce(enemy,ice);
     if(deriveEffects && burn) this.ignite(enemy,burn,true);
     const shatter=deriveEffects && enemy.frozen>0 && enemy.frozenExecution;
@@ -469,7 +472,7 @@ export class EnemySystem {
     if (deriveEffects && source) this.spreadBurn(enemy);
     if (source) { this.kills++; this.onKill(source, enemy.spec.kind === 'boss'); }
     this.special.onDeath(enemy, source);
-    this.bosses.cancel(enemy.id); this.areaAttacks.cancel(enemy.id);
+    this.bosses.remove(enemy.id); this.areaAttacks.cancel(enemy.id);
     const color = enemy.variant === 'splitter' ? 0x76dac6 : { bomber:0xffa56a, priest:0x87e4c5, artillery:0xac91de, boss:0xff9568, chaser:0xd39b96, ranged:0xc4a0ec, brute:0xe6ba78, swift:0xc6dc79 }[enemy.spec.kind];
     this.effects.death(enemy.view.x, enemy.view.y, color, enemy.spec.radius);
     const x = enemy.view.x, y = enemy.view.y;

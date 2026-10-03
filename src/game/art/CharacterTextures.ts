@@ -1,3 +1,4 @@
+import { prepareGuardianTextures } from './GuardianTextures';
 import { paintEnemyDetails, paintVariantDetails } from './EnemyModelDetails';
 import { prepareSpecialEnemyTextures } from './SpecialEnemyTextures';
 import { prepareEnemyLegTextures } from './EnemyLegTextures';
@@ -216,7 +217,7 @@ export function prepareEnemyTextures(scene: Phaser.Scene): void {
     g.lineStyle(2,0xb8abe1).lineBetween(50,74,64,85).lineBetween(64,85,80,74);
     paintEnemyDetails(g,'artillery');
   });
-  texture(scene, enemyTexture('boss'), 128, 128, g => paintEnemyDetails(g,'boss'));
+  prepareGuardianTextures(scene);
   texture(scene,enemyTexture('artillery','triple'),128,128,g=>{
     // Three orbiting cores and a pronged crown distinguish it at battle size.
     g.fillStyle(ink).fillEllipse(64,104,77,18);
