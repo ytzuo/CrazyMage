@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#141a1a" />
+    <title>敌人图鉴 · 失控法师</title>
+  </head>
+  <body>
+    <div class="book">
+      <header class="book-header">
+        <a class="brand" href="./index.html"><span class="brand-rune" aria-hidden="true">✧</span> 失控法师</a>
+        <span class="edition">试验场档案 / 09 种敌人</span>
+        <a class="return-link" href="./index.html">进入试验场 ↗</a>
+      </header>
+      <div class="book-layout">
+        <aside class="index">
+          <div class="index-heading"><span class="eyebrow">FIELD GUIDE</span><h1>敌人图鉴</h1><p>认出危险，读懂出手。</p></div>
+          <label class="search-label"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="搜索敌人或机制" aria-label="搜索敌人或机制" /></label>
+          <nav id="enemy-list" aria-label="敌人目录"></nav>
+          <p id="empty" hidden>没有匹配的敌人。</p>
+          <div class="index-footer"><span class="tiny-rune">◇</span><span>7 种小怪 · 7 种变种<br />2 位 Boss · 2 种半血形态</span></div>
+        </aside>
+        <main id="entry">
+          <header class="entry-heading">
+            <div><div class="entry-meta"><span id="entry-number"></span><span id="entry-role"></span></div><h2 id="enemy-name"></h2><p id="enemy-summary"></p></div>
+            <div id="forms" class="forms" role="group" aria-label="敌人形态"></div>
+          </header>
+          <section class="theatre" aria-label="敌人动作演示">
+            <div class="theatre-top"><div class="mode-buttons" role="group" aria-label="演示内容"><button data-demo="movement">移动动作</button><button data-demo="attack" aria-pressed="true">攻击演示</button><button data-demo="mechanic">机制演示</button></div><span id="live-phase" role="status">准备演示</span></div>
+            <div id="stage" aria-label="敌人与演示靶的实时战斗画面"><span id="loading">正在展开档案…</span></div>
+            <div class="theatre-bottom"><div class="playback"><button id="play" aria-label="暂停演示">Ⅱ 暂停</button><button id="replay" aria-label="重新播放演示">↺ 重播</button><label>速度 <select id="speed" aria-label="演示速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option></select></label></div><label id="move-picker-label">招式 <select id="move-picker" aria-label="选择攻击招式"></select></label></div>
+          </section>
+          <div class="interaction-row"><p id="stage-hint">拖动法师演示靶，观察预警锁定和攻击范围。</p><div><button id="hit">施加一次命中</button><button id="freeze">冻结 2 秒</button><button id="mechanic-action"></button></div></div>
+          <section class="stats" aria-label="敌人属性"><div><span>生命</span><strong id="stat-health"></strong></div><div><span>攻击</span><strong id="stat-damage"></strong></div><div><span>移速</span><strong id="stat-speed"></strong></div><div><span>首次出现</span><strong id="stat-wave"></strong></div><label class="wave-control"><span>观察波次 <output id="wave-value">1</output></span><input id="wave" type="range" min="1" max="20" value="1" aria-label="观察波次" /></label><label class="mode-control"><span>成长模式</span><select id="growth" aria-label="成长模式"><option value="race">竞速</option><option value="endless">无尽</option></select></label></section>
+          <div class="notes"><section class="note"><span class="note-index">01 / MOTION</span><h3>动作与攻击</h3><div id="attack-notes"></div></section><section class="note"><span class="note-index">02 / RULES</span><h3>关键机制</h3><div id="mechanic-notes"></div></section><section class="note counter"><span class="note-index">03 / COUNTERPLAY</span><h3>怎么应对</h3><div id="counter-notes"></div></section></div>
+          <footer class="entry-footer"><span>模型与攻击取自当前游戏。</span><span>属性按所选波次计算；演示靶不会死亡。</span></footer>
+          <div id="dev-tools"></div>
+        </main>
+      </div>
+    </div>
+    <script type="module" src="./src/bestiary/main.ts"></script>
+  </body>
+</html>
