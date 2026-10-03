@@ -27,7 +27,7 @@ export const UPGRADES: readonly UpgradeDefinition[] = [
   {id:'skill.lightning.reach',name:'贯雷延伸',description:'扩大贯雷的覆盖范围。',maxStacks:3,effect:{kind:'skill',school:'lightning',module:'reach'}},
   {id:'skill.lightning.tempo',name:'电能循环',description:'让贯雷更快充能。',maxStacks:3,effect:{kind:'skill',school:'lightning',module:'tempo'}},
   { id: 'fire.damage', name: '灼热增幅', description: '按基础伤害增加 30%，保留其他火球能力。', maxStacks: 2, effect: { kind: 'fire', module: 'damage' } },
-  { id: 'fire.multi', name: '多重火球', description: '增加 2 枚扇形弹丸，最多 5 枚；每枚使用强化后伤害的 65%。', maxStacks: 2, effect: { kind: 'fire', module: 'multi' } },
+  { id: 'fire.multi', name: '多重火球', description: '增加 2 枚扇形弹丸，最多 9 枚；每枚使用强化后伤害的 65%。', maxStacks: 4, effect: { kind: 'fire', module: 'multi' } },
   { id: 'fire.pierce', name: '穿透火球', description: '每枚火球可额外命中 1 个不同目标。', maxStacks: 2, effect: { kind: 'fire', module: 'pierce' } },
   {id:'fire.rebound',name:'回旋焰弹',description:'火球达到命中或飞行上限后折返；回程只命中一名敌人，不触发穿透、爆炸或灼烧。',maxStacks:2,effect:{kind:'fire',module:'rebound'}},
   {id:'fire.burn',name:'灼烧蔓延',description:'火球命中点燃敌人，死亡传播火种并留下持续伤害火区。',maxStacks:2,effect:{kind:'fire',module:'burn'}},

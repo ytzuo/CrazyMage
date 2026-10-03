@@ -46,7 +46,7 @@ export const UPGRADE_PRESENTATION: Record<string, { symbol: string; summary: str
 
 const ENDLESS_SUMMARIES: Readonly<Record<string, string>> = {
   'lightning.chain': '主链连接更多敌人，最多 18 个；数量封顶后继续增伤。',
-  'fire.multi': '增加扇形火球，最多 5 枚；数量封顶后继续增伤。单枚威力只降低一次。',
+  'fire.multi': '增加扇形火球，最多 9 枚；数量封顶后继续增伤。单枚威力只降低一次。',
   'fire.pierce': '每枚火球贯穿更多敌人，最多 36 个；数量封顶后继续增伤，不增加飞行距离。',
   'fire.explosion': '首次命中爆炸，后续穿透不再引爆。范围与威力持续强化，范围封顶后仍增伤；同次施法对每个敌人只溅射一次。',
 };
