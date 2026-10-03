@@ -20,7 +20,7 @@ function renderList():void {
   const query=$<HTMLInputElement>('search').value.trim().toLocaleLowerCase(),list=$('enemy-list');
   list.replaceChildren();let count=0;
   CATALOG.forEach((entry,i)=>{
-    const searchable=[entry.name,entry.role,...entry.forms.flatMap(f=>[f.name,f.summary,...f.mechanics,...f.attack,...f.counter])].join(' ');
+    const searchable=[entry.name,entry.role,...entry.forms.flatMap(f=>[f.name,...f.mechanics,...f.attack])].join(' ');
     if(query&&!searchable.toLocaleLowerCase().includes(query))return;
     if(i===0||i===7){const label=document.createElement('div');label.className='list-label';label.textContent=i===7?'周期 BOSS':'试验场小怪';list.append(label);}
     const button=document.createElement('button');button.className='enemy-link';button.dataset.kind=entry.kind;button.setAttribute('aria-current',String(i===entryIndex));
@@ -39,7 +39,7 @@ function renderEntry():void {
   const chosenMove=entry.moves?.find(m=>m.id===move)??entry.moves?.[0];
   if(chosenMove)move=chosenMove.id;
   $('entry-number').textContent=`NO. ${String(entryIndex+1).padStart(2,'0')}`;
-  $('entry-role').textContent=entry.role;$('enemy-name').textContent=form.name;$('enemy-summary').textContent=form.summary;
+  $('entry-role').textContent=entry.role;$('enemy-name').textContent=form.name;
   document.title=`${form.name} · 敌人图鉴`;
   const forms=$('forms');forms.replaceChildren();
   entry.forms.forEach((f,i)=>{const button=document.createElement('button');button.textContent=f.label;button.setAttribute('aria-pressed',String(i===formIndex));
@@ -47,8 +47,8 @@ function renderEntry():void {
   const moveNotes=chosenMove?[chosenMove.description,...(form.half&&chosenMove.halfDescription?[chosenMove.halfDescription]:[])]:[];
   const attacks=chosenMove?moveNotes:special?form.attack:[...form.attack,...form.mechanics];
   $('attack-section').hidden=combined;$('mechanic-section').hidden=!special;
-  document.querySelector('.notes')!.classList.toggle('two-columns',combined||!special);
-  for(const [id,paragraphs] of [['attack-notes',attacks],['mechanic-notes',combined?[...form.attack,...form.mechanics]:form.mechanics],['counter-notes',form.counter]] as const) {
+  document.querySelector('.notes')!.classList.toggle('single-column',combined||!special);
+  for(const [id,paragraphs] of [['attack-notes',attacks],['mechanic-notes',combined?[...form.attack,...form.mechanics]:form.mechanics]] as const) {
     $(id).replaceChildren(...paragraphs.map(text=>{const p=document.createElement('p');p.textContent=text;return p;}));
   }
   const spec=enemySpec(entry.kind,wave,growth);
@@ -61,11 +61,8 @@ function renderEntry():void {
     button.setAttribute('aria-pressed',String(demo==='attack'&&move===attack.id));
     button.onclick=()=>{move=attack.id;demo='attack';renderEntry();};return button;
   }));
-  $('move-description').textContent=demo==='movement'?'选择一项招式，查看完整预警、出手与恢复过程。':moveNotes.join(' ');
   $('mechanic-action').hidden=!form.action||demo!=='mechanic';$('mechanic-action').textContent=form.action??'';
   $('hit').hidden=$('freeze').hidden=demo==='movement';
-  $('stage-hint').textContent=demo==='movement'?'近看真实步态；切换形态可以比较腿部与漂浮动作。':
-    demo==='mechanic'?'自动演示关键机制；也可以用右侧按钮尝试命中和冻结。':'拖动法师演示靶，观察预警锁定和攻击范围。';
   document.querySelectorAll<HTMLButtonElement>('[data-demo]').forEach(button=>{button.hidden=!modes.includes(button.dataset.demo as DemoMode);button.setAttribute('aria-pressed',String(button.dataset.demo===demo));});
   scene.configure(selection());
 }

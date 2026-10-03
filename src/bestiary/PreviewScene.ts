@@ -208,12 +208,12 @@ export class PreviewScene extends Phaser.Scene {
     else if(this.system.special.counts.shields)label='护盾生效';
     else if(e?.attackTime||this.system.shots.count)label='攻击 / 弹丸飞行';
     else if(e?.cooldown)label='冷却 / 调整距离';
-    this.onPhase(this.manualPause?'已暂停 · '+label:label);
+    this.onPhase(this.manualPause?'已暂停':label);
   }
   private sleep():void {this.game.pause();this.game.loop.sleep();}
   pause(reason='手动'):void {
     this.pauseReasons.add(reason);this.manualPause=true;this.dragging=false;
-    if(this.ready)this.sleep();this.onPhase(reason==='手动'?'已暂停':'失焦暂停 · 点击继续');
+    if(this.ready)this.sleep();this.onPhase('已暂停');
   }
   resume():void {
     if(document.hidden)return;this.pauseReasons.clear();this.manualPause=false;
