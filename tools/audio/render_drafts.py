@@ -285,7 +285,66 @@ def ice(kind, seed=0):
     return room(fade(y,.002,.10), .28)
 
 
+LIGHTNING_VARIANTS = {
+    "cast": [("短弧", .22), ("连弧", .29), ("游弧", .34)],
+    "impact": [("电裂", .18), ("电灼", .25)],
+}
+
+
+def lightning_basic(kind, index):
+    """Noise-led, irregular electrical bursts with no pitched oscillator tail."""
+    _, seconds = LIGHTNING_VARIANTS[kind][index]
+    t = timeline(seconds)
+    rng = rng_for(f"lightning-v7-{kind}-{index}")
+    crack = noise(t, rng, 450, 4600, -.18)
+    static = noise(t, rng, 260, 3000, -.25)
+    body = noise(t, rng, 65, 1100, -.35)
+    y = np.zeros(len(t))
+
+    def burst(at, decay, gain, signal):
+        local = np.maximum(t-at, 0)
+        envelope = (t >= at) * (1-np.exp(-local/.0008)) * np.exp(-local/decay)
+        return gain * signal * envelope
+
+    if kind == "cast" and index == 0:
+        # One dry arc with two fading sparks, rather than a ringing note.
+        for at, decay, gain in ((.003,.013,.42),(.025,.008,.20),(.056,.010,.09)):
+            y += burst(at, decay, gain, crack)
+        y += burst(.003,.033,.12,body)
+    elif kind == "cast" and index == 1:
+        # Successive discharges make a broader, broken electrical zipper.
+        for at, decay, gain in ((.003,.010,.31),(.026,.012,.29),(.059,.014,.20),(.105,.012,.10)):
+            y += burst(at, decay, gain, crack)
+        y += burst(.008,.047,.12,static) + burst(.003,.044,.08,body)
+    elif kind == "cast":
+        # Softer moving static, punctuated by uneven, progressively quiet sparks.
+        y += burst(.003,.062,.19,static) + burst(.003,.043,.10,body)
+        for at, decay, gain in ((.010,.008,.20),(.038,.006,.18),(.063,.011,.16),(.104,.009,.12),(.146,.012,.07)):
+            y += burst(at, decay, gain, crack)
+    elif index == 0:
+        # Contact: a sharp electrical snap with a very short noisy body.
+        y += burst(.002,.008,.48,crack) + burst(.014,.010,.18,static)
+        y += burst(.002,.026,.17,body)
+    else:
+        # Contact: lower, muffled discharge followed by a little residual static.
+        y += burst(.002,.025,.30,static) + burst(.002,.045,.24,body)
+        for at, decay, gain in ((.032,.008,.13),(.069,.010,.09),(.113,.009,.05)):
+            y += burst(at, decay, gain, crack)
+    return fade(y, .001, .035)
+
+
+def render_lightning_variant(kind, index):
+    character, _ = LIGHTNING_VARIANTS[kind][index]
+    label = "普攻" if kind == "cast" else "命中"
+    save(f"lightning_{kind}_{index+1:02}", f"闪电 · {label} {index+1} / {character}",
+         "sfx", lightning_basic(kind, index), .50 if kind == "cast" else .40,
+         tags=["lightning", kind, "variant"])
+    REPORT[-1]["variant_character"] = character
+
+
 def lightning(kind, seed=0):
+    if kind in LIGHTNING_VARIANTS:
+        return lightning_basic(kind, seed)
     rng = rng_for(f"lightning-{kind}-{seed}")
     length = {"cast":.32,"impact":.33,"skill":.82,"ultimate":2.3,"discharge":.72}[kind]
     t = timeline(length)
@@ -336,11 +395,15 @@ def render_effects():
         for i in range(3):
             if school == "fire":
                 render_fire_variant("cast", i)
+            elif school == "lightning":
+                render_lightning_variant("cast", i)
             else:
                 save(f"{school}_cast_{i+1:02}",f"{label} · 普攻 {i+1}","sfx",make("cast",i),.50,tags=[school,"cast","variant"])
         for i in range(2):
             if school == "fire":
                 render_fire_variant("impact", i)
+            elif school == "lightning":
+                render_lightning_variant("impact", i)
             else:
                 save(f"{school}_impact_{i+1:02}",f"{label} · 命中 {i+1}","sfx",make("impact",i),.40,tags=[school,"impact","variant"])
         save(f"{school}_skill",f"{label} · E 技能","sfx",make("skill"),.72,tags=[school,"skill"])

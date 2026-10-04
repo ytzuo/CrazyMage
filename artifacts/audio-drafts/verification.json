@@ -12,8 +12,8 @@
     "theme_duration_seconds": 160,
     "theme_bars": 64,
     "theme_endpoints": "at most 2 PCM units from silence",
-    "original_master_checksums": "fire Q refinement: 37 other masters unchanged; fire_ultimate updated",
-    "sampler_seconds": 23.13,
+    "original_master_checksums": "lightning refinement: 33 other masters unchanged in this isolated commit; five lightning basic sounds updated",
+    "sampler_seconds": 22.88,
     "headers_and_frame_counts": "passed",
     "finite_non_silent_samples": "passed",
     "full_scale_clipping": "none",
@@ -30,10 +30,11 @@
       32
     ],
     "fire_comparison_seconds": 5.31,
-    "fire_pulse_preview_seconds": 1.88
+    "fire_pulse_preview_seconds": 1.88,
+    "lightning_comparison_seconds": 4.63,
+    "listening_page_audio_players": 42
   },
   "browser": {
-    "audio_players": 41,
     "music_and_sampler_playback": "confirmed via controls, decoded durations and playback state",
     "music_decoded_durations_seconds": [
       40,
@@ -75,6 +76,20 @@
       "stop_button_pauses_all": true,
       "audio_players": 41,
       "console_errors_and_warnings": 0
+    },
+    "lightning_refinement": {
+      "comparison_decoded_duration_seconds": 4.63,
+      "individual_decoded_durations_seconds": [
+        0.22,
+        0.29,
+        0.34,
+        0.18,
+        0.25
+      ],
+      "playback": "all six players triggered through native controls; comparison advanced; all five decoded without media errors",
+      "stop_button_pauses_all": true,
+      "console_errors_and_warnings": 0,
+      "check_context": "Shared working page included one unrelated player hurt preview; its combined page had 43 players."
     }
   },
   "preview_http": {

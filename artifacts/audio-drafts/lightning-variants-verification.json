@@ -1,0 +1,271 @@
+{
+  "scope": "Five offline lightning cast/impact variants; no game integration",
+  "reference_commit": "537826d",
+  "environment": "Bundled Python with NumPy; 44.1 kHz / 16-bit mono PCM WAV",
+  "design": "Noise-led irregular electric pulses; basic attacks/hits bypass the old pitched FM oscillator, pitch sweep and diffusion tail",
+  "measurements": {
+    "method": "10 largest FFT bins as a fraction of 400–3500 Hz power; same Hann-windowed 10–160 ms range, mean-channel PCM; spectral concentration, not subjective instrument likeness",
+    "assets": [
+      {
+        "id": "lightning_cast_01",
+        "before": {
+          "id": "lightning_cast_01",
+          "title": "闪电 · 普攻 1",
+          "group": "sfx",
+          "file": "sfx/lightning_cast_01.wav",
+          "duration": 0.32,
+          "sample_rate": 44100,
+          "channels": 2,
+          "bits": 16,
+          "peak_dbfs": -6.02,
+          "rms_dbfs": -25.09,
+          "clipped_samples": 0,
+          "loop": false,
+          "tags": [
+            "lightning",
+            "cast",
+            "variant"
+          ],
+          "sha256": "3a2b64c052daba7aa30b2ba9f869b2b32d69db4bc514f5438ce1c149573b7d88"
+        },
+        "after": {
+          "id": "lightning_cast_01",
+          "title": "闪电 · 普攻 1 / 短弧",
+          "group": "sfx",
+          "file": "sfx/lightning_cast_01.wav",
+          "duration": 0.22,
+          "sample_rate": 44100,
+          "channels": 1,
+          "bits": 16,
+          "peak_dbfs": -6.02,
+          "rms_dbfs": -26.08,
+          "clipped_samples": 0,
+          "loop": false,
+          "tags": [
+            "lightning",
+            "cast",
+            "variant"
+          ],
+          "sha256": "cc41dcc15ce80af476334b36f91de82f75aaa4af0904e97d15a4d9c2de9a5780",
+          "variant_character": "短弧"
+        },
+        "spectral_bin_concentration_before": 0.1491,
+        "spectral_bin_concentration_after": 0.1134
+      },
+      {
+        "id": "lightning_cast_02",
+        "before": {
+          "id": "lightning_cast_02",
+          "title": "闪电 · 普攻 2",
+          "group": "sfx",
+          "file": "sfx/lightning_cast_02.wav",
+          "duration": 0.32,
+          "sample_rate": 44100,
+          "channels": 2,
+          "bits": 16,
+          "peak_dbfs": -6.02,
+          "rms_dbfs": -26.7,
+          "clipped_samples": 0,
+          "loop": false,
+          "tags": [
+            "lightning",
+            "cast",
+            "variant"
+          ],
+          "sha256": "b032e3856c29b0e953846030cf4c3c36c8b9b6f0058436dba6323a6c9cacbffb"
+        },
+        "after": {
+          "id": "lightning_cast_02",
+          "title": "闪电 · 普攻 2 / 连弧",
+          "group": "sfx",
+          "file": "sfx/lightning_cast_02.wav",
+          "duration": 0.29,
+          "sample_rate": 44100,
+          "channels": 1,
+          "bits": 16,
+          "peak_dbfs": -6.02,
+          "rms_dbfs": -25.75,
+          "clipped_samples": 0,
+          "loop": false,
+          "tags": [
+            "lightning",
+            "cast",
+            "variant"
+          ],
+          "sha256": "df4b9c8583d50c150af1f8832e24988592620c8aeebfcf8fc8c5535d8c851c33",
+          "variant_character": "连弧"
+        },
+        "spectral_bin_concentration_before": 0.6307,
+        "spectral_bin_concentration_after": 0.1244
+      },
+      {
+        "id": "lightning_cast_03",
+        "before": {
+          "id": "lightning_cast_03",
+          "title": "闪电 · 普攻 3",
+          "group": "sfx",
+          "file": "sfx/lightning_cast_03.wav",
+          "duration": 0.32,
+          "sample_rate": 44100,
+          "channels": 2,
+          "bits": 16,
+          "peak_dbfs": -6.02,
+          "rms_dbfs": -25.63,
+          "clipped_samples": 0,
+          "loop": false,
+          "tags": [
+            "lightning",
+            "cast",
+            "variant"
+          ],
+          "sha256": "55809e24a71414eb90b06695e3ce6100dac40a1194ba673e1fcce742e50e93fb"
+        },
+        "after": {
+          "id": "lightning_cast_03",
+          "title": "闪电 · 普攻 3 / 游弧",
+          "group": "sfx",
+          "file": "sfx/lightning_cast_03.wav",
+          "duration": 0.34,
+          "sample_rate": 44100,
+          "channels": 1,
+          "bits": 16,
+          "peak_dbfs": -6.02,
+          "rms_dbfs": -25.24,
+          "clipped_samples": 0,
+          "loop": false,
+          "tags": [
+            "lightning",
+            "cast",
+            "variant"
+          ],
+          "sha256": "b9959623b8235c7c14e5c5f096d7f95822caeba328145d2e978609bd98471632",
+          "variant_character": "游弧"
+        },
+        "spectral_bin_concentration_before": 0.4575,
+        "spectral_bin_concentration_after": 0.1369
+      },
+      {
+        "id": "lightning_impact_01",
+        "before": {
+          "id": "lightning_impact_01",
+          "title": "闪电 · 命中 1",
+          "group": "sfx",
+          "file": "sfx/lightning_impact_01.wav",
+          "duration": 0.33,
+          "sample_rate": 44100,
+          "channels": 2,
+          "bits": 16,
+          "peak_dbfs": -7.96,
+          "rms_dbfs": -28.48,
+          "clipped_samples": 0,
+          "loop": false,
+          "tags": [
+            "lightning",
+            "impact",
+            "variant"
+          ],
+          "sha256": "84ed48ce66b5b74493303418b15b1192b17f544e9502258790f8d345a7617c72"
+        },
+        "after": {
+          "id": "lightning_impact_01",
+          "title": "闪电 · 命中 1 / 电裂",
+          "group": "sfx",
+          "file": "sfx/lightning_impact_01.wav",
+          "duration": 0.18,
+          "sample_rate": 44100,
+          "channels": 1,
+          "bits": 16,
+          "peak_dbfs": -7.96,
+          "rms_dbfs": -28.56,
+          "clipped_samples": 0,
+          "loop": false,
+          "tags": [
+            "lightning",
+            "impact",
+            "variant"
+          ],
+          "sha256": "150d4bbc1da4f77e680a73e12448d581dd117380d3b93ed23f394d5866f7328c",
+          "variant_character": "电裂"
+        },
+        "spectral_bin_concentration_before": 0.7289,
+        "spectral_bin_concentration_after": 0.3261
+      },
+      {
+        "id": "lightning_impact_02",
+        "before": {
+          "id": "lightning_impact_02",
+          "title": "闪电 · 命中 2",
+          "group": "sfx",
+          "file": "sfx/lightning_impact_02.wav",
+          "duration": 0.33,
+          "sample_rate": 44100,
+          "channels": 2,
+          "bits": 16,
+          "peak_dbfs": -7.96,
+          "rms_dbfs": -26.29,
+          "clipped_samples": 0,
+          "loop": false,
+          "tags": [
+            "lightning",
+            "impact",
+            "variant"
+          ],
+          "sha256": "190756515d6bcba3dd4b7a7635c14affae16bde340b327476361242861109e64"
+        },
+        "after": {
+          "id": "lightning_impact_02",
+          "title": "闪电 · 命中 2 / 电灼",
+          "group": "sfx",
+          "file": "sfx/lightning_impact_02.wav",
+          "duration": 0.25,
+          "sample_rate": 44100,
+          "channels": 1,
+          "bits": 16,
+          "peak_dbfs": -7.96,
+          "rms_dbfs": -26.24,
+          "clipped_samples": 0,
+          "loop": false,
+          "tags": [
+            "lightning",
+            "impact",
+            "variant"
+          ],
+          "sha256": "6af3f3681b905d585fe4cef75c665c651c4f6f28f31a1633d9643da4a7a34008",
+          "variant_character": "电灼"
+        },
+        "spectral_bin_concentration_before": 0.7791,
+        "spectral_bin_concentration_after": 0.1682
+      }
+    ]
+  },
+  "checks": {
+    "headers_frames_non_silent_endpoints": "passed",
+    "full_scale_clipping": "none",
+    "unique_master_checksums": 5,
+    "other_masters_matching_reference": 31,
+    "unrelated_in_progress_assets_excluded": [
+      "player_hurt_01",
+      "player_hurt_02"
+    ],
+    "fire_audition_reels_unchanged": true,
+    "comparison_exactly_matches_five_assets": true,
+    "comparison_seconds": 4.63
+  },
+  "limitations": [
+    "No reliable subjective listening review was performed.",
+    "Perceived electrical identity, loudness and comfort need user listening; no game mix or rapid repeated attacks were tested."
+  ],
+  "browser": {
+    "comparison_decoded_duration_seconds": 4.63,
+    "individual_decoded_durations_seconds": [
+      0.22,
+      0.29,
+      0.34,
+      0.18,
+      0.25
+    ],
+    "playback": "all six players triggered through native controls; comparison advanced; all five decoded without media errors",
+    "stop_button_pauses_all": true,
+    "console_errors_and_warnings": 0
+  }
+}

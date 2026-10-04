@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "title": "失控法师 · 原创合成音频小样",
   "method": "Deterministic offline NumPy synthesis; no third-party samples.",
   "integrated_into_game": false,
@@ -336,15 +336,15 @@
     },
     {
       "id": "lightning_cast_01",
-      "title": "闪电 · 普攻 1",
+      "title": "闪电 · 普攻 1 / 短弧",
       "group": "sfx",
       "file": "sfx/lightning_cast_01.wav",
-      "duration": 0.32,
+      "duration": 0.22,
       "sample_rate": 44100,
-      "channels": 2,
+      "channels": 1,
       "bits": 16,
       "peak_dbfs": -6.02,
-      "rms_dbfs": -25.09,
+      "rms_dbfs": -26.08,
       "clipped_samples": 0,
       "loop": false,
       "tags": [
@@ -352,19 +352,20 @@
         "cast",
         "variant"
       ],
-      "sha256": "3a2b64c052daba7aa30b2ba9f869b2b32d69db4bc514f5438ce1c149573b7d88"
+      "sha256": "cc41dcc15ce80af476334b36f91de82f75aaa4af0904e97d15a4d9c2de9a5780",
+      "variant_character": "短弧"
     },
     {
       "id": "lightning_cast_02",
-      "title": "闪电 · 普攻 2",
+      "title": "闪电 · 普攻 2 / 连弧",
       "group": "sfx",
       "file": "sfx/lightning_cast_02.wav",
-      "duration": 0.32,
+      "duration": 0.29,
       "sample_rate": 44100,
-      "channels": 2,
+      "channels": 1,
       "bits": 16,
       "peak_dbfs": -6.02,
-      "rms_dbfs": -26.7,
+      "rms_dbfs": -25.75,
       "clipped_samples": 0,
       "loop": false,
       "tags": [
@@ -372,19 +373,20 @@
         "cast",
         "variant"
       ],
-      "sha256": "b032e3856c29b0e953846030cf4c3c36c8b9b6f0058436dba6323a6c9cacbffb"
+      "sha256": "df4b9c8583d50c150af1f8832e24988592620c8aeebfcf8fc8c5535d8c851c33",
+      "variant_character": "连弧"
     },
     {
       "id": "lightning_cast_03",
-      "title": "闪电 · 普攻 3",
+      "title": "闪电 · 普攻 3 / 游弧",
       "group": "sfx",
       "file": "sfx/lightning_cast_03.wav",
-      "duration": 0.32,
+      "duration": 0.34,
       "sample_rate": 44100,
-      "channels": 2,
+      "channels": 1,
       "bits": 16,
       "peak_dbfs": -6.02,
-      "rms_dbfs": -25.63,
+      "rms_dbfs": -25.24,
       "clipped_samples": 0,
       "loop": false,
       "tags": [
@@ -392,19 +394,20 @@
         "cast",
         "variant"
       ],
-      "sha256": "55809e24a71414eb90b06695e3ce6100dac40a1194ba673e1fcce742e50e93fb"
+      "sha256": "b9959623b8235c7c14e5c5f096d7f95822caeba328145d2e978609bd98471632",
+      "variant_character": "游弧"
     },
     {
       "id": "lightning_impact_01",
-      "title": "闪电 · 命中 1",
+      "title": "闪电 · 命中 1 / 电裂",
       "group": "sfx",
       "file": "sfx/lightning_impact_01.wav",
-      "duration": 0.33,
+      "duration": 0.18,
       "sample_rate": 44100,
-      "channels": 2,
+      "channels": 1,
       "bits": 16,
       "peak_dbfs": -7.96,
-      "rms_dbfs": -28.48,
+      "rms_dbfs": -28.56,
       "clipped_samples": 0,
       "loop": false,
       "tags": [
@@ -412,19 +415,20 @@
         "impact",
         "variant"
       ],
-      "sha256": "84ed48ce66b5b74493303418b15b1192b17f544e9502258790f8d345a7617c72"
+      "sha256": "150d4bbc1da4f77e680a73e12448d581dd117380d3b93ed23f394d5866f7328c",
+      "variant_character": "电裂"
     },
     {
       "id": "lightning_impact_02",
-      "title": "闪电 · 命中 2",
+      "title": "闪电 · 命中 2 / 电灼",
       "group": "sfx",
       "file": "sfx/lightning_impact_02.wav",
-      "duration": 0.33,
+      "duration": 0.25,
       "sample_rate": 44100,
-      "channels": 2,
+      "channels": 1,
       "bits": 16,
       "peak_dbfs": -7.96,
-      "rms_dbfs": -26.29,
+      "rms_dbfs": -26.24,
       "clipped_samples": 0,
       "loop": false,
       "tags": [
@@ -432,7 +436,8 @@
         "impact",
         "variant"
       ],
-      "sha256": "190756515d6bcba3dd4b7a7635c14affae16bde340b327476361242861109e64"
+      "sha256": "6af3f3681b905d585fe4cef75c665c651c4f6f28f31a1633d9643da4a7a34008",
+      "variant_character": "电灼"
     },
     {
       "id": "lightning_skill",
@@ -810,7 +815,7 @@
   ],
   "sampler": {
     "file": "sfx_sampler.wav",
-    "duration": 23.13,
+    "duration": 22.88,
     "order": [
       "fire_cast_01",
       "fire_impact_01",
@@ -862,5 +867,17 @@
       0.75,
       1.2
     ]
+  },
+  "lightning_comparison": {
+    "file": "lightning_variants_comparison.wav",
+    "duration": 4.63,
+    "order": [
+      "lightning_cast_01",
+      "lightning_cast_02",
+      "lightning_cast_03",
+      "lightning_impact_01",
+      "lightning_impact_02"
+    ],
+    "gap_seconds": 0.6
   }
 }
