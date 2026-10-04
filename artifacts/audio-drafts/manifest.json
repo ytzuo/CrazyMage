@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "title": "失控法师 · 原创合成音频小样",
   "method": "Deterministic offline NumPy synthesis; no third-party samples.",
   "integrated_into_game": false,
@@ -14,15 +14,15 @@
   "assets": [
     {
       "id": "fire_cast_01",
-      "title": "火焰 · 普攻 1",
+      "title": "火焰 · 普攻 1 / 短喷",
       "group": "sfx",
       "file": "sfx/fire_cast_01.wav",
-      "duration": 0.48,
+      "duration": 0.32,
       "sample_rate": 44100,
       "channels": 1,
       "bits": 16,
       "peak_dbfs": -6.02,
-      "rms_dbfs": -21.41,
+      "rms_dbfs": -22.94,
       "clipped_samples": 0,
       "loop": false,
       "tags": [
@@ -30,19 +30,20 @@
         "cast",
         "variant"
       ],
-      "sha256": "e2d0753955d16328357c3cba669fae7d2737d66d765530b6f27e74f421c3035e"
+      "sha256": "4815502f21fb787d09f6106d4ccdd9d633c7dcd3b8602935f28b5109f3262c6f",
+      "variant_character": "短喷"
     },
     {
       "id": "fire_cast_02",
-      "title": "火焰 · 普攻 2",
+      "title": "火焰 · 普攻 2 / 卷焰",
       "group": "sfx",
       "file": "sfx/fire_cast_02.wav",
-      "duration": 0.48,
+      "duration": 0.46,
       "sample_rate": 44100,
       "channels": 1,
       "bits": 16,
       "peak_dbfs": -6.02,
-      "rms_dbfs": -22.66,
+      "rms_dbfs": -21.84,
       "clipped_samples": 0,
       "loop": false,
       "tags": [
@@ -50,19 +51,20 @@
         "cast",
         "variant"
       ],
-      "sha256": "88bade34b90e21a2bb8d4c98dfa2bfef39c4e5b29cce7ecb9f8b4a3eb41525c0"
+      "sha256": "9fc0eeee53797b565c0b7e9b03b1460d89c89f974e06af4a8c1b6d1356c2dcc9",
+      "variant_character": "卷焰"
     },
     {
       "id": "fire_cast_03",
-      "title": "火焰 · 普攻 3",
+      "title": "火焰 · 普攻 3 / 余烬",
       "group": "sfx",
       "file": "sfx/fire_cast_03.wav",
-      "duration": 0.48,
+      "duration": 0.52,
       "sample_rate": 44100,
       "channels": 1,
       "bits": 16,
       "peak_dbfs": -6.02,
-      "rms_dbfs": -22.33,
+      "rms_dbfs": -23.43,
       "clipped_samples": 0,
       "loop": false,
       "tags": [
@@ -70,19 +72,20 @@
         "cast",
         "variant"
       ],
-      "sha256": "cdf0551fa1a7a6d8651b5748cda40eb8503b46f84a691418078aa4911763ecf9"
+      "sha256": "d52d1b7f5bf85ca4e64656a1c2df05e2edece94b2dae486f44ece047c22a9989",
+      "variant_character": "余烬"
     },
     {
       "id": "fire_impact_01",
-      "title": "火焰 · 命中 1",
+      "title": "火焰 · 命中 1 / 脆裂",
       "group": "sfx",
       "file": "sfx/fire_impact_01.wav",
-      "duration": 0.46,
+      "duration": 0.24,
       "sample_rate": 44100,
       "channels": 1,
       "bits": 16,
       "peak_dbfs": -7.96,
-      "rms_dbfs": -22.28,
+      "rms_dbfs": -28.51,
       "clipped_samples": 0,
       "loop": false,
       "tags": [
@@ -90,19 +93,20 @@
         "impact",
         "variant"
       ],
-      "sha256": "70b4ef92295a5bdadc1e80f47167d498ee31d244e76354814ddd196492ed185e"
+      "sha256": "35b00091351cffbdbb86f86ac814187037cf0a536508dd86972289dea3ee9774",
+      "variant_character": "脆裂"
     },
     {
       "id": "fire_impact_02",
-      "title": "火焰 · 命中 2",
+      "title": "火焰 · 命中 2 / 闷爆",
       "group": "sfx",
       "file": "sfx/fire_impact_02.wav",
-      "duration": 0.46,
+      "duration": 0.42,
       "sample_rate": 44100,
       "channels": 1,
       "bits": 16,
       "peak_dbfs": -7.96,
-      "rms_dbfs": -23.32,
+      "rms_dbfs": -21.47,
       "clipped_samples": 0,
       "loop": false,
       "tags": [
@@ -110,7 +114,8 @@
         "impact",
         "variant"
       ],
-      "sha256": "9403c91659fdd2827854361bf92c87505716e91c538985c8f814e6e8f5582c85"
+      "sha256": "cf01a4e705a9ccdd0e7fbafac506ecce084a969200bb5827233c58ad8eb6647f",
+      "variant_character": "闷爆"
     },
     {
       "id": "fire_skill",
@@ -804,7 +809,7 @@
   ],
   "sampler": {
     "file": "sfx_sampler.wav",
-    "duration": 25.23,
+    "duration": 24.85,
     "order": [
       "fire_cast_01",
       "fire_impact_01",
@@ -833,5 +838,17 @@
     "sfx_endpoints": true,
     "loop_length_and_endpoints": true,
     "theme_length_and_endpoints": true
+  },
+  "fire_comparison": {
+    "file": "fire_variants_comparison.wav",
+    "duration": 5.31,
+    "order": [
+      "fire_cast_01",
+      "fire_cast_02",
+      "fire_cast_03",
+      "fire_impact_01",
+      "fire_impact_02"
+    ],
+    "gap_seconds": 0.6
   }
 }

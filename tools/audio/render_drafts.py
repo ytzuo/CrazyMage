@@ -138,22 +138,77 @@ def save(name, title, group, y, peak=.65, loop=False, tags=None):
     print(f"Rendered {name}: {record['duration']} s", flush=True)
 
 
+FIRE_VARIANTS = {
+    "cast": [("短喷", .32), ("卷焰", .46), ("余烬", .52)],
+    "impact": [("脆裂", .24), ("闷爆", .42)],
+}
+
+
+def fire_basic(kind, index):
+    """Distinct timbres and envelopes, retaining one common fire palette."""
+    _, seconds = FIRE_VARIANTS[kind][index]
+    t = timeline(seconds)
+    rng = rng_for(f"fire-v3-{kind}-{index}")
+    if kind == "cast" and index == 0:
+        # Fast nozzle burst: bright air, a short body, almost no lingering flame.
+        flame = noise(t, rng, 180, 4500, -.22)
+        grit = noise(t, rng, 900, 7200)
+        env = (1 - np.exp(-t / .004)) * np.exp(-t / .046)
+        y = .34 * flame * env + .085 * grit * np.exp(-t / .015)
+        y += .18 * sweep(t, 260, 115, .022) * np.exp(-t / .07)
+    elif kind == "cast" and index == 1:
+        # Broader rising whoosh: low flame rolls into a small midrange flare.
+        flame = noise(t, rng, 80, 2300, -.45)
+        flare = noise(t, rng, 400, 3800, -.1)
+        env = (1 - np.exp(-t / .035)) * np.exp(-t / .09)
+        y = .44 * flame * env * (1 + .13 * np.sin(TAU * 19 * t))
+        y += .11 * flare * np.exp(-((t - .16) / .029) ** 2)
+        y += .085 * sweep(t, 140, 78, .08) * env
+    elif kind == "cast":
+        # A round puff, then a clearly separated, quiet crackling ember tail.
+        flame = noise(t, rng, 160, 3400, -.3)
+        grit = noise(t, rng, 1500, 7400)
+        y = .24 * flame * (1 - np.exp(-t / .010)) * np.exp(-t / .059)
+        y += .24 * sweep(t, 190, 80, .03) * np.exp(-t / .065)
+        y += .055 * flame * np.exp(-t / .14)
+        for at, width, gain in ((.115,.004,.085),(.183,.003,.066),(.257,.005,.050),(.34,.004,.030)):
+            y += gain * grit * np.exp(-((t - at) / width) ** 2)
+    elif index == 0:
+        # Dry brittle contact, with little low end and a very short decay.
+        crack = noise(t, rng, 700, 6800)
+        crunch = noise(t, rng, 500, 3400)
+        y = .38 * crack * np.exp(-t / .013)
+        y += .15 * crunch * np.exp(-t / .032)
+        y += .16 * sweep(t, 200, 72, .018) * np.exp(-t / .045)
+    else:
+        # Low, rounded combustion impact: thump followed by a muffled flame tail.
+        flame = noise(t, rng, 40, 1600, -.45)
+        grit = noise(t, rng, 900, 4500)
+        y = .48 * sweep(t, 135, 43, .025) * np.exp(-t / .09)
+        y += .20 * flame * np.exp(-t / .10)
+        y += .03 * grit * np.exp(-((t - .075) / .016) ** 2)
+        y += .12 * sweep(t, 70, 50, .08) * np.exp(-t / .10)
+    return fade(y, .002, .045)
+
+
+def render_fire_variant(kind, index):
+    character, _ = FIRE_VARIANTS[kind][index]
+    label = "普攻" if kind == "cast" else "命中"
+    save(f"fire_{kind}_{index+1:02}", f"火焰 · {label} {index+1} / {character}",
+         "sfx", fire_basic(kind, index), .50 if kind == "cast" else .40,
+         tags=["fire", kind, "variant"])
+    REPORT[-1]["variant_character"] = character
+
+
 def fire(kind, seed=0):
+    if kind in FIRE_VARIANTS:
+        return fire_basic(kind, seed)
     rng = rng_for(f"fire-{kind}-{seed}")
     length = {"cast":.48,"impact":.46,"skill":1.05,"ultimate":2.1,"embers":1.5}[kind]
     t = timeline(length)
-    variant = 1 + (seed - 1) * .045
     breath = noise(t, rng, 70, 3900, -.3)
     grit = noise(t, rng, 500, 6200)
-    if kind == "cast":
-        y = .40 * breath * (1-np.exp(-t/.015)) * np.exp(-t/.10)
-        y += .25 * sweep(t, 370*variant, 105, .065) * np.exp(-t/.105)
-        y += .08 * grit * np.exp(-((t-.055)/.018)**2)
-    elif kind == "impact":
-        y = .30 * breath * np.exp(-t/.11)
-        y += .42 * sweep(t, 165*variant, 50, .024) * np.exp(-t/.13)
-        y += .08 * grit * np.exp(-t/.032)
-    elif kind == "skill":
+    if kind == "skill":
         y = .4 * breath * np.exp(-t/.21) + .10 * grit * np.exp(-t/.075)
         y += .50 * sweep(t, 195, 43, .034) * np.exp(-t/.25)
         y += .11 * sweep(t, 600, 90, .14) * np.exp(-t/.19)
@@ -262,9 +317,15 @@ def render_effects():
     schools = {"fire":(fire,"火焰"),"ice":(ice,"冰霜"),"lightning":(lightning,"闪电")}
     for school,(make,label) in schools.items():
         for i in range(3):
-            save(f"{school}_cast_{i+1:02}",f"{label} · 普攻 {i+1}","sfx",make("cast",i),.50,tags=[school,"cast","variant"])
+            if school == "fire":
+                render_fire_variant("cast", i)
+            else:
+                save(f"{school}_cast_{i+1:02}",f"{label} · 普攻 {i+1}","sfx",make("cast",i),.50,tags=[school,"cast","variant"])
         for i in range(2):
-            save(f"{school}_impact_{i+1:02}",f"{label} · 命中 {i+1}","sfx",make("impact",i),.40,tags=[school,"impact","variant"])
+            if school == "fire":
+                render_fire_variant("impact", i)
+            else:
+                save(f"{school}_impact_{i+1:02}",f"{label} · 命中 {i+1}","sfx",make("impact",i),.40,tags=[school,"impact","variant"])
         save(f"{school}_skill",f"{label} · E 技能","sfx",make("skill"),.72,tags=[school,"skill"])
         save(f"{school}_ultimate",f"{label} · Q 大招概念","sfx",make("ultimate"),.78,tags=[school,"ultimate","concept"])
         special = {"fire":("embers","余烬"),"ice":("shatter","碎冰处决"),"lightning":("discharge","蓄雷放电")}[school]

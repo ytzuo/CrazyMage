@@ -12,30 +12,61 @@
     "theme_duration_seconds": 160,
     "theme_bars": 64,
     "theme_endpoints": "at most 2 PCM units from silence",
-    "original_master_checksums": "all 37 existing assets unchanged",
-    "sampler_seconds": 25.23,
+    "original_master_checksums": "fire refinement: 33 other masters unchanged; five fire cast/impact masters updated",
+    "sampler_seconds": 24.85,
     "headers_and_frame_counts": "passed",
     "finite_non_silent_samples": "passed",
     "full_scale_clipping": "none",
     "sound_effect_endpoints": "at most 2 PCM units from silence",
     "music_loop_endpoints": "at most 1 PCM unit apart",
-    "music_duration_seconds": [40, 80, 80],
-    "music_bars": [16, 32, 32]
+    "music_duration_seconds": [
+      40,
+      80,
+      80
+    ],
+    "music_bars": [
+      16,
+      32,
+      32
+    ],
+    "fire_comparison_seconds": 5.31
   },
   "browser": {
-    "audio_players": 39,
+    "audio_players": 40,
     "music_and_sampler_playback": "confirmed via controls, decoded durations and playback state",
-    "music_decoded_durations_seconds": [40, 80, 80],
-    "sampler_decoded_duration_seconds": 25.23,
+    "music_decoded_durations_seconds": [
+      40,
+      80,
+      80
+    ],
+    "sampler_decoded_duration_seconds": 24.85,
     "switching_pauses_previous_audio": "passed",
     "stop_button_pauses_all": "passed",
     "scene_music_loop_enabled_initially": true,
     "theme_loop_enabled_initially": false,
     "theme_decoded_duration_seconds": 160,
     "theme_seekable_end_seconds": 160,
-    "theme_chapter_jumps_seconds": [120, 150],
+    "theme_chapter_jumps_seconds": [
+      120,
+      150
+    ],
     "theme_chapter_jumps": "confirmed via actual playback position",
-    "console_errors_and_warnings_during_check": 0
+    "console_errors_and_warnings_during_check": 0,
+    "fire_refinement": {
+      "comparison_decoded_duration_seconds": 5.31,
+      "comparison_playback": "confirmed via active playback position",
+      "individual_decoded_durations_seconds": [
+        0.32,
+        0.46,
+        0.52,
+        0.24,
+        0.42
+      ],
+      "individual_playback": "all five triggered through native controls; durations decoded",
+      "switching_pauses_previous_audio": true,
+      "stop_button_pauses_all": true,
+      "console_errors_and_warnings": 0
+    }
   },
   "preview_http": {
     "loopback_only": true,
