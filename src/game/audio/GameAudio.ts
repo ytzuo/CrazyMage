@@ -15,12 +15,15 @@ export class GameAudio {
   private homeMusic: HTMLAudioElement | null = null;
   private homeMusicUrl = '';
   private homeMusicActive = false;
+  private battleMusic: HTMLAudioElement | null = null;
+  private battleMusicUrl = '';
+  private battleMusicActive = false;
   private listeners = new AbortController();
   private disposed = false;
   private paused = true;
   private muted = false;
   readonly ready: Promise<void>;
-  constructor(urls: Record<string, string>, homeMusicUrl?: string) {
+  constructor(urls: Record<string, string>, homeMusicUrl?: string, battleMusicUrl?: string) {
     try {
       this.muted = localStorage.getItem('mage-sfx-muted') === 'true';
     } catch { /* Private browsing may disallow storage. */ }
@@ -38,15 +41,24 @@ export class GameAudio {
       this.homeMusic.muted = this.muted;
       this.homeMusic.loop = false;
     }
+    if (battleMusicUrl) {
+      this.battleMusic = new Audio();
+      this.battleMusic.preload = 'none';
+      this.battleMusicUrl = battleMusicUrl;
+      this.battleMusic.volume = 0.07;
+      this.battleMusic.muted = this.muted;
+      this.battleMusic.loop = true;
+    }
     const signal = this.listeners.signal;
     const unlock = () => {
       if (this.context?.state === 'suspended') void this.context.resume().catch(() => {});
       this.startHomeMusic();
+      this.startBattleMusic();
     };
     window.addEventListener('pointerdown', unlock, { signal, capture: true });
     window.addEventListener('keydown', unlock, { signal, capture: true });
-    window.addEventListener('blur', () => { this.stop(); this.pauseHomeMusic(false); }, { signal });
-    document.addEventListener('visibilitychange', () => { if (document.hidden) { this.stop(); this.pauseHomeMusic(false); } }, { signal });
+    window.addEventListener('blur', () => { this.stop(); this.pauseHomeMusic(false); this.pauseBattleMusic(false); }, { signal });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) { this.stop(); this.pauseHomeMusic(false); this.pauseBattleMusic(false); } }, { signal });
     this.ready = this.load(urls);
   }
   private async load(urls: Record<string, string>): Promise<void> {
@@ -62,17 +74,19 @@ export class GameAudio {
     }));
   }
   get isMuted(): boolean { return this.muted; }
-  get status() { return { loaded: this.buffers.size, active: this.voices.size, state: this.context?.state ?? 'unavailable', muted: this.muted, paused: this.paused, homeMusicActive: this.homeMusicActive, homeMusicPlaying: this.homeMusic ? !this.homeMusic.paused : false }; }
+  get status() { return { loaded: this.buffers.size, active: this.voices.size, state: this.context?.state ?? 'unavailable', muted: this.muted, paused: this.paused, homeMusicActive: this.homeMusicActive, homeMusicPlaying: this.homeMusic ? !this.homeMusic.paused : false, battleMusicActive: this.battleMusicActive, battleMusicPlaying: this.battleMusic ? !this.battleMusic.paused : false }; }
   toggleMute(): boolean {
     this.muted = !this.muted;
     if (this.master) this.master.gain.value = this.muted ? 0 : 0.65;
     if (this.homeMusic) this.homeMusic.muted = this.muted;
-    if (this.muted) { this.stop(); this.pauseHomeMusic(false); }
-    else this.startHomeMusic();
+    if (this.battleMusic) this.battleMusic.muted = this.muted;
+    if (this.muted) { this.stop(); this.pauseHomeMusic(false); this.pauseBattleMusic(false); }
+    else { this.startHomeMusic(); this.startBattleMusic(); }
     try { localStorage.setItem('mage-sfx-muted', String(this.muted)); } catch { /* Optional persistence. */ }
     return this.muted;
   }
   setHomeMusic(active: boolean): void {
+    if (active) this.setBattleMusic(false);
     this.homeMusicActive = active;
     if (active) this.startHomeMusic();
     else this.pauseHomeMusic(true);
@@ -90,7 +104,28 @@ export class GameAudio {
     music.pause();
     if (reset) music.currentTime = 0;
   }
-  setPaused(paused: boolean): void { this.paused = paused; if (paused) this.stop(true); }
+  setBattleMusic(active: boolean): void {
+    this.battleMusicActive = active;
+    if (active) { this.setHomeMusic(false); this.startBattleMusic(); }
+    else this.pauseBattleMusic(true);
+  }
+  private startBattleMusic(): void {
+    const music = this.battleMusic;
+    if (!music || !this.battleMusicActive || this.paused || this.muted || this.disposed || document.hidden || !music.paused) return;
+    if (!music.src && !navigator.userActivation?.isActive && this.context?.state !== 'running') return;
+    if (!music.src) music.src = this.battleMusicUrl;
+    void music.play().catch(() => { /* Retry on a later gesture; never block combat. */ });
+  }
+  private pauseBattleMusic(reset: boolean): void {
+    if (!this.battleMusic) return;
+    this.battleMusic.pause();
+    if (reset) this.battleMusic.currentTime = 0;
+  }
+  setPaused(paused: boolean): void {
+    this.paused = paused;
+    if (paused) { this.stop(true); this.pauseBattleMusic(false); }
+    else this.startBattleMusic();
+  }
   play(id: string, options: CueOptions = {}): boolean {
     const context = this.context, buffer = this.buffers.get(id), combat = options.combat ?? true;
     if (!context || !this.master || !buffer || this.disposed || this.muted || document.hidden || context.state !== 'running' || (combat && this.paused)) return false;
@@ -131,13 +166,15 @@ export class GameAudio {
     voice.source.onended = null; voice.source.stop(); voice.source.disconnect(); voice.gain.disconnect();
   }
   stop(combatOnly = false): void { for (const voice of this.voices) if (!combatOnly || voice.combat) this.release(voice); }
-  reset(): void { this.stop(); this.last.clear(); this.variants.clear(); }
+  reset(): void { this.stop(); this.last.clear(); this.variants.clear(); this.setBattleMusic(false); }
   destroy(): void {
     if (this.disposed) return;
     this.disposed = true; this.listeners.abort(); this.reset(); this.buffers.clear();
     this.homeMusicActive = false; this.pauseHomeMusic(true);
     if (this.homeMusic) { this.homeMusic.removeAttribute('src'); this.homeMusic.load(); this.homeMusic = null; }
     this.homeMusicUrl = '';
+    if (this.battleMusic) { this.battleMusic.removeAttribute('src'); this.battleMusic.load(); this.battleMusic = null; }
+    this.battleMusicUrl = '';
     this.master?.disconnect(); if (this.context) void this.context.close().catch(() => {});
   }
 }

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { GameAudio, attachAudio, detachAudio } from '../src/game/audio/GameAudio';
-import { soundUrls, themeUrl } from '../src/game/audio/assets';
+import { soundUrls, themeUrl, battleMusicUrl } from '../src/game/audio/assets';
 import { Player } from '../src/game/entities/Player';
 import { EnemySystem } from '../src/game/enemies/EnemySystem';
 import { SchoolSkill } from '../src/game/spells/SchoolSkill';
@@ -9,7 +9,7 @@ import { SCHOOLS } from '../src/game/upgrades/definitions';
 const output=document.querySelector<HTMLPreElement>('#result')!;
 const check=(value:unknown,message:string)=>{if(!value)throw Error(message);};
 const wait=(ms:number)=>new Promise(resolve=>setTimeout(resolve,ms));
-const audio=new GameAudio(soundUrls,themeUrl);
+const audio=new GameAudio(soundUrls,themeUrl,battleMusicUrl);
 const calls:{id:string;time:number}[]=[];
 const original=audio.play.bind(audio);
 audio.play=(id,options)=>{calls.push({id,time:performance.now()});return original(id,options);};
@@ -28,6 +28,26 @@ async function run(stress:boolean){
     check(audio.status.homeMusicActive&&audio.status.homeMusicPlaying,'Home theme did not start after user gesture');
     audio.setHomeMusic(false);
     check(!audio.status.homeMusicActive&&!audio.status.homeMusicPlaying,'Home theme did not stop for combat');
+    audio.setBattleMusic(true);
+    const musicDeadline=performance.now()+10000;
+    while(!audio.status.battleMusicPlaying&&performance.now()<musicDeadline)await wait(50);
+    check(audio.status.battleMusicPlaying,'Battle music did not start');
+    audio.setPaused(true);
+    check(!audio.status.battleMusicPlaying,'Paused battle music still playing');
+    audio.toggleMute();audio.toggleMute();
+    check(!audio.status.battleMusicPlaying,'Unmute bypassed pause');
+    audio.setPaused(false);
+    check(audio.status.battleMusicPlaying,'Battle music did not resume');
+    audio.toggleMute();
+    check(!audio.status.battleMusicPlaying,'Muted battle music still playing');
+    audio.toggleMute();
+    check(audio.status.battleMusicPlaying,'Unmute did not resume battle music');
+    audio.setHomeMusic(true);
+    check(!audio.status.battleMusicActive&&!audio.status.battleMusicPlaying,'Home did not stop battle music');
+    audio.setBattleMusic(true);
+    check(!audio.status.homeMusicPlaying,'Battle overlaps home theme');
+    audio.reset();
+    check(!audio.status.battleMusicActive&&!audio.status.battleMusicPlaying,'Reset leaked battle music');
     check(audio.play('fire_cast_01'),'Unable to start source');
     check(!audio.play('fire_cast_01'),'Identical cue not throttled');
     for(let i=0;i<100;i++)audio.play('ice_impact_01',{gap:0});
@@ -39,7 +59,7 @@ async function run(stress:boolean){
     check(audio.play('wave_clear',{combat:false}),'UI sound blocked while paused');
     audio.toggleMute();check(audio.status.active===0&&!audio.play('ui_select',{combat:false}),'Mute failed');audio.toggleMute();
     audio.reset();audio.setPaused(false);
-    const reports:string[]=['36 decoded; real gesture unlock; home theme start/stop; 8/12 voice caps; throttling; paused combat/UI separation; mute'];
+    const reports:string[]=['36 decoded; real gesture unlock; home/battle transition; battle pause/resume/mute/reset; 8/12 voice caps; throttling; paused combat/UI separation; mute'];
     game?.destroy(true);
     await new Promise<void>((resolve,reject)=>{
       class Checks extends Phaser.Scene {

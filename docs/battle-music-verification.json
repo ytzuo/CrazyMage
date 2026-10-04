@@ -1,0 +1,110 @@
+{
+  "passed": true,
+  "environment": "macOS; headless Chrome 154.0.8037.93; Vite dev; 1280x720",
+  "initial": [
+    {
+      "paused": true,
+      "time": 0,
+      "volume": 0.16,
+      "loop": false,
+      "src": null,
+      "preload": "none"
+    },
+    {
+      "paused": true,
+      "time": 0,
+      "volume": 0.07,
+      "loop": true,
+      "src": null,
+      "preload": "none"
+    }
+  ],
+  "playing": [
+    {
+      "paused": true,
+      "time": 0,
+      "volume": 0.16,
+      "loop": false,
+      "src": "/artifacts/audio-drafts/music/unstable_mage_theme.wav",
+      "preload": "none"
+    },
+    {
+      "paused": false,
+      "time": 0.115542,
+      "volume": 0.07,
+      "loop": true,
+      "src": "/artifacts/audio-drafts/music/battle_loop.wav",
+      "preload": "none"
+    }
+  ],
+  "paused": [
+    {
+      "paused": true,
+      "time": 0,
+      "volume": 0.16,
+      "loop": false,
+      "src": "/artifacts/audio-drafts/music/unstable_mage_theme.wav",
+      "preload": "none"
+    },
+    {
+      "paused": true,
+      "time": 0.143678,
+      "volume": 0.07,
+      "loop": true,
+      "src": "/artifacts/audio-drafts/music/battle_loop.wav",
+      "preload": "none"
+    }
+  ],
+  "loop": [
+    {
+      "paused": true,
+      "time": 0,
+      "volume": 0.16,
+      "loop": false,
+      "src": "/artifacts/audio-drafts/music/unstable_mage_theme.wav",
+      "preload": "none"
+    },
+    {
+      "paused": false,
+      "time": 0,
+      "volume": 0.07,
+      "loop": true,
+      "src": "/artifacts/audio-drafts/music/battle_loop.wav",
+      "preload": "none"
+    }
+  ],
+  "returned": [
+    {
+      "paused": false,
+      "time": 0,
+      "volume": 0.16,
+      "loop": false,
+      "src": "/artifacts/audio-drafts/music/unstable_mage_theme.wav",
+      "preload": "none"
+    },
+    {
+      "paused": true,
+      "time": 0,
+      "volume": 0.07,
+      "loop": true,
+      "src": "/artifacts/audio-drafts/music/battle_loop.wav",
+      "preload": "none"
+    }
+  ],
+  "mediaElementCount": 2,
+  "mediaRequests": 6,
+  "checks": [
+    "direct start",
+    "7% volume",
+    "home/battle mutual exclusion",
+    "pause/resume position",
+    "mute while paused",
+    "blur requires explicit resume",
+    "actual loop rollover after seek",
+    "three restarts reuse two media elements"
+  ],
+  "errors": [],
+  "limitations": [
+    "No subjective listening, mobile hardware or full-run performance measurement."
+  ]
+}
