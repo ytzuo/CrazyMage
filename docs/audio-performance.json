@@ -1,0 +1,169 @@
+{
+  "environment": "macOS, Codex IAB, warm Vite dev, 1280x720 iframe, DPR 2, 120 frames per row; rounded to 0.1ms ready; synthetic iframe input may leave audio suspended",
+  "before": [
+    {
+      "mode": "startup",
+      "readyMs": 252.9,
+      "meanRenderMs": 0.21,
+      "meanFrameMs": 8.31,
+      "p95FrameMs": 9.2,
+      "first20RenderMs": 0.31,
+      "trial": 1
+    },
+    {
+      "mode": "movement",
+      "readyMs": 147.4,
+      "meanRenderMs": 0.19,
+      "meanFrameMs": 8.21,
+      "p95FrameMs": 9.2,
+      "first20RenderMs": 0.22,
+      "trial": 1
+    },
+    {
+      "mode": "attack",
+      "readyMs": 128.1,
+      "meanRenderMs": 0.17,
+      "meanFrameMs": 8.19,
+      "p95FrameMs": 9,
+      "first20RenderMs": 0.21,
+      "trial": 1
+    },
+    {
+      "mode": "startup",
+      "readyMs": 137.3,
+      "meanRenderMs": 0.25,
+      "meanFrameMs": 8.21,
+      "p95FrameMs": 9.3,
+      "first20RenderMs": 0.25,
+      "trial": 2
+    },
+    {
+      "mode": "movement",
+      "readyMs": 144.7,
+      "meanRenderMs": 0.23,
+      "meanFrameMs": 8.18,
+      "p95FrameMs": 9.3,
+      "first20RenderMs": 0.18,
+      "trial": 2
+    },
+    {
+      "mode": "attack",
+      "readyMs": 144.1,
+      "meanRenderMs": 0.22,
+      "meanFrameMs": 8.2,
+      "p95FrameMs": 9.1,
+      "first20RenderMs": 0.2,
+      "trial": 2
+    },
+    {
+      "mode": "startup",
+      "readyMs": 136.7,
+      "meanRenderMs": 0.24,
+      "meanFrameMs": 8.21,
+      "p95FrameMs": 9.3,
+      "first20RenderMs": 0.21,
+      "trial": 3
+    },
+    {
+      "mode": "movement",
+      "readyMs": 138.7,
+      "meanRenderMs": 0.22,
+      "meanFrameMs": 8.18,
+      "p95FrameMs": 9.2,
+      "first20RenderMs": 0.22,
+      "trial": 3
+    },
+    {
+      "mode": "attack",
+      "readyMs": 126.6,
+      "meanRenderMs": 0.18,
+      "meanFrameMs": 8.17,
+      "p95FrameMs": 8.9,
+      "first20RenderMs": 0.22,
+      "trial": 3
+    }
+  ],
+  "after": [
+    {
+      "mode": "startup",
+      "readyMs": 181.7,
+      "meanRenderMs": 0.2,
+      "meanFrameMs": 8.22,
+      "p95FrameMs": 9.1,
+      "first20RenderMs": 0.3,
+      "trial": 1
+    },
+    {
+      "mode": "movement",
+      "readyMs": 150,
+      "meanRenderMs": 0.17,
+      "meanFrameMs": 8.18,
+      "p95FrameMs": 9.4,
+      "first20RenderMs": 0.2,
+      "trial": 1
+    },
+    {
+      "mode": "attack",
+      "readyMs": 155,
+      "meanRenderMs": 0.17,
+      "meanFrameMs": 8.17,
+      "p95FrameMs": 9,
+      "first20RenderMs": 0.23,
+      "trial": 1
+    },
+    {
+      "mode": "startup",
+      "readyMs": 141.8,
+      "meanRenderMs": 0.21,
+      "meanFrameMs": 8.22,
+      "p95FrameMs": 8.9,
+      "first20RenderMs": 0.23,
+      "trial": 2
+    },
+    {
+      "mode": "movement",
+      "readyMs": 152.4,
+      "meanRenderMs": 0.18,
+      "meanFrameMs": 8.16,
+      "p95FrameMs": 8.9,
+      "first20RenderMs": 0.22,
+      "trial": 2
+    },
+    {
+      "mode": "attack",
+      "readyMs": 149.4,
+      "meanRenderMs": 0.19,
+      "meanFrameMs": 8.16,
+      "p95FrameMs": 9,
+      "first20RenderMs": 0.2,
+      "trial": 2
+    },
+    {
+      "mode": "startup",
+      "readyMs": 151.9,
+      "meanRenderMs": 0.22,
+      "meanFrameMs": 8.19,
+      "p95FrameMs": 9.2,
+      "first20RenderMs": 0.16,
+      "trial": 3
+    },
+    {
+      "mode": "movement",
+      "readyMs": 150.1,
+      "meanRenderMs": 0.12,
+      "meanFrameMs": 8.16,
+      "p95FrameMs": 9,
+      "first20RenderMs": 0.19,
+      "trial": 3
+    },
+    {
+      "mode": "attack",
+      "readyMs": 143,
+      "meanRenderMs": 0.22,
+      "meanFrameMs": 8.19,
+      "p95FrameMs": 9.4,
+      "first20RenderMs": 0.22,
+      "trial": 3
+    }
+  ]
+}

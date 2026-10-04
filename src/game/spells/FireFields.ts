@@ -1,3 +1,4 @@
+import { audioFor } from '../audio/GameAudio';
 import type Phaser from 'phaser';
 import type { EnemySystem } from '../enemies/EnemySystem';
 import type { FireFieldSpec } from '../combat/BurnSpec';
@@ -9,6 +10,7 @@ export class FireFields {
   get count():number{return this.fields.length;}
   constructor(private scene:Phaser.Scene){}
   add(x:number,y:number,spec:FireFieldSpec):void {
+    audioFor(this.scene)?.play('fire_embers',{volume:0.18,gap:0.8,priority:0});
     if(this.fields.length>=18) this.fields.shift()!.view.destroy();
     const view=this.scene.add.image(x,y,'fire-nova-detail').setDepth(5).setDisplaySize(spec.radius*2,spec.radius*2).setAlpha(0.5);
     this.fields.push({x,y,spec,remaining:spec.duration,view});

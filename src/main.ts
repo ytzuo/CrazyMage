@@ -17,6 +17,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <main class="arena launching" aria-label="魔法试验场操控原型">
     <div id="game" role="application" tabindex="0" aria-label="WASD 移动，方向键施法，Q 释放大招；左下角摇杆可移动"></div>
     <nav class="arena-tools" aria-label="试验场控制">
+      <button id="sound" class="icon-button" title="静音" aria-label="静音" aria-pressed="false">♪</button>
       <button id="build" class="icon-button" title="查看构筑 (U)" aria-label="查看构筑">✦</button>
       <button id="reset" class="icon-button" title="重新开始" aria-label="重新开始">↺</button>
       <button id="pause" class="pause-button">Ⅱ <span>暂停</span></button>
@@ -248,6 +249,7 @@ picker = new SchoolPicker(element('school-overlay'), (school,mode,gender) => { i
 game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
+  audio: { noAudio: true }, // The bounded SFX mixer owns the Web Audio context.
   backgroundColor: '#17251f',
   antialias: true,
   scale: { mode: Phaser.Scale.RESIZE, width: '100%', height: '100%' },
@@ -258,12 +260,21 @@ game = new Phaser.Game({
       instance.canvas.setAttribute('aria-label', '魔法试验场');
       queueMicrotask(() => {
         syncPause();
+        syncSoundButton();
         if (import.meta.env.DEV) instance.canvas.dataset.loopRunning = String(instance.loop.running);
       });
     },
   },
 });
 if (import.meta.env.DEV) observePerformance(game, 'cached-textures');
+
+function syncSoundButton(): void {
+  const muted = scene.audio?.isMuted ?? false;
+  element('sound').textContent = muted ? '♫̸' : '♪';
+  element('sound').setAttribute('aria-pressed', String(muted));
+  element('sound').setAttribute('aria-label', muted ? '开启音效' : '静音');
+  element('sound').title = muted ? '开启音效' : '静音';
+}
 
 function syncPause(): void {
   if (!game) return;
@@ -307,6 +318,11 @@ function restart(): void {
 }
 element('resume').addEventListener('click', () => dead ? restart() : setPaused(false), listenerOptions);
 element('reset').addEventListener('click', restart, listenerOptions);
+element('sound').addEventListener('click', () => { scene.audio?.toggleMute(); syncSoundButton(); }, listenerOptions);
+document.addEventListener('click', event => {
+  const target = event.target instanceof Element ? event.target.closest('button') : null;
+  if (target && !target.disabled && target.id !== 'sound' && target.id !== 'skill' && target.id !== 'ultimate' && !target.closest('[data-upgrade]')) scene.audio?.play('ui_select', {combat:false, volume:0.3, priority:2, gap:0.1});
+}, listenerOptions);
 element('back-launch').addEventListener('click', restart, listenerOptions);
 window.addEventListener('keydown', (event) => {
   if (selectingSchool) return;
@@ -336,6 +352,8 @@ if (import.meta.hot) {
     panel.destroy();
     picker.destroy();
     notice.destroy();
+    // Phaser defers game destruction until a frame; paused games may be asleep.
+    scene.audio?.destroy();
     game.destroy(true);
   });
 }

@@ -1,3 +1,4 @@
+import { audioFor } from '../audio/GameAudio';
 import Phaser from 'phaser';
 import { ARENA, PLAYER, type Direction } from '../config';
 import { Health } from '../combat/Health';
@@ -33,7 +34,7 @@ export class Player {
   private flashTime = 0;
   speed: number = PLAYER.speed;
 
-  constructor(scene: Phaser.Scene) {
+  constructor(private scene: Phaser.Scene) {
     this.view = scene.add.container(ARENA.width / 2, ARENA.height / 2).setDepth(10);
     this.aura = scene.add.circle(0, 0, 28, 0x94e3ab, 0.025).setStrokeStyle(1, 0x9be3b4, 0.25);
     this.shadow = scene.add.ellipse(0, 9, 40, 16, 0x000000, 0.35);
@@ -131,7 +132,12 @@ export class Player {
   }
 
   hurt(damage: number, sourceX: number, sourceY: number): boolean {
+    const health = this.health.current, shield = this.health.shield;
     if (!this.health.hurt(damage, PLAYER.invulnerability)) return false;
+    const audio = audioFor(this.scene);
+    if (shield > 0 && this.health.shield === 0) audio?.play('shield_break', { priority: 3 });
+    if (this.health.dead) audio?.play('defeat', { combat: false, priority: 3 });
+    else if (this.health.current < health) audio?.variant('hurt', this.gender === 'male' ? ['player_hurt_01','player_hurt_03'] : ['player_hurt_02','player_hurt_04'], { priority: 3, volume: 0.85 });
     const dx = this.view.x - sourceX;
     const dy = this.view.y - sourceY;
     const length = Math.hypot(dx, dy) || 1;

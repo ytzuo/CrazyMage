@@ -1,3 +1,4 @@
+import { audioFor } from '../audio/GameAudio';
 import { prepareLightningTextures } from '../art/SpellTextures';
 import Phaser from 'phaser';
 import type { Direction } from '../config';
@@ -99,6 +100,7 @@ export class LightningSpell {
       (other.view.x-x)**2+(other.view.y-y)**2<=spec.radius**2)
       .sort((a,b)=>(a.view.x-x)**2+(a.view.y-y)**2-((b.view.x-x)**2+(b.view.y-y)**2)||a.id-b.id)]
       .slice(0,spec.targets);
+    audioFor(this.scene)?.play('lightning_discharge',{volume:0.45,gap:0.18});
     const pulse=this.scene.add.image(x,y,'lightning-discharge-detail').setDepth(13).setDisplaySize(spec.radius*1.3,spec.radius*1.3)
       .setBlendMode(Phaser.BlendModes.ADD);
     this.remember(pulse,260,spec.radius*2);

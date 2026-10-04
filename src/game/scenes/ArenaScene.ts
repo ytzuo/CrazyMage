@@ -1,3 +1,5 @@
+import { GameAudio, attachAudio, detachAudio } from '../audio/GameAudio';
+import { soundUrls } from '../audio/assets';
 import { isBoss } from '../enemies/roster';
 import { RACE_WAVES, type GameMode } from '../modes';
 import Phaser from 'phaser';
@@ -14,6 +16,7 @@ import { mageBodyTexture, mageStaffTexture, type SchoolArtwork, type CharacterGe
 import { BuildStore } from '../upgrades/BuildStore';
 
 export class ArenaScene extends Phaser.Scene {
+  audio!: GameAudio;
   private previewArt: Partial<Record<CharacterGender, SchoolArtwork>> = {};
   private player!: Player;
   private spell!: SpellRunner;
@@ -33,6 +36,15 @@ export class ArenaScene extends Phaser.Scene {
   }
 
   create(): void {
+    this.audio = new GameAudio(soundUrls);
+    attachAudio(this, this.audio);
+    const disposeAudio = () => {
+      detachAudio(this);
+      this.events.off(Phaser.Scenes.Events.SHUTDOWN, disposeAudio);
+      this.events.off(Phaser.Scenes.Events.DESTROY, disposeAudio);
+    };
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, disposeAudio);
+    this.events.once(Phaser.Scenes.Events.DESTROY, disposeAudio);
     this.drawArena();
     this.selectingSchool = true;
     this.won = false;
@@ -45,9 +57,10 @@ export class ArenaScene extends Phaser.Scene {
     this.enemies = new EnemySystem(this, (wave, bossDefeated) => {
       this.player.health.heal(PLAYER.waveHealing);
       if(this.mode==='race' && this.enemies.waves.cleared===RACE_WAVES) {
+        this.audio.play('victory', { combat: false, priority: 3 });
         this.won=true; this.movement.setEnabled(false);
-      } else this.builds.completeWave(wave, bossDefeated);
-    }, (source, boss) => boss ? this.ultimate.charge.fill() : this.ultimate.charge.onKill(source),undefined,(id,x,y,source)=>this.spell.enemyDefeated(id,x,y,this.enemies,source));
+      } else { this.audio.play('wave_clear', { combat: false, priority: 3 }); this.builds.completeWave(wave, bossDefeated); }
+    }, (source, boss) => { const ready = this.ultimate.charge.ready; if (boss) this.ultimate.charge.fill(); else this.ultimate.charge.onKill(source); if (!ready && this.ultimate.charge.ready) this.audio.play('skill_ready', { priority: 2, volume: 0.4 }); },undefined,(id,x,y,source)=>this.spell.enemyDefeated(id,x,y,this.enemies,source));
     this.enemies.reset();
     this.aimIndicator = new AimIndicator(this);
     this.cameras.main.setBounds(0, 0, ARENA.width, ARENA.height);
@@ -172,6 +185,7 @@ export class ArenaScene extends Phaser.Scene {
     if(this.won || this.builds.pendingChoice) {this.movement.setEnabled(false);this.publish();return;}
     if (!this.won && !this.player.health.dead) {
       if (attack && this.spell.cast(this.player.view.x, this.player.view.y, attack, this.enemies)) {
+        this.audio.cast(this.builds.snapshot.build.school);
         this.player.cast(attack, this.builds.snapshot.build.school);
         this.movement.consumeAttack();
         this.publish();
@@ -190,11 +204,13 @@ export class ArenaScene extends Phaser.Scene {
 
   setPaused(paused: boolean): void {
     this.paused = paused;
+    this.audio?.setPaused(paused);
     this.movement.setEnabled(!paused && !this.selectingSchool && !this.player?.health.dead && !this.won);
     this.publish();
   }
 
   resetPosition(): void {
+    this.audio?.reset();
     this.movement.reset();
     if (!this.player) return;
     this.selectingSchool = true;
@@ -223,6 +239,7 @@ export class ArenaScene extends Phaser.Scene {
     this.ultimate.reset(school);
     this.skill.reset(school);
     this.selectingSchool = false;
+    this.audio.play('ui_select', { combat: false, priority: 2 });
     this.enemies.effects.empower(this.player.view.x, this.player.view.y, school);
     this.movement.setEnabled(!this.paused);
     this.publish();
@@ -284,6 +301,7 @@ export class ArenaScene extends Phaser.Scene {
   chooseUpgrade(batchId: string, id: string): boolean {
     if (!this.paused || this.won || this.player.health.dead) return false;
     if (!this.builds.choose(batchId, id, this.enemies.waveClock.elapsedTime)) return false;
+    this.audio.play('upgrade_accept', { combat: false, priority: 3 });
     this.applyBuild();
     this.enemies.effects.empower(this.player.view.x, this.player.view.y, this.builds.snapshot.build.school);
     this.publish();

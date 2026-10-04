@@ -1,3 +1,4 @@
+import { audioFor } from '../audio/GameAudio';
 import { IceShards } from '../effects/IceShards';
 import type { IceEffectsSpec, IceShardSpec } from '../combat/IceEffectsSpec';
 import { SpecialEnemyCombat } from './SpecialEnemyCombat';
@@ -159,7 +160,7 @@ export class EnemySystem {
   private spawnWave(player: Player, wave = this.waveClock.wave): void {
     const kind = bossKind(wave);
     const boss = kind !== null && this.spawn(player, wave, kind);
-    if(boss) this.bossWaves.add(wave);
+    if(boss) { this.bossWaves.add(wave); audioFor(this.scene)?.play('boss_arrival',{priority:3,volume:0.6}); }
     const count = waveDifficulty(wave,this.mode).count;
     // Register the whole wave before replenishing; its final reserved spawn must also die.
     this.waves.register(wave, count + Number(boss));

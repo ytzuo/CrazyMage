@@ -1,3 +1,4 @@
+import { audioFor } from '../audio/GameAudio';
 import { IceZone } from './IceZone';
 import type { LightningChargeHit } from '../combat/LightningChargeHit';
 import Phaser from 'phaser';
@@ -39,7 +40,9 @@ export class SchoolSkill {
     return view;
   }
   update(delta:number):void {
+    const wasReady=this.ready;
     this.remaining=Math.max(0,this.remaining-delta);
+    if(!wasReady&&this.ready)audioFor(this.scene)?.play('skill_ready',{priority:2,volume:0.4,gap:0.5});
     if(this.iceZone&&!this.iceZone.update(delta))this.iceZone=null;
     const release=this.release;
     if(release){
@@ -47,6 +50,7 @@ export class SchoolSkill {
       if(release.school==='lightning'){
         release.view.setAlpha(0.5+0.5*Math.min(1,release.age/80));
         if(release.age>=80){
+          audioFor(this.scene)?.play('lightning_skill',{priority:2});
           this.release=null;release.view.setVisible(false);
           const angle=Math.atan2(release.aim.y,release.aim.x), reach=Math.hypot(release.tx-release.x,release.ty-release.y);
           this.visual(release.x,release.y,'lightning-arc-detail-1',reach,true,angle,release.spec.width*0.875,280);
@@ -65,6 +69,7 @@ export class SchoolSkill {
         if(touched){nx=previousX+(nx-previousX)*first;ny=previousY+(ny-previousY)*first;}
         release.view.setPosition(nx,ny);
         if(touched||t===1){
+          audioFor(this.scene)?.play('fire_skill',{priority:2});
           this.release=null;release.view.setVisible(false);
           this.visual(nx,ny,'fire-impact-detail',release.spec.radius*2);
           this.visual(nx,ny,'fire-nova-detail',release.spec.radius*1.36,false,0,36,280);
@@ -88,6 +93,7 @@ export class SchoolSkill {
     const length=Math.hypot(aim.x,aim.y), direction=length?{x:aim.x/length,y:aim.y/length}:{x:1,y:0};
     const angle=Math.atan2(direction.y,direction.x);
     if(school==='ice'){
+      audioFor(this.scene)?.play('ice_skill',{priority:2});
       this.iceZone?.reset();
       this.iceZone=new IceZone(this.scene,enemies,x,y,direction,{radius:this.spec.radius,damage:this.spec.damage,duration:this.spec.duration,interval:300,initialDamage:this.spec.initialDamage,fan:true,source:'spell',frost:0,freeze:0});
     }else{

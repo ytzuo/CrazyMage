@@ -1,3 +1,4 @@
+import { audioFor } from '../audio/GameAudio';
 import { IceZone } from '../spells/IceZone';
 import type { LightningChargeHit } from '../combat/LightningChargeHit';
 import { prepareFireTextures, prepareLightningTextures, prepareIceTextures } from '../art/SpellTextures';
@@ -54,6 +55,7 @@ export class UltimateSpell {
     if(!this.targets(seq).length)return false;
     this.charge.consume();this.casts++;
     if(seq.spec.school==='ice'){
+      audioFor(this.scene)?.play('ice_ultimate',{priority:2});
       const spec=seq.spec;
       this.iceZone=new IceZone(this.scene,enemies,x,y,seq.aim,{radius:spec.radius,damage:spec.damage,duration:spec.duration,interval:spec.interval,fan:false,source:'ultimate',frost:spec.frostGain,freeze:spec.freeze});
       enemies.effects.empower(x,y,'ice');return true;
@@ -66,6 +68,7 @@ export class UltimateSpell {
   }
   private pulse(seq:Sequence):void {
     const {x,y,spec,enemies}=seq;
+    audioFor(this.scene)?.play(`${spec.school}_ultimate`, {priority:2, gap:0.1, duration:spec.school==='lightning'?0.42:undefined});
     const cleared=enemies.waves.cleared,burstHits=new Set<number>();
     const targets=spec.school==='fire'?[]:this.targets(seq);
     for(const enemy of [...targets]){

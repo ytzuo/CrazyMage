@@ -1,3 +1,4 @@
+import { audioFor } from '../audio/GameAudio';
 import Phaser from 'phaser';
 import { prepareEnemyAttackTextures } from '../art/EnemyAttackTextures';
 import type { Direction } from '../config';
@@ -42,6 +43,7 @@ export class CombatEffects {
     }
   }
   spellHit(x:number,y:number,school:School,direction:Direction):void{
+    audioFor(this.scene)?.impact(school);
     const fire=school==='fire', color=fire?0xffb557:school==='lightning'?0xb8caff:SCHOOL_COLOR.ice;
     this.add(x,y,color,fire?28:36,260,0,0,0.8,true);
     for(let i=0;i<4;i++){
@@ -50,6 +52,7 @@ export class CombatEffects {
     }
   }
   shatter(x:number,y:number,radius:number):void {
+    audioFor(this.scene)?.play('ice_shatter', { volume: 0.35, gap: 0.2 });
     this.burst(x,y,0xd2f7ff,12,12,140);
     this.add(x,y,0x9de6ff,radius*2.8,350,0,0,0.6,true);
   }
