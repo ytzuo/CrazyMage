@@ -1,6 +1,6 @@
 """Original offline audio drafts. Requires Python 3 and NumPy; never runs in game.
 
-Seeded synthesis, no samples or downloaded material. Music tails wrap around the
+Seeded synthesis plus CC0 player vocal recordings. Music tails wrap around the
 loop; all output is 44.1 kHz / 16-bit PCM. Run from any directory.
 """
 
@@ -474,6 +474,52 @@ def chime(notes, spacing=.09, seconds=1, decay=.17):
     return room(y,.25)
 
 
+PLAYER_HURT_VARIANTS = (
+    # Existing IDs 01/02 remain male 1/female 1; 03/04 add independent takes.
+    ("male", 1, "player_hurt_male.wav", .10, .24, 1.5),
+    ("female", 1, "player_hurt_female.wav", .03, .32, 1.5),
+    ("male", 2, "player_hurt_male_02.wav", .12, .26, 1.0),
+    ("female", 2, "player_hurt_female_02.wav", .03, .33, .5),
+)
+
+
+def render_player_hurt(index):
+    """Four real vocal takes, lightly brightened for a youthful character style."""
+    sex, variant, filename, start, seconds, semitones = PLAYER_HURT_VARIANTS[index]
+    source = ROOT / "artifacts/audio-drafts/sources" / filename
+    with wave.open(str(source)) as f:
+        assert f.getsampwidth() == 2
+        rate = f.getframerate()
+        pcm = np.frombuffer(f.readframes(f.getnframes()), dtype="<i2")
+        pcm = pcm.reshape(-1, f.getnchannels()).astype(float).mean(axis=1) / 32767
+    voice = pcm[round(start * rate):round((start + seconds) * rate)]
+    assert len(voice) == round(seconds * rate)
+    # Small varispeed raises pitch and vocal resonances together, also shortening
+    # the effort naturally. Each version uses a different performance.
+    speed = 2 ** (semitones / 12)
+    voice = np.interp(timeline(seconds / speed) * speed, np.arange(len(voice)) / rate, voice)
+    # Gently reduce chest rumble; keep breaths and the original vocal texture.
+    padding = round(.025 * SR)
+    padded = np.pad(voice, (padding, padding), mode="reflect")
+    frequency = np.fft.rfftfreq(len(padded), 1 / SR)
+    response = frequency / np.sqrt(frequency ** 2 + 110 ** 2)
+    voice = np.fft.irfft(np.fft.rfft(padded) * response, n=len(padded))[padding:-padding]
+    voice *= .40 / max(np.max(np.abs(voice)), 1e-6)
+    character = "少年" if sex == "male" else "少女"
+    save(f"player_hurt_{index+1:02}", f"玩家受伤 / {character} {variant} · 短促闷哼",
+         "sfx", voice, .56, tags=["player", "priority", sex, "variant"])
+    REPORT[-1]["voice"] = sex
+    REPORT[-1]["variant"] = variant
+    REPORT[-1]["character_direction"] = "youthful; actor age unspecified"
+    REPORT[-1]["source"] = {
+        "file": str(source.relative_to(ROOT / "artifacts/audio-drafts")),
+        "license": "CC0-1.0", "credits": "sources/README.md",
+        "trim_start_seconds": start, "trim_duration_seconds": seconds,
+        "pitch_shift_semitones": semitones, "playback_speed": speed,
+        "sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+    }
+
+
 def render_shield_break():
     """Glass pane fracture followed by bright, inharmonic shards and bounces."""
     rng = rng_for("shield-break-glass-v9")
@@ -544,13 +590,8 @@ def render_effects():
             save(f"{school}_ultimate",f"{label} · Q 大招概念","sfx",make("ultimate"),.78,tags=[school,"ultimate","concept"])
         special = {"fire":("embers","余烬"),"ice":("shatter","碎冰处决"),"lightning":("discharge","蓄雷放电")}[school]
         save(f"{school}_{special[0]}",f"{label} · {special[1]}","sfx",make(special[0]),.50,tags=[school,"special"])
-    for i in range(2):
-        t = timeline(.43)
-        rng = rng_for(f"hurt-{i}")
-        y = .28*sweep(t,155+i*15,53,.023)*np.exp(-t/.11)
-        y += .15*noise(t,rng,180,2800)*np.exp(-t/.05)
-        y += .12*np.sin(TAU*330*t)*np.exp(-t/.075)
-        save(f"player_hurt_{i+1:02}",f"玩家受伤 {i+1}","sfx",room(y,.06),.67,tags=["player","priority"])
+    for i in range(len(PLAYER_HURT_VARIANTS)):
+        render_player_hurt(i)
     render_shield_break()
     for name,title,notes,seconds,peak in (
         ("skill_ready","技能就绪",[81,86],.72,.27),
@@ -752,8 +793,8 @@ def main():
     reel = render_reel()
     verify_outputs()
     manifest = {
-        "version":1, "title":"失控法师 · 原创合成音频小样",
-        "method":"Deterministic offline NumPy synthesis; no third-party samples.",
+        "version":13, "title":"失控法师 · 音频小样",
+        "method":"Offline NumPy synthesis with four edited CC0 human vocal takes; see sources/README.md.",
         "integrated_into_game":False,
         "limitations":"Technical file checks only; subjective listening and device playback require review.",
         "music":{"bpm":BPM,"meter":"4/4","key_center":"D minor","loop_master":"WAV, exact bar length; wrapped synthesis and diffusion tails"},

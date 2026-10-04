@@ -26,6 +26,8 @@ def make_preview():
     music = [a for a in manifest["assets"] if a["group"] == "music" and a["loop"]]
     themes = [a for a in manifest["assets"] if a["group"] == "music" and "theme" in a["tags"]]
     effects = [a for a in manifest["assets"] if a["group"] == "sfx"]
+    hurt = manifest.get("player_hurt_preview")
+    hurt_preview = f'''<div class="sampler"><div><strong>玩家受伤 · 四版本试听</strong><p>依次播放少年 1 → 少年 2 → 少女 1 → 少女 2，间隔 {hurt['interval_seconds']:.2f} 秒。四段独立真人发声，音色轻盈清亮，短促收声。</p></div><audio controls preload="none" src="{hurt['file']}" aria-label="玩家受伤四版本试听"></audio></div>''' if hurt else ''
     comparison = manifest.get("fire_comparison")
     fire_comparison = f'''<div class="sampler"><div><strong>火焰变体对比 · {comparison['duration']:.2f} 秒</strong><p>普攻依次为短喷 → 卷焰 → 余烬，命中依次为脆裂 → 闷爆。每个声音之间留出 0.60 秒。</p></div><audio controls preload="none" src="{comparison['file']}" aria-label="火焰变体对比"></audio></div>''' if comparison else ''
     pulse = manifest.get("fire_pulse_preview")
@@ -86,14 +88,15 @@ def make_preview():
 .theme-card{margin-top:30px;padding:26px 28px;background:linear-gradient(115deg,#3a302a70,#202532);border-top-color:#d8ba85}.theme-card h3{font-size:23px;margin-top:22px}.theme-card p{min-height:0}.theme-card .wave{height:80px;margin-top:16px}.theme-sections{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:18px}.theme-sections button{color:#c9ba9e;background:#d8ba8508;border:1px solid #d8ba8525;border-radius:6px;padding:10px 8px;font:inherit;font-size:12px;text-align:left;cursor:pointer}.theme-sections button:hover{background:#d8ba851a;border-color:#d8ba8570}.theme-sections small{display:block;font-size:10px;color:#818b98;margin-bottom:6px}@media(max-width:760px){.theme-card{padding:22px}.theme-sections{grid-template-columns:repeat(3,1fr)}}
 </style></head><body><main>
 <header><div class="eyebrow">UNSTABLE MAGE / AUDIO STUDIES · VOL. __REVISION__</div><h1>失控法师 <em>声音试验室</em></h1>
-<p>古老法阵里的电子魔法。先听音色，再决定它如何进入战斗。这里的音乐与音效均为原创离线合成小样，尚未接入游戏。</p>
-<div class="stats"><span><strong>34</strong> 个音效</span><span><strong>3</strong> 段循环音乐</span>__THEME_STAT__<span><strong>44.1</strong> kHz / 无损 WAV</span></div>
+<p>古老法阵里的电子魔法。先听音色，再决定它如何进入战斗。音乐与法术音效为原创离线合成，玩家受击使用 CC0 真人录音剪辑，尚未接入游戏。</p>
+<div class="stats"><span><strong>__SFX_COUNT__</strong> 个音效</span><span><strong>3</strong> 段循环音乐</span>__THEME_STAT__<span><strong>44.1</strong> kHz / 无损 WAV</span></div>
 <div class="toolbar"><button id="stop" type="button">停止播放</button><label>试听音量 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.6" aria-label="试听音量"></label></div><div class="status" id="status" role="status">点击播放器开始试听。每次只播放一个声音。</div></header>
 __THEME__
 <div class="section-head"><h2>主题与场景音乐</h2><p>共同主题 · D 小调色彩 · 96 BPM · 4/4 拍</p></div>
 <div class="music-grid">__MUSIC__</div>
 <div class="section-head"><h2>法术与战斗反馈</h2><p>普攻三种变体、命中两种变体，另有 E / Q 与特殊反馈</p></div>
 <div class="sampler"><div><strong>__SAMPLER_SECONDS__ 秒音效速览</strong><p>按火焰 → 冰霜 → 闪电 → 受伤与护盾 → 清波与强化 → Boss 登场排列。各声音之间留有短暂停顿。</p></div><audio controls preload="none" src="sfx_sampler.wav" aria-label="音效速览"></audio></div>
+__HURT_PREVIEW__
 __FIRE_COMPARE__
 <div class="sound-grid">__SOUNDS__</div>
 <footer>文件已检查：可读取、非静音、无满幅削波，音效首尾与音乐循环端点符合制作约束。听感、实际浏览器循环与手机外放仍待试听。火焰 Q 已制作成单轮火墙声音；冰霜与闪电 Q 仍是完整声音概念，后续接入时需按实际技能阶段同步。<br><a href="README.md">制作说明 ↗</a>　·　<a href="manifest.json">素材清单 ↗</a></footer>
@@ -132,6 +135,8 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) { sto
 window.addEventListener('pagehide', () => stopAll(false));
 </script></body></html>
 '''.replace("__MUSIC__", ''.join(cards)).replace("__SOUNDS__", ''.join(sections)).replace("__THEME__", ''.join(theme_cards)).replace("__THEME_STAT__", '<span><strong>1</strong> 首主题曲</span>' if themes else '').replace("__FIRE_COMPARE__", fire_comparison).replace("__REVISION__", f"{manifest['version']:02}")
+    html = html.replace("__HURT_PREVIEW__", hurt_preview)
+    html = html.replace("__SFX_COUNT__", str(len(effects)))
     html = html.replace("__SAMPLER_SECONDS__", f"{manifest['sampler']['duration']:.0f}")
     (OUT / "index.html").write_text(html, encoding="utf-8")
     print("Built listening page", flush=True)

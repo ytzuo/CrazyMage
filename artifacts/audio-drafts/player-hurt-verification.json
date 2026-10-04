@@ -1,0 +1,221 @@
+{
+  "environment": {
+    "platform": "macOS-26.6-arm64-arm-64bit",
+    "python": "3.9.6",
+    "numpy": "2.0.2"
+  },
+  "before": [
+    {
+      "id": "player_hurt_01",
+      "title": "玩家受伤 / 男声 · 短促闷哼",
+      "group": "sfx",
+      "file": "sfx/player_hurt_01.wav",
+      "duration": 0.24,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -5.04,
+      "rms_dbfs": -16.88,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "player",
+        "priority",
+        "male"
+      ],
+      "sha256": "abf4cbd2d65adaebdfa34d831aeecd61ee6f65cb2ba0a5aa42da52fc4144a832",
+      "voice": "male",
+      "source": {
+        "file": "sources/player_hurt_male.wav",
+        "license": "CC0-1.0",
+        "credits": "sources/README.md",
+        "trim_start_seconds": 0.1,
+        "trim_duration_seconds": 0.24,
+        "sha256": "c762eb053bad5e083a15501565155adb09b40c8c5fd7cb0a8715b01299b01e25"
+      }
+    },
+    {
+      "id": "player_hurt_02",
+      "title": "玩家受伤 / 女声 · 短促闷哼",
+      "group": "sfx",
+      "file": "sfx/player_hurt_02.wav",
+      "duration": 0.32,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -5.04,
+      "rms_dbfs": -16.63,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "player",
+        "priority",
+        "female"
+      ],
+      "sha256": "298e022f7ab469058ef078caf1973451078d14d550670c41f03429f21a46071e",
+      "voice": "female",
+      "source": {
+        "file": "sources/player_hurt_female.wav",
+        "license": "CC0-1.0",
+        "credits": "sources/README.md",
+        "trim_start_seconds": 0.03,
+        "trim_duration_seconds": 0.32,
+        "sha256": "25ea4b8e2a82023439e51db23081ab16c062e5793e2321597373e1119841a970"
+      }
+    }
+  ],
+  "after": [
+    {
+      "id": "player_hurt_01",
+      "title": "玩家受伤 / 少年 1 · 短促闷哼",
+      "group": "sfx",
+      "file": "sfx/player_hurt_01.wav",
+      "duration": 0.2201,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -5.04,
+      "rms_dbfs": -16.94,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "player",
+        "priority",
+        "male",
+        "variant"
+      ],
+      "sha256": "cac73e99af8acdacf69b9825cf32c6efc1f3944217933782422dce55e9aaa859",
+      "voice": "male",
+      "variant": 1,
+      "character_direction": "youthful; actor age unspecified",
+      "source": {
+        "file": "sources/player_hurt_male.wav",
+        "license": "CC0-1.0",
+        "credits": "sources/README.md",
+        "trim_start_seconds": 0.1,
+        "trim_duration_seconds": 0.24,
+        "pitch_shift_semitones": 1.5,
+        "playback_speed": 1.0905077326652577,
+        "sha256": "c762eb053bad5e083a15501565155adb09b40c8c5fd7cb0a8715b01299b01e25"
+      }
+    },
+    {
+      "id": "player_hurt_03",
+      "title": "玩家受伤 / 少年 2 · 短促闷哼",
+      "group": "sfx",
+      "file": "sfx/player_hurt_03.wav",
+      "duration": 0.2454,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -5.04,
+      "rms_dbfs": -15.9,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "player",
+        "priority",
+        "male",
+        "variant"
+      ],
+      "sha256": "e99802dcda5bc3d2ada2fa3ef5e923f990a08055a0f281124ff32ceb3cacbae7",
+      "voice": "male",
+      "variant": 2,
+      "character_direction": "youthful; actor age unspecified",
+      "source": {
+        "file": "sources/player_hurt_male_02.wav",
+        "license": "CC0-1.0",
+        "credits": "sources/README.md",
+        "trim_start_seconds": 0.12,
+        "trim_duration_seconds": 0.26,
+        "pitch_shift_semitones": 1.0,
+        "playback_speed": 1.0594630943592953,
+        "sha256": "4bd492c6d5f86165b9f16fc653a43f34104f1ed9f8ad7a7ef33e3e581015aa55"
+      }
+    },
+    {
+      "id": "player_hurt_02",
+      "title": "玩家受伤 / 少女 1 · 短促闷哼",
+      "group": "sfx",
+      "file": "sfx/player_hurt_02.wav",
+      "duration": 0.2934,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -5.04,
+      "rms_dbfs": -16.63,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "player",
+        "priority",
+        "female",
+        "variant"
+      ],
+      "sha256": "3dfb5e23074d2948646e366eae4324e1f844f1bca593d03a2d67e4aba87fd088",
+      "voice": "female",
+      "variant": 1,
+      "character_direction": "youthful; actor age unspecified",
+      "source": {
+        "file": "sources/player_hurt_female.wav",
+        "license": "CC0-1.0",
+        "credits": "sources/README.md",
+        "trim_start_seconds": 0.03,
+        "trim_duration_seconds": 0.32,
+        "pitch_shift_semitones": 1.5,
+        "playback_speed": 1.0905077326652577,
+        "sha256": "25ea4b8e2a82023439e51db23081ab16c062e5793e2321597373e1119841a970"
+      }
+    },
+    {
+      "id": "player_hurt_04",
+      "title": "玩家受伤 / 少女 2 · 短促闷哼",
+      "group": "sfx",
+      "file": "sfx/player_hurt_04.wav",
+      "duration": 0.3206,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -5.04,
+      "rms_dbfs": -18.16,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "player",
+        "priority",
+        "female",
+        "variant"
+      ],
+      "sha256": "520642ba7d405da5657a118c8dad13666c92670fcde00b217c6a942e92be327b",
+      "voice": "female",
+      "variant": 2,
+      "character_direction": "youthful; actor age unspecified",
+      "source": {
+        "file": "sources/player_hurt_female_02.wav",
+        "license": "CC0-1.0",
+        "credits": "sources/README.md",
+        "trim_start_seconds": 0.03,
+        "trim_duration_seconds": 0.33,
+        "pitch_shift_semitones": 0.5,
+        "playback_speed": 1.029302236643492,
+        "sha256": "c984f4f0abda828637d5ae684356e86b4a4ecb9d919f5bfa31b3cb83e2cf0844"
+      }
+    }
+  ],
+  "checks": {
+    "two_versions_per_gender": true,
+    "four_distinct_source_takes": true,
+    "pcm_header": true,
+    "non_silent": true,
+    "no_full_scale_clipping": true,
+    "zero_endpoints": true,
+    "deterministic_regeneration": true,
+    "preview_exact_samples": true,
+    "sampler_exact_samples": true,
+    "http_range": true,
+    "all_asset_hashes_match_manifest": true,
+    "source_hashes_match": true,
+    "other_wavs_unchanged_since_baseline": 42
+  },
+  "limitations": "Youthful character direction, not a claim of actor age. File, PCM and HTTP checks only; subjective listening, browser audio, phone-speaker and in-game validation remain pending."
+}

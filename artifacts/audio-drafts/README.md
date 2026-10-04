@@ -1,6 +1,6 @@
-# 失控法师 · 原创合成音频小样 V11
+# 失控法师 · 音频小样 V13
 
-34 个音效、3 段循环音乐、一首 2 分 40 秒主题曲，以及一个 22.19 秒音效速览。音色均由离线波形与噪声合成生成，没有导入第三方采样、现成歌曲或外部音频素材。没有接入游戏，也没有修改游戏入口、战斗逻辑、构建配置或生产界面。
+36 个音效、3 段循环音乐、一首 2 分 40 秒主题曲，以及一个 21.98 秒音效速览。音乐与 32 个音效由离线合成生成；四个玩家受击音效采用 CC0 真人录音剪辑，作者、许可与原始来源见[人声来源](sources/README.md)。没有接入游戏，也没有修改游戏入口、战斗逻辑、构建配置或生产界面。
 
 ## 试听
 
@@ -31,12 +31,14 @@
 
 ## 音效目录
 
+玩家受伤提供少年、少女方向各两个独立真人录音版本，时长约 0.22–0.32 秒，配有四版本对比试听，详见[玩家受伤音效打磨](player-hurt.md)。
+
 | 分组 | 内容 | 数量 |
 | --- | --- | --- |
 | 火焰 | 普攻 3、命中 2、E 焰爆、Q 单轮火墙、余烬 | 8 |
 | 冰霜 | 普攻 3、命中 2、E 冰棘、Q 寒域概念、碎冰处决 | 8 |
 | 闪电 | 普攻 3、命中 2、E 贯雷、Q 雷暴概念、蓄雷放电 | 8 |
-| 通用 | 受伤 2、护盾破裂、技能就绪、菜单选择、强化确认、清波、Boss 登场、通关、失败 | 10 |
+| 通用 | 受伤少年/少女各 2、护盾破裂、技能就绪、菜单选择、强化确认、清波、Boss 登场、通关、失败 | 12 |
 
 火焰以低频滑音和带通噪声制造喷燃与爆裂；冰霜以非整数倍泛音、结晶音阶和短扩散尾音制造晶体共鸣；闪电以噪声脉冲、频率调制和低频雷鸣制造断续放电。常用声音变体采用固定随机种子，重复生成可复现。
 
@@ -123,6 +125,7 @@ python3 tools/audio/render_fire_pulse.py
 python3 tools/audio/render_lightning_variants.py
 python3 tools/audio/render_ice_impacts.py
 python3 tools/audio/render_ice_skill.py
+python3 tools/audio/render_player_hurt.py
 python3 tools/audio/render_shield_break.py
 python3 tools/audio/make_preview.py
 ```
@@ -135,6 +138,7 @@ python3 tools/audio/serve_preview.py
 
 然后访问 `http://127.0.0.1:4178/`；结束试听后在终端按 Ctrl+C 关闭服务。服务只监听本机地址，不用于公开发布。直接打开 WAV 文件也可以试听。
 
+
 所有生成物仅写入本目录。音乐是无损制作文件，当前包未进行交付体积压缩；后续确认声音方向后，再选择游戏用编码和加载方式。
 
 仅重新生成雷系普攻、命中与对比音频时，执行 `render_lightning_variants.py` 与 `make_preview.py`。
@@ -142,3 +146,5 @@ python3 tools/audio/serve_preview.py
 仅重新生成冰系两种命中与对比音频时，执行 `render_ice_impacts.py` 与 `make_preview.py`。
 
 仅重新生成冰系 E 时，执行 `render_ice_skill.py` 与 `make_preview.py`。
+
+仅重新生成护盾破裂时，执行 `render_shield_break.py` 与 `make_preview.py`；仅重新生成受伤音效与连续试听时，执行 `render_player_hurt.py` 与 `make_preview.py`。
