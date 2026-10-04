@@ -38,7 +38,7 @@ a { color: inherit; text-decoration: none; }
   z-index: auto;
 }
 .arena-tools > button { position: relative; z-index: 2; }
-#sound { z-index: 7; }
+#sound { z-index: 8; }
 #sound svg { display: block; width: 20px; height: 20px; margin: auto; pointer-events: none; }
 #sound .sound-off { display: none; }
 #sound[aria-pressed="true"] .sound-on { display: none; }

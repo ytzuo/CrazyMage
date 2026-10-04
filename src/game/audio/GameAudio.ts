@@ -12,12 +12,15 @@ export class GameAudio {
   private voices = new Set<Voice>();
   private last = new Map<string, number>();
   private variants = new Map<string, number>();
+  private homeMusic: HTMLAudioElement | null = null;
+  private homeMusicUrl = '';
+  private homeMusicActive = false;
   private listeners = new AbortController();
   private disposed = false;
   private paused = true;
   private muted = false;
   readonly ready: Promise<void>;
-  constructor(urls: Record<string, string>) {
+  constructor(urls: Record<string, string>, homeMusicUrl?: string) {
     try {
       this.muted = localStorage.getItem('mage-sfx-muted') === 'true';
     } catch { /* Private browsing may disallow storage. */ }
@@ -27,12 +30,23 @@ export class GameAudio {
       this.master.gain.value = this.muted ? 0 : 0.65;
       this.master.connect(this.context.destination);
     } catch { /* Audio is optional on unsupported devices. */ }
+    if (homeMusicUrl) {
+      this.homeMusic = new Audio();
+      this.homeMusic.preload = 'none';
+      this.homeMusicUrl = homeMusicUrl;
+      this.homeMusic.volume = 0.16;
+      this.homeMusic.muted = this.muted;
+      this.homeMusic.loop = false;
+    }
     const signal = this.listeners.signal;
-    const unlock = () => { if (this.context?.state === 'suspended') void this.context.resume().catch(() => {}); };
+    const unlock = () => {
+      if (this.context?.state === 'suspended') void this.context.resume().catch(() => {});
+      this.startHomeMusic();
+    };
     window.addEventListener('pointerdown', unlock, { signal, capture: true });
     window.addEventListener('keydown', unlock, { signal, capture: true });
-    window.addEventListener('blur', () => this.stop(), { signal });
-    document.addEventListener('visibilitychange', () => { if (document.hidden) this.stop(); }, { signal });
+    window.addEventListener('blur', () => { this.stop(); this.pauseHomeMusic(false); }, { signal });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) { this.stop(); this.pauseHomeMusic(false); } }, { signal });
     this.ready = this.load(urls);
   }
   private async load(urls: Record<string, string>): Promise<void> {
@@ -48,13 +62,33 @@ export class GameAudio {
     }));
   }
   get isMuted(): boolean { return this.muted; }
-  get status() { return { loaded: this.buffers.size, active: this.voices.size, state: this.context?.state ?? 'unavailable', muted: this.muted, paused: this.paused }; }
+  get status() { return { loaded: this.buffers.size, active: this.voices.size, state: this.context?.state ?? 'unavailable', muted: this.muted, paused: this.paused, homeMusicActive: this.homeMusicActive, homeMusicPlaying: this.homeMusic ? !this.homeMusic.paused : false }; }
   toggleMute(): boolean {
     this.muted = !this.muted;
     if (this.master) this.master.gain.value = this.muted ? 0 : 0.65;
-    if (this.muted) this.stop();
+    if (this.homeMusic) this.homeMusic.muted = this.muted;
+    if (this.muted) { this.stop(); this.pauseHomeMusic(false); }
+    else this.startHomeMusic();
     try { localStorage.setItem('mage-sfx-muted', String(this.muted)); } catch { /* Optional persistence. */ }
     return this.muted;
+  }
+  setHomeMusic(active: boolean): void {
+    this.homeMusicActive = active;
+    if (active) this.startHomeMusic();
+    else this.pauseHomeMusic(true);
+  }
+  private startHomeMusic(): void {
+    const music = this.homeMusic;
+    if (!music || !this.homeMusicActive || this.muted || this.disposed || document.hidden || !music.paused || music.ended) return;
+    if (!music.src && !navigator.userActivation?.isActive && this.context?.state !== 'running') return;
+    if (!music.src) music.src = this.homeMusicUrl;
+    void music.play().catch(() => { /* A later trusted gesture retries playback. */ });
+  }
+  private pauseHomeMusic(reset: boolean): void {
+    const music = this.homeMusic;
+    if (!music) return;
+    music.pause();
+    if (reset) music.currentTime = 0;
   }
   setPaused(paused: boolean): void { this.paused = paused; if (paused) this.stop(true); }
   play(id: string, options: CueOptions = {}): boolean {
@@ -101,6 +135,9 @@ export class GameAudio {
   destroy(): void {
     if (this.disposed) return;
     this.disposed = true; this.listeners.abort(); this.reset(); this.buffers.clear();
+    this.homeMusicActive = false; this.pauseHomeMusic(true);
+    if (this.homeMusic) { this.homeMusic.removeAttribute('src'); this.homeMusic.load(); this.homeMusic = null; }
+    this.homeMusicUrl = '';
     this.master?.disconnect(); if (this.context) void this.context.close().catch(() => {});
   }
 }

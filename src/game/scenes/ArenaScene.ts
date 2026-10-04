@@ -1,5 +1,5 @@
 import { GameAudio, attachAudio, detachAudio } from '../audio/GameAudio';
-import { soundUrls } from '../audio/assets';
+import { soundUrls, themeUrl } from '../audio/assets';
 import { isBoss } from '../enemies/roster';
 import { RACE_WAVES, type GameMode } from '../modes';
 import Phaser from 'phaser';
@@ -36,7 +36,8 @@ export class ArenaScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.audio = new GameAudio(soundUrls);
+    this.audio = new GameAudio(soundUrls, themeUrl);
+    this.audio.setHomeMusic(true);
     attachAudio(this, this.audio);
     const disposeAudio = () => {
       detachAudio(this);
@@ -214,6 +215,7 @@ export class ArenaScene extends Phaser.Scene {
     this.movement.reset();
     if (!this.player) return;
     this.selectingSchool = true;
+    this.audio.setHomeMusic(true);
     this.won = false;
     this.builds.reset();
     this.applyBuild();
@@ -239,6 +241,7 @@ export class ArenaScene extends Phaser.Scene {
     this.ultimate.reset(school);
     this.skill.reset(school);
     this.selectingSchool = false;
+    this.audio.setHomeMusic(false);
     this.audio.play('ui_select', { combat: false, priority: 2 });
     this.enemies.effects.empower(this.player.view.x, this.player.view.y, school);
     this.movement.setEnabled(!this.paused);

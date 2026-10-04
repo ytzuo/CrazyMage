@@ -1071,5 +1071,6 @@
     ]
   },
   "sfx_integrated_into_game": true,
-  "music_integrated_into_game": false
+  "theme_integrated_into_home": true,
+  "loop_music_integrated_into_game": false
 }
