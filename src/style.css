@@ -35,8 +35,14 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   gap: 10px;
   align-items: center;
-  z-index: 2;
+  z-index: auto;
 }
+.arena-tools > button { position: relative; z-index: 2; }
+#sound { z-index: 7; }
+#sound svg { display: block; width: 20px; height: 20px; margin: auto; pointer-events: none; }
+#sound .sound-off { display: none; }
+#sound[aria-pressed="true"] .sound-on { display: none; }
+#sound[aria-pressed="true"] .sound-off { display: inline; }
 .icon-button, .pause-button {
   height: 36px;
   border: 1px solid #82926950;

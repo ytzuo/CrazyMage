@@ -1,5 +1,7 @@
 import type { School } from '../upgrades/definitions';
 
+const COMBAT_VOLUME = 0.6;
+
 type Voice = { source: AudioBufferSourceNode; gain: GainNode; priority: number; combat: boolean };
 export interface CueOptions { volume?: number; priority?: number; combat?: boolean; gap?: number; duration?: number; group?: string }
 /** One scene owns one mixer. No deferred cues: unavailable/paused sounds are discarded. */
@@ -70,7 +72,7 @@ export class GameAudio {
     const source = context.createBufferSource(), gain = context.createGain();
     const duration = Math.min(buffer.duration, options.duration ?? buffer.duration);
     source.buffer = buffer;
-    const volume = options.volume ?? 0.65;
+    const volume = (options.volume ?? 0.65) * (combat && id !== 'boss_arrival' ? COMBAT_VOLUME : 1);
     gain.gain.setValueAtTime(0, now);
     gain.gain.linearRampToValueAtTime(volume, now + 0.004);
     gain.gain.setValueAtTime(volume, now + Math.max(0.004, duration - 0.06));

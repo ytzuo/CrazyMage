@@ -17,7 +17,13 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <main class="arena launching" aria-label="魔法试验场操控原型">
     <div id="game" role="application" tabindex="0" aria-label="WASD 移动，方向键施法，Q 释放大招；左下角摇杆可移动"></div>
     <nav class="arena-tools" aria-label="试验场控制">
-      <button id="sound" class="icon-button" title="静音" aria-label="静音" aria-pressed="false">♪</button>
+      <button id="sound" class="icon-button" title="关闭声音" aria-label="关闭声音" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M11 4 6 8H3v8h3l5 4Z"/>
+          <path class="sound-on" d="M15 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>
+          <path class="sound-off" d="m16 9 6 6m0-6-6 6"/>
+        </svg>
+      </button>
       <button id="build" class="icon-button" title="查看构筑 (U)" aria-label="查看构筑">✦</button>
       <button id="reset" class="icon-button" title="重新开始" aria-label="重新开始">↺</button>
       <button id="pause" class="pause-button">Ⅱ <span>暂停</span></button>
@@ -270,10 +276,9 @@ if (import.meta.env.DEV) observePerformance(game, 'cached-textures');
 
 function syncSoundButton(): void {
   const muted = scene.audio?.isMuted ?? false;
-  element('sound').textContent = muted ? '♫̸' : '♪';
   element('sound').setAttribute('aria-pressed', String(muted));
-  element('sound').setAttribute('aria-label', muted ? '开启音效' : '静音');
-  element('sound').title = muted ? '开启音效' : '静音';
+  element('sound').setAttribute('aria-label', muted ? '开启声音' : '关闭声音');
+  element('sound').title = muted ? '开启声音' : '关闭声音';
 }
 
 function syncPause(): void {
