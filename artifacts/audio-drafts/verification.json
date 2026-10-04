@@ -8,6 +8,11 @@
   "assets": {
     "sound_effects": 34,
     "music_loops": 3,
+    "full_themes": 1,
+    "theme_duration_seconds": 160,
+    "theme_bars": 64,
+    "theme_endpoints": "at most 2 PCM units from silence",
+    "original_master_checksums": "all 37 existing assets unchanged",
     "sampler_seconds": 25.23,
     "headers_and_frame_counts": "passed",
     "finite_non_silent_samples": "passed",
@@ -18,14 +23,26 @@
     "music_bars": [16, 32, 32]
   },
   "browser": {
-    "audio_players": 38,
+    "audio_players": 39,
     "music_and_sampler_playback": "confirmed via controls, decoded durations and playback state",
     "music_decoded_durations_seconds": [40, 80, 80],
     "sampler_decoded_duration_seconds": 25.23,
     "switching_pauses_previous_audio": "passed",
     "stop_button_pauses_all": "passed",
-    "music_loop_enabled_initially": true,
+    "scene_music_loop_enabled_initially": true,
+    "theme_loop_enabled_initially": false,
+    "theme_decoded_duration_seconds": 160,
+    "theme_seekable_end_seconds": 160,
+    "theme_chapter_jumps_seconds": [120, 150],
+    "theme_chapter_jumps": "confirmed via actual playback position",
     "console_errors_and_warnings_during_check": 0
+  },
+  "preview_http": {
+    "loopback_only": true,
+    "byte_ranges": "passed; 206 and exact bytes",
+    "suffix_range": "passed",
+    "head_length_and_accept_ranges": "passed",
+    "out_of_bounds_range": "passed; 416"
   },
   "limitations": [
     "No reliable subjective listening or mix review was performed.",

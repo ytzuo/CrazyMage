@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "title": "失控法师 · 原创合成音频小样",
   "method": "Deterministic offline NumPy synthesis; no third-party samples.",
   "integrated_into_game": false,
@@ -8,7 +8,8 @@
     "bpm": 96,
     "meter": "4/4",
     "key_center": "D minor",
-    "loop_master": "WAV, exact bar length; wrapped synthesis and diffusion tails"
+    "loop_master": "WAV, exact bar length; wrapped synthesis and diffusion tails",
+    "theme_master": "WAV, 64 bars, intro and resolved coda; not a loop"
   },
   "assets": [
     {
@@ -737,6 +738,68 @@
       "bpm": 96,
       "bars": 32,
       "boundary_step": 0.0
+    },
+    {
+      "id": "unstable_mage_theme",
+      "title": "魔核苏醒 · 失控法师主题曲",
+      "group": "music",
+      "file": "music/unstable_mage_theme.wav",
+      "duration": 160.0,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -16.49,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "theme",
+        "boss-derived",
+        "original",
+        "full-track"
+      ],
+      "sha256": "2dd02966cf17df71b313c493f7ff665346cca0f39eac6064d1620b8c75bb3356",
+      "bpm": 96,
+      "bars": 64,
+      "derived_from": "boss_loop",
+      "sections": [
+        {
+          "title": "前奏 · 法阵唤醒",
+          "start_seconds": 0.0,
+          "end_seconds": 20.0,
+          "bars": 8
+        },
+        {
+          "title": "主题 · 魔核苏醒",
+          "start_seconds": 20.0,
+          "end_seconds": 60.0,
+          "bars": 16
+        },
+        {
+          "title": "过渡 · 核心回响",
+          "start_seconds": 60.0,
+          "end_seconds": 80.0,
+          "bars": 8
+        },
+        {
+          "title": "再现 · 失控试验",
+          "start_seconds": 80.0,
+          "end_seconds": 120.0,
+          "bars": 16
+        },
+        {
+          "title": "高潮 · 魔力奔涌",
+          "start_seconds": 120.0,
+          "end_seconds": 150.0,
+          "bars": 12
+        },
+        {
+          "title": "尾声 · 余光",
+          "start_seconds": 150.0,
+          "end_seconds": 160.0,
+          "bars": 4
+        }
+      ]
     }
   ],
   "sampler": {
@@ -768,6 +831,7 @@
     "non_silent": true,
     "no_full_scale_clipping": true,
     "sfx_endpoints": true,
-    "loop_length_and_endpoints": true
+    "loop_length_and_endpoints": true,
+    "theme_length_and_endpoints": true
   }
 }
