@@ -58,12 +58,15 @@ def make_preview():
     theme_cards = []
     for a in themes:
         jumps = ''.join(f'''<button type="button" data-theme-seek="{s['start_seconds']}"><small>{int(s['start_seconds']//60)}:{int(s['start_seconds']%60):02d}</small>{escape(s['title'].split(' · ')[0])}</button>''' for s in a['sections'])
+        transitions = manifest.get("theme_transitions")
+        transitions_player = f'''<div class="sampler"><div><strong>五处段落衔接 · 集中试听</strong><p>依次播放前奏→主题、主题→过渡、过渡→再现、再现→高潮、高潮→尾声，每处保留交界前后各 3 秒。</p></div><audio controls preload="none" src="{transitions['file']}" aria-label="主题曲五处衔接试听"></audio></div>''' if transitions else ''
         theme_cards.append(f'''<article class="music-card theme-card" style="--tint:#d8ba85">
           <div class="card-top"><span class="eyebrow">THEME / 完整主题曲 · 2 分 40 秒</span><span class="chip">96 BPM · 64 小节</span></div>
           <h3>{escape(a['title'])}</h3><p>沿用 Boss 战的主题与音色，展开为前奏、主题、过渡、再现、高潮与尾声。完整曲目，默认单次播放。</p>
           {waveform(a['file'])}
           <audio controls preload="none" data-music data-theme data-loop="false" src="{a['file']}" aria-label="{escape(a['title'])}"></audio>
           <div class="theme-sections" aria-label="主题曲段落">{jumps}</div>
+          {transitions_player}
           <div class="card-bottom"><span>原版 Boss 战音乐保留在下方</span><a href="{a['file']}" download>下载主题曲 WAV ↗</a></div>
         </article>''')
     groups = [

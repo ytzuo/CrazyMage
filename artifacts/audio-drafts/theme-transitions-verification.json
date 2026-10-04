@@ -1,0 +1,201 @@
+{
+  "environment": {
+    "platform": "macOS-26.6-arm64-arm-64bit",
+    "python": "3.9.6",
+    "numpy": "2.0.2"
+  },
+  "before": {
+    "id": "unstable_mage_theme",
+    "title": "魔核苏醒 · 失控法师主题曲",
+    "group": "music",
+    "file": "music/unstable_mage_theme.wav",
+    "duration": 160.0,
+    "sample_rate": 44100,
+    "channels": 2,
+    "bits": 16,
+    "peak_dbfs": -2.16,
+    "rms_dbfs": -16.49,
+    "clipped_samples": 0,
+    "loop": false,
+    "tags": [
+      "theme",
+      "boss-derived",
+      "original",
+      "full-track"
+    ],
+    "sha256": "2dd02966cf17df71b313c493f7ff665346cca0f39eac6064d1620b8c75bb3356",
+    "bpm": 96,
+    "bars": 64,
+    "derived_from": "boss_loop",
+    "sections": [
+      {
+        "title": "前奏 · 法阵唤醒",
+        "start_seconds": 0.0,
+        "end_seconds": 20.0,
+        "bars": 8
+      },
+      {
+        "title": "主题 · 魔核苏醒",
+        "start_seconds": 20.0,
+        "end_seconds": 60.0,
+        "bars": 16
+      },
+      {
+        "title": "过渡 · 核心回响",
+        "start_seconds": 60.0,
+        "end_seconds": 80.0,
+        "bars": 8
+      },
+      {
+        "title": "再现 · 失控试验",
+        "start_seconds": 80.0,
+        "end_seconds": 120.0,
+        "bars": 16
+      },
+      {
+        "title": "高潮 · 魔力奔涌",
+        "start_seconds": 120.0,
+        "end_seconds": 150.0,
+        "bars": 12
+      },
+      {
+        "title": "尾声 · 余光",
+        "start_seconds": 150.0,
+        "end_seconds": 160.0,
+        "bars": 4
+      }
+    ]
+  },
+  "after": {
+    "id": "unstable_mage_theme",
+    "title": "魔核苏醒 · 失控法师主题曲",
+    "group": "music",
+    "file": "music/unstable_mage_theme.wav",
+    "duration": 160.0,
+    "sample_rate": 44100,
+    "channels": 2,
+    "bits": 16,
+    "peak_dbfs": -2.16,
+    "rms_dbfs": -16.35,
+    "clipped_samples": 0,
+    "loop": false,
+    "tags": [
+      "theme",
+      "boss-derived",
+      "original",
+      "full-track"
+    ],
+    "sha256": "1598783537f54e9c3a57c22cce81a56c63f6b5387216fd7639bda047ce0a40ee",
+    "bpm": 96,
+    "bars": 64,
+    "derived_from": "boss_loop",
+    "sections": [
+      {
+        "title": "前奏 · 法阵唤醒",
+        "start_seconds": 0.0,
+        "end_seconds": 20.0,
+        "bars": 8
+      },
+      {
+        "title": "主题 · 魔核苏醒",
+        "start_seconds": 20.0,
+        "end_seconds": 60.0,
+        "bars": 16
+      },
+      {
+        "title": "过渡 · 核心回响",
+        "start_seconds": 60.0,
+        "end_seconds": 80.0,
+        "bars": 8
+      },
+      {
+        "title": "再现 · 失控试验",
+        "start_seconds": 80.0,
+        "end_seconds": 120.0,
+        "bars": 16
+      },
+      {
+        "title": "高潮 · 魔力奔涌",
+        "start_seconds": 120.0,
+        "end_seconds": 150.0,
+        "bars": 12
+      },
+      {
+        "title": "尾声 · 余光",
+        "start_seconds": 150.0,
+        "end_seconds": 160.0,
+        "bars": 4
+      }
+    ]
+  },
+  "before_transitions": [
+    {
+      "at_seconds": 20,
+      "previous_bar_rms_dbfs": -18.38,
+      "next_bar_rms_dbfs": -15.35
+    },
+    {
+      "at_seconds": 60,
+      "previous_bar_rms_dbfs": -16.58,
+      "next_bar_rms_dbfs": -19.1
+    },
+    {
+      "at_seconds": 80,
+      "previous_bar_rms_dbfs": -18.68,
+      "next_bar_rms_dbfs": -15.5
+    },
+    {
+      "at_seconds": 120,
+      "previous_bar_rms_dbfs": -16.2,
+      "next_bar_rms_dbfs": -14.2
+    },
+    {
+      "at_seconds": 150,
+      "previous_bar_rms_dbfs": -14.92,
+      "next_bar_rms_dbfs": -16.71
+    }
+  ],
+  "after_transitions": [
+    {
+      "at_seconds": 20,
+      "previous_bar_rms_dbfs": -15.36,
+      "next_bar_rms_dbfs": -15.9,
+      "boundary_sample_step": 117
+    },
+    {
+      "at_seconds": 60,
+      "previous_bar_rms_dbfs": -15.94,
+      "next_bar_rms_dbfs": -18.5,
+      "boundary_sample_step": 44
+    },
+    {
+      "at_seconds": 80,
+      "previous_bar_rms_dbfs": -15.45,
+      "next_bar_rms_dbfs": -15.98,
+      "boundary_sample_step": 126
+    },
+    {
+      "at_seconds": 120,
+      "previous_bar_rms_dbfs": -15.9,
+      "next_bar_rms_dbfs": -14.81,
+      "boundary_sample_step": 10
+    },
+    {
+      "at_seconds": 150,
+      "previous_bar_rms_dbfs": -18.45,
+      "next_bar_rms_dbfs": -16.62,
+      "boundary_sample_step": 13
+    }
+  ],
+  "checks": {
+    "160_seconds_64_bars": true,
+    "section_times_preserved": true,
+    "no_full_scale_clipping": true,
+    "zero_endpoints": true,
+    "all_asset_hashes_match_manifest": true,
+    "transition_preview_samples_match_theme": true,
+    "http_range": true,
+    "other_wavs_unchanged": 49
+  },
+  "limitations": "RMS windows are 2.5 seconds before/after each boundary, measured on exported PCM; musical dynamics are intentional and these are not perceptual smoothness scores. No subjective listening, browser playback, device or in-game validation."
+}

@@ -883,7 +883,7 @@
       "channels": 2,
       "bits": 16,
       "peak_dbfs": -2.16,
-      "rms_dbfs": -16.49,
+      "rms_dbfs": -16.35,
       "clipped_samples": 0,
       "loop": false,
       "tags": [
@@ -892,7 +892,7 @@
         "original",
         "full-track"
       ],
-      "sha256": "2dd02966cf17df71b313c493f7ff665346cca0f39eac6064d1620b8c75bb3356",
+      "sha256": "1598783537f54e9c3a57c22cce81a56c63f6b5387216fd7639bda047ce0a40ee",
       "bpm": 96,
       "bars": 64,
       "derived_from": "boss_loop",
@@ -1028,6 +1028,47 @@
       "ice_impact_02"
     ],
     "gap_seconds": 0.6
+  },
+  "theme_transitions": {
+    "file": "theme_transitions.wav",
+    "duration": 33.6,
+    "windows": [
+      {
+        "title": "前奏 → 主题",
+        "boundary_seconds": 20.0,
+        "source_start_seconds": 17.0,
+        "source_end_seconds": 23.0,
+        "preview_start_seconds": 0.35
+      },
+      {
+        "title": "主题 → 过渡",
+        "boundary_seconds": 60.0,
+        "source_start_seconds": 57.0,
+        "source_end_seconds": 63.0,
+        "preview_start_seconds": 7.0
+      },
+      {
+        "title": "过渡 → 再现",
+        "boundary_seconds": 80.0,
+        "source_start_seconds": 77.0,
+        "source_end_seconds": 83.0,
+        "preview_start_seconds": 13.65
+      },
+      {
+        "title": "再现 → 高潮",
+        "boundary_seconds": 120.0,
+        "source_start_seconds": 117.0,
+        "source_end_seconds": 123.0,
+        "preview_start_seconds": 20.3
+      },
+      {
+        "title": "高潮 → 尾声",
+        "boundary_seconds": 150.0,
+        "source_start_seconds": 147.0,
+        "source_end_seconds": 153.0,
+        "preview_start_seconds": 26.95
+      }
+    ]
   },
   "sfx_integrated_into_game": true,
   "music_integrated_into_game": false
