@@ -1,5 +1,5 @@
 {
-  "version": 13,
+  "version": 16,
   "title": "失控法师 · 音频小样",
   "method": "Offline NumPy synthesis with four edited CC0 human vocal takes; see sources/README.md.",
   "integrated_into_game": false,
@@ -765,22 +765,45 @@
     },
     {
       "id": "boss_arrival",
-      "title": "Boss 登场",
+      "title": "Boss 登场 / 魔核降临 · 史诗短乐句",
       "group": "sfx",
       "file": "sfx/boss_arrival.wav",
-      "duration": 1.85,
+      "duration": 3.25,
       "sample_rate": 44100,
       "channels": 2,
       "bits": 16,
       "peak_dbfs": -2.5,
-      "rms_dbfs": -17.6,
+      "rms_dbfs": -15.77,
       "clipped_samples": 0,
       "loop": false,
       "tags": [
         "boss",
-        "priority"
+        "priority",
+        "music-stinger"
       ],
-      "sha256": "070449c9b5464cefa0e35211fe0283e6ac8b78695958504604ca04a8dfc75fa3"
+      "sha256": "f33c4c58b136a23cb3805c77aea1777a9824666417f06775debfb79c617542f0",
+      "cue": {
+        "bpm": 96,
+        "meter": "4/4",
+        "bars": 1,
+        "key": "D minor",
+        "melody": [
+          "D4",
+          "F4",
+          "E4",
+          "A3",
+          "D4"
+        ],
+        "onsets_beats": [
+          0,
+          0.75,
+          1.5,
+          2.25,
+          3
+        ],
+        "tail_seconds": 0.75,
+        "arrangement": "octave brass, sustained and moving strings, timpani roll, cymbal cadence"
+      }
     },
     {
       "id": "menu_loop",
@@ -916,7 +939,7 @@
   ],
   "sampler": {
     "file": "sfx_sampler.wav",
-    "duration": 21.98,
+    "duration": 23.38,
     "order": [
       "fire_cast_01",
       "fire_impact_01",

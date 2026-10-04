@@ -1,6 +1,6 @@
-# 失控法师 · 音频小样 V13
+# 失控法师 · 音频小样 V16
 
-36 个音效、3 段循环音乐、一首 2 分 40 秒主题曲，以及一个 21.98 秒音效速览。音乐与 32 个音效由离线合成生成；四个玩家受击音效采用 CC0 真人录音剪辑，作者、许可与原始来源见[人声来源](sources/README.md)。没有接入游戏，也没有修改游戏入口、战斗逻辑、构建配置或生产界面。
+36 个音效、3 段循环音乐、一首 2 分 40 秒主题曲，以及一个 23.38 秒音效速览。音乐与 32 个音效由离线合成生成；四个玩家受击音效采用 CC0 真人录音剪辑，作者、许可与原始来源见[人声来源](sources/README.md)。没有接入游戏，也没有修改游戏入口、战斗逻辑、构建配置或生产界面。
 
 ## 试听
 
@@ -113,6 +113,14 @@
 
 总长从上一版 0.64 秒延长为 1 秒，以容纳碎片散落，峰值保持约 −4.01 dBFS。仍是 44.1 kHz、16 位双声道 PCM，固定随机种子可复现。已验证非静音、无满幅削波、首尾为零、重复生成一致、速览逐段样本一致，以及 HTTP 分段读取；受伤音效与其他主素材保持本轮修改前内容。检查环境及数据见[护盾破裂验证](shield-break-verification.json)。本轮未做人工听音、浏览器音频播放或手机外放验证，尚未接入游戏。
 
+## Boss 登场短乐句
+
+[魔核降临 · Boss 登场](sfx/boss_arrival.wav) 为 3.25 秒、单次播放的史诗感短音乐，使用离线合成的管弦乐风格音色。保持 D 小调、96 BPM、4/4 拍和 D–F–E–A–D 五音动机：主旋律由跨三个八度的铜管声部齐奏，弦乐铺底与短句增加运动感；和声按 D 小调 → A 大调 → D 小调推进。收尾前五次渐强定音鼓滚奏，在最后和弦处叠加低鼓、镲声与稍宽的扩散尾音。
+
+仍为一小节 2.5 秒，尾音从上一版 0.5 秒增至 0.75 秒，总长 3.25 秒；最终和弦仍在 1.875 秒落下。峰值保持约 −2.50 dBFS，通过声部、音域、节奏与空间感调整史诗氛围，并非只提高导出峰值。格式为 44.1 kHz、16 位双声道 PCM，保持 `boss_arrival.wav` 路径，不循环。铜管、弦乐、定音鼓均为合成音色，不是真实乐团录音。
+
+已验证非静音、无满幅削波、首尾为零、重复生成一致、小节加尾音长度正确、单声道合并非静音、速览逐段一致、素材清单校验值及 HTTP 分段读取。环境与数据见[Boss 登场验证](boss-arrival-verification.json)。本轮未进行人工听音、浏览器音频播放、手机外放或实战混音验证，也尚未接入 Boss 生成事件。
+
 ## 重新生成
 
 在仓库根目录执行，需 Python 3 与 NumPy：
@@ -127,6 +135,7 @@ python3 tools/audio/render_ice_impacts.py
 python3 tools/audio/render_ice_skill.py
 python3 tools/audio/render_player_hurt.py
 python3 tools/audio/render_shield_break.py
+python3 tools/audio/render_boss_arrival.py
 python3 tools/audio/make_preview.py
 ```
 
@@ -148,3 +157,5 @@ python3 tools/audio/serve_preview.py
 仅重新生成冰系 E 时，执行 `render_ice_skill.py` 与 `make_preview.py`。
 
 仅重新生成护盾破裂时，执行 `render_shield_break.py` 与 `make_preview.py`；仅重新生成受伤音效与连续试听时，执行 `render_player_hurt.py` 与 `make_preview.py`。
+
+仅重新生成 Boss 登场时，执行 `render_boss_arrival.py` 与 `make_preview.py`。

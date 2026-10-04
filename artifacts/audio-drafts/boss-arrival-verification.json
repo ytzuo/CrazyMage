@@ -1,0 +1,105 @@
+{
+  "environment": {
+    "platform": "macOS-26.6-arm64-arm-64bit",
+    "python": "3.9.6",
+    "numpy": "2.0.2"
+  },
+  "before": {
+    "id": "boss_arrival",
+    "title": "Boss 登场 / 魔核降临 · 短乐句",
+    "group": "sfx",
+    "file": "sfx/boss_arrival.wav",
+    "duration": 3.0,
+    "sample_rate": 44100,
+    "channels": 2,
+    "bits": 16,
+    "peak_dbfs": -2.5,
+    "rms_dbfs": -15.87,
+    "clipped_samples": 0,
+    "loop": false,
+    "tags": [
+      "boss",
+      "priority",
+      "music-stinger"
+    ],
+    "sha256": "d59fe6efffb58007130f61be1c6b4514e0791bc419bad7f410f23e8212a58e80",
+    "cue": {
+      "bpm": 96,
+      "meter": "4/4",
+      "bars": 1,
+      "key": "D minor",
+      "melody": [
+        "D4",
+        "F4",
+        "E4",
+        "A3",
+        "D4"
+      ],
+      "onsets_beats": [
+        0,
+        0.75,
+        1.5,
+        2.25,
+        3
+      ],
+      "tail_seconds": 0.5
+    }
+  },
+  "after": {
+    "id": "boss_arrival",
+    "title": "Boss 登场 / 魔核降临 · 史诗短乐句",
+    "group": "sfx",
+    "file": "sfx/boss_arrival.wav",
+    "duration": 3.25,
+    "sample_rate": 44100,
+    "channels": 2,
+    "bits": 16,
+    "peak_dbfs": -2.5,
+    "rms_dbfs": -15.77,
+    "clipped_samples": 0,
+    "loop": false,
+    "tags": [
+      "boss",
+      "priority",
+      "music-stinger"
+    ],
+    "sha256": "f33c4c58b136a23cb3805c77aea1777a9824666417f06775debfb79c617542f0",
+    "cue": {
+      "bpm": 96,
+      "meter": "4/4",
+      "bars": 1,
+      "key": "D minor",
+      "melody": [
+        "D4",
+        "F4",
+        "E4",
+        "A3",
+        "D4"
+      ],
+      "onsets_beats": [
+        0,
+        0.75,
+        1.5,
+        2.25,
+        3
+      ],
+      "tail_seconds": 0.75,
+      "arrangement": "octave brass, sustained and moving strings, timpani roll, cymbal cadence"
+    }
+  },
+  "checks": {
+    "pcm_header": true,
+    "non_silent": true,
+    "no_full_scale_clipping": true,
+    "zero_endpoints": true,
+    "deterministic_regeneration": true,
+    "one_bar_plus_tail": true,
+    "single_play_no_loop": true,
+    "mono_downmix_rms_dbfs": -15.95,
+    "sampler_exact_samples": true,
+    "http_range": true,
+    "all_asset_hashes_match_manifest": true,
+    "other_wavs_unchanged": 48
+  },
+  "limitations": "Synthesized orchestral-style timbres, not live instruments. File, PCM and HTTP validation only; subjective listening, browser audio, phone-speaker and in-game mixing unverified."
+}

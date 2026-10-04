@@ -561,6 +561,82 @@ def render_shield_break():
          tags=["player", "priority"])
 
 
+def render_boss_arrival():
+    """Short orchestral-style entrance: octave brass, strings and timpani."""
+    seconds = 4 * BEAT + .75
+    y = np.zeros((round(seconds * SR), 2))
+    rng = rng_for("boss-epic-entrance-v16")
+
+    def horn(midi, duration):
+        t = timeline(duration)
+        f = note(midi)
+        tone = np.zeros(len(t))
+        for harmonic in range(1, 7):
+            tone += (np.sin(TAU * f * harmonic * .999 * t)
+                     + np.sin(TAU * f * harmonic * 1.001 * t)) / (2 * harmonic ** 1.45)
+        tone *= .75 + .25 * np.exp(-t / .09)
+        return fade(tone, .024, min(.22, duration * .4))
+
+    def strings(midi, duration):
+        t = timeline(duration)
+        phase = TAU * note(midi) * t + .025 * np.sin(TAU * 5.2 * t)
+        tone = np.zeros(len(t))
+        for harmonic in range(1, 10):
+            tone += (np.sin(phase * harmonic * .998)
+                     + np.sin(phase * harmonic * 1.002)) / (2 * harmonic ** 1.7)
+        return fade(tone, min(.09, duration * .25), min(.25, duration * .4))
+
+    def timpani(midi, duration):
+        t = timeline(duration)
+        f = note(midi)
+        tone = sweep(t, f * 1.65, f, .019) * np.exp(-t / .22)
+        tone += .28 * np.sin(TAU * f * 1.51 * t) * np.exp(-t / .12)
+        tone += .06 * noise(t, rng, 120, 2200, -.3) * np.exp(-t / .019)
+        return fade(tone, .002, .09)
+
+    # Use the score's D-F-E-A motif, then return to D for a definite arrival.
+    melody = ((0, 62, .42), (.75, 65, .36), (1.5, 64, .40),
+              (2.25, 57, .40), (3, 62, 1.12))
+    for beat, midi, duration in melody:
+        place(y, horn(midi, duration), beat * BEAT, .22, -.28)
+        place(y, horn(midi - 12, duration), beat * BEAT + .006, .15, .26)
+        place(y, horn(midi + 12, duration), beat * BEAT + .012, .055, .1)
+
+    # D minor -> A major -> D minor: harmonic motion rather than a noise swell.
+    for beat, root, notes, duration in (
+        (0, 38, (50, 53, 57), 1.18),
+        (2, 45, (49, 52, 57), .58),
+        (3, 38, (50, 53, 57, 62), 1.13),
+    ):
+        place(y, bass(root, duration, True), beat * BEAT, .24)
+        for i, midi in enumerate(notes):
+            pan = (i % 2 * 2 - 1) * .55
+            place(y, horn(midi, duration), beat * BEAT, .065, pan)
+            place(y, strings(midi + 12, duration), beat * BEAT, .075, -pan)
+
+    # Upper string motion and a short drum crescendo lead to the final downbeat.
+    for i, midi in enumerate((62, 69, 74, 69, 61, 64)):
+        place(y, strings(midi, .23), i * .5 * BEAT, .075, -.5 if i % 2 else .5)
+    place(y, timpani(38, .65), 0, .23)
+    for i in range(5):
+        place(y, timpani(45, .24), (2.2 + i * .16) * BEAT, .04 + i * .018,
+              -.15 if i % 2 else .15)
+    place(y, timpani(38, .90), 3 * BEAT, .31)
+    place(y, percussion("kick"), 3 * BEAT, .16)
+    ct = timeline(1.15)
+    cymbal = noise(ct, rng, 1600, 7500, -.25) * np.exp(-ct / .30)
+    place(y, fade(cymbal, .006, .25), 3 * BEAT, .055, .15)
+    # Fixed diffusion taps expand the cadence while keeping its attack readable.
+    y = room(y, .45)
+    save("boss_arrival", "Boss 登场 / 魔核降临 · 史诗短乐句", "sfx",
+         y, .75, tags=["boss", "priority", "music-stinger"])
+    REPORT[-1]["cue"] = {"bpm": BPM, "meter": "4/4", "bars": 1,
+                         "key": "D minor", "melody": ["D4", "F4", "E4", "A3", "D4"],
+                         "onsets_beats": [0, .75, 1.5, 2.25, 3],
+                         "tail_seconds": .75,
+                         "arrangement": "octave brass, sustained and moving strings, timpani roll, cymbal cadence"}
+
+
 def render_effects():
     schools = {"fire":(fire,"火焰"),"ice":(ice,"冰霜"),"lightning":(lightning,"闪电")}
     for school,(make,label) in schools.items():
@@ -602,13 +678,7 @@ def render_effects():
         ("defeat","失败收束",[74,69,65,62,50],2.1,.50),
     ):
         save(name,title,"sfx",chime(notes,.115 if seconds>1 else .065,seconds,.31 if seconds>1 else .14),peak,tags=["ui" if name.startswith("ui") else "event"])
-    t = timeline(1.85)
-    rng = rng_for("boss-arrival")
-    env = (1-np.exp(-t/.018))*np.exp(-t/.38)
-    y = .40*sweep(t,100,34,.09)*env + .15*noise(t,rng,40,1200,-.4)*env
-    for midi in (38,45,50,56):
-        y += .07*np.sin(TAU*note(midi)*t)*env
-    save("boss_arrival","Boss 登场","sfx",room(y,.35),.75,tags=["boss","priority"])
+    render_boss_arrival()
 
 
 def pluck(midi, seconds=.8, color=0):
@@ -793,7 +863,7 @@ def main():
     reel = render_reel()
     verify_outputs()
     manifest = {
-        "version":13, "title":"失控法师 · 音频小样",
+        "version":16, "title":"失控法师 · 音频小样",
         "method":"Offline NumPy synthesis with four edited CC0 human vocal takes; see sources/README.md.",
         "integrated_into_game":False,
         "limitations":"Technical file checks only; subjective listening and device playback require review.",
