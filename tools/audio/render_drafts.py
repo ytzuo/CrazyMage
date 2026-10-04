@@ -139,57 +139,37 @@ def save(name, title, group, y, peak=.65, loop=False, tags=None):
 
 
 FIRE_VARIANTS = {
-    "cast": [("短喷", .32), ("卷焰", .46), ("余烬", .52)],
-    "impact": [("脆裂", .24), ("闷爆", .42)],
+    "cast": [("短燃", .32), ("卷焰", .46), ("流焰", .52)],
+    "impact": [("附燃", .24), ("灼烧", .42)],
 }
 
 
 def fire_basic(kind, index):
-    """Distinct timbres and envelopes, retaining one common fire palette."""
+    """Sustained flame turbulence and soft burning contact, without blast hits."""
     _, seconds = FIRE_VARIANTS[kind][index]
     t = timeline(seconds)
-    rng = rng_for(f"fire-v3-{kind}-{index}")
-    if kind == "cast" and index == 0:
-        # Fast nozzle burst: bright air, a short body, almost no lingering flame.
-        flame = noise(t, rng, 180, 4500, -.22)
-        grit = noise(t, rng, 900, 7200)
-        env = (1 - np.exp(-t / .004)) * np.exp(-t / .046)
-        y = .34 * flame * env + .085 * grit * np.exp(-t / .015)
-        y += .18 * sweep(t, 260, 115, .022) * np.exp(-t / .07)
-    elif kind == "cast" and index == 1:
-        # Broader rising whoosh: low flame rolls into a small midrange flare.
-        flame = noise(t, rng, 80, 2300, -.45)
-        flare = noise(t, rng, 400, 3800, -.1)
-        env = (1 - np.exp(-t / .035)) * np.exp(-t / .09)
-        y = .44 * flame * env * (1 + .13 * np.sin(TAU * 19 * t))
-        y += .11 * flare * np.exp(-((t - .16) / .029) ** 2)
-        y += .085 * sweep(t, 140, 78, .08) * env
-    elif kind == "cast":
-        # A round puff, then a clearly separated, quiet crackling ember tail.
-        flame = noise(t, rng, 160, 3400, -.3)
-        grit = noise(t, rng, 1500, 7400)
-        y = .24 * flame * (1 - np.exp(-t / .010)) * np.exp(-t / .059)
-        y += .24 * sweep(t, 190, 80, .03) * np.exp(-t / .065)
-        y += .055 * flame * np.exp(-t / .14)
-        for at, width, gain in ((.115,.004,.085),(.183,.003,.066),(.257,.005,.050),(.34,.004,.030)):
-            y += gain * grit * np.exp(-((t - at) / width) ** 2)
-    elif index == 0:
-        # Dry brittle contact, with little low end and a very short decay.
-        crack = noise(t, rng, 700, 6800)
-        crunch = noise(t, rng, 500, 3400)
-        y = .38 * crack * np.exp(-t / .013)
-        y += .15 * crunch * np.exp(-t / .032)
-        y += .16 * sweep(t, 200, 72, .018) * np.exp(-t / .045)
+    rng = rng_for(f"fire-burning-v18-{kind}-{index}")
+    if kind == "cast":
+        attack, hold, decay, cutoff = ((.015,.080,.075,2100),
+                                       (.027,.160,.095,1500),
+                                       (.016,.200,.100,2400))[index]
     else:
-        # Low, rounded combustion impact: thump followed by a muffled flame tail.
-        flame = noise(t, rng, 40, 1600, -.45)
-        grit = noise(t, rng, 900, 4500)
-        y = .48 * sweep(t, 135, 43, .025) * np.exp(-t / .09)
-        y += .20 * flame * np.exp(-t / .10)
-        y += .03 * grit * np.exp(-((t - .075) / .016) ** 2)
-        y += .12 * sweep(t, 70, 50, .08) * np.exp(-t / .10)
-    return fade(y, .002, .045)
-
+        attack, hold, decay, cutoff = ((.010,.055,.065,2400),
+                                       (.022,.150,.090,1700))[index]
+    envelope = (1 - np.exp(-t / attack)) * np.exp(-np.maximum(t - hold, 0) / decay)
+    turbulence = .78 + .22 * np.tanh(noise(t, rng, 3, 34))
+    flame = noise(t, rng, 90, cutoff, -.50)
+    air = noise(t, rng, 450, 3300, -.28)
+    y = (.26 * flame * turbulence + .07 * air) * envelope
+    if kind == "cast" and index == 1:
+        y *= .85 + .15 * np.sin(TAU * 11 * t) ** 2
+    elif kind == "cast" and index == 2:
+        y += .055 * air * envelope * (.5 + .5 * np.sin(TAU * 23 * t))
+    elif kind == "impact":
+        # Soft sizzling contact keeps hit feedback distinct from a flying flame.
+        sizzle = noise(t, rng, 800, 3600, -.25)
+        y += .085 * sizzle * envelope * (.72 + .28 * np.sin(TAU * 37 * t) ** 2)
+    return fade(y, .006, .055)
 
 def render_fire_variant(kind, index):
     character, _ = FIRE_VARIANTS[kind][index]
@@ -371,52 +351,35 @@ def ice(kind, seed=0):
 
 
 LIGHTNING_VARIANTS = {
-    "cast": [("短弧", .22), ("连弧", .29), ("游弧", .34)],
-    "impact": [("电裂", .18), ("电灼", .25)],
+    "cast": [("短流", .22), ("双涌", .29), ("游流", .34)],
+    "impact": [("触电", .18), ("余流", .25)],
 }
 
 
 def lightning_basic(kind, index):
-    """Noise-led, irregular electrical bursts with no pitched oscillator tail."""
+    """Short bands of buzzing current: continuous static, not isolated snaps."""
     _, seconds = LIGHTNING_VARIANTS[kind][index]
     t = timeline(seconds)
-    rng = rng_for(f"lightning-v7-{kind}-{index}")
-    crack = noise(t, rng, 450, 4600, -.18)
-    static = noise(t, rng, 260, 3000, -.25)
-    body = noise(t, rng, 65, 1100, -.35)
-    y = np.zeros(len(t))
-
-    def burst(at, decay, gain, signal):
-        local = np.maximum(t-at, 0)
-        envelope = (t >= at) * (1-np.exp(-local/.0008)) * np.exp(-local/decay)
-        return gain * signal * envelope
-
-    if kind == "cast" and index == 0:
-        # One dry arc with two fading sparks, rather than a ringing note.
-        for at, decay, gain in ((.003,.013,.42),(.025,.008,.20),(.056,.010,.09)):
-            y += burst(at, decay, gain, crack)
-        y += burst(.003,.033,.12,body)
-    elif kind == "cast" and index == 1:
-        # Successive discharges make a broader, broken electrical zipper.
-        for at, decay, gain in ((.003,.010,.31),(.026,.012,.29),(.059,.014,.20),(.105,.012,.10)):
-            y += burst(at, decay, gain, crack)
-        y += burst(.008,.047,.12,static) + burst(.003,.044,.08,body)
-    elif kind == "cast":
-        # Softer moving static, punctuated by uneven, progressively quiet sparks.
-        y += burst(.003,.062,.19,static) + burst(.003,.043,.10,body)
-        for at, decay, gain in ((.010,.008,.20),(.038,.006,.18),(.063,.011,.16),(.104,.009,.12),(.146,.012,.07)):
-            y += burst(at, decay, gain, crack)
-    elif index == 0:
-        # Contact: a sharp electrical snap with a very short noisy body.
-        y += burst(.002,.008,.48,crack) + burst(.014,.010,.18,static)
-        y += burst(.002,.026,.17,body)
-    else:
-        # Contact: lower, muffled discharge followed by a little residual static.
-        y += burst(.002,.025,.30,static) + burst(.002,.045,.24,body)
-        for at, decay, gain in ((.032,.008,.13),(.069,.010,.09),(.113,.009,.05)):
-            y += burst(at, decay, gain, crack)
-    return fade(y, .001, .035)
-
+    rng = rng_for(f"lightning-current-v18-{kind}-{index}")
+    attack = .006 if kind == "cast" else .004
+    hold = ((.095,.145,.180) if kind == "cast" else (.065,.115))[index]
+    decay = .035 if kind == "impact" else .040
+    envelope = (1 - np.exp(-t / attack)) * np.exp(-np.maximum(t - hold, 0) / decay)
+    # Irregular mains-like modulation gives the noisy body its electrical buzz.
+    phase = TAU * (120 + index * 13) * t + 1.5 * np.sin(TAU * 29 * t)
+    phase += .28 * noise(t, rng, 10, 75)
+    buzz = sum(np.sin(phase * harmonic) / harmonic ** .7 for harmonic in range(3, 16))
+    buzz /= max(np.sqrt(np.mean(buzz ** 2)), 1e-6)
+    static = noise(t, rng, 700, 5600 if kind == "cast" else 6500, -.12)
+    flow = .40 + .60 * (.5 + .5 * np.sin(phase))
+    y = (.19 * static * flow + .065 * buzz) * envelope
+    if kind == "cast" and index == 1:
+        y *= 1 - .68 * np.exp(-((t - .095) / .017) ** 2)
+    elif index == 2:
+        y *= .65 + .35 * np.sin(TAU * 19 * t) ** 2
+    elif kind == "impact" and index == 1:
+        y *= .70 + .30 * np.sin(TAU * 31 * t) ** 2
+    return fade(y, .003, .035)
 
 def render_lightning_variant(kind, index):
     character, _ = LIGHTNING_VARIANTS[kind][index]
@@ -863,9 +826,9 @@ def main():
     reel = render_reel()
     verify_outputs()
     manifest = {
-        "version":16, "title":"失控法师 · 音频小样",
+        "version":18, "title":"失控法师 · 音频小样",
         "method":"Offline NumPy synthesis with four edited CC0 human vocal takes; see sources/README.md.",
-        "integrated_into_game":False,
+        "sfx_integrated_into_game":True, "music_integrated_into_game":False,
         "limitations":"Technical file checks only; subjective listening and device playback require review.",
         "music":{"bpm":BPM,"meter":"4/4","key_center":"D minor","loop_master":"WAV, exact bar length; wrapped synthesis and diffusion tails"},
         "assets":REPORT,"sampler":reel,

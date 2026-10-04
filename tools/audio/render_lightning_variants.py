@@ -34,7 +34,7 @@ def main():
         render_lightning_variant("impact", i)
     verify_outputs()
     replacements = {a["id"]:a for a in REPORT}
-    manifest["version"] = max(manifest.get("version", 1), 7)
+    manifest["version"] = max(manifest.get("version", 1), 18)
     manifest["assets"] = [replacements.get(a["id"], a) for a in manifest["assets"]]
     manifest["sampler"] = render_reel()
     manifest["lightning_comparison"] = render_comparison()

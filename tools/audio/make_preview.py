@@ -29,14 +29,14 @@ def make_preview():
     hurt = manifest.get("player_hurt_preview")
     hurt_preview = f'''<div class="sampler"><div><strong>玩家受伤 · 四版本试听</strong><p>依次播放少年 1 → 少年 2 → 少女 1 → 少女 2，间隔 {hurt['interval_seconds']:.2f} 秒。四段独立真人发声，音色轻盈清亮，短促收声。</p></div><audio controls preload="none" src="{hurt['file']}" aria-label="玩家受伤四版本试听"></audio></div>''' if hurt else ''
     comparison = manifest.get("fire_comparison")
-    fire_comparison = f'''<div class="sampler"><div><strong>火焰变体对比 · {comparison['duration']:.2f} 秒</strong><p>普攻依次为短喷 → 卷焰 → 余烬，命中依次为脆裂 → 闷爆。每个声音之间留出 0.60 秒。</p></div><audio controls preload="none" src="{comparison['file']}" aria-label="火焰变体对比"></audio></div>''' if comparison else ''
+    fire_comparison = f'''<div class="sampler"><div><strong>火焰变体对比 · {comparison['duration']:.2f} 秒</strong><p>普攻依次为短燃 → 卷焰 → 流焰，命中依次为附燃 → 灼烧。火苗翻卷与持续燃烧。每个声音之间留出 0.60 秒。</p></div><audio controls preload="none" src="{comparison['file']}" aria-label="火焰变体对比"></audio></div>''' if comparison else ''
     pulse = manifest.get("fire_pulse_preview")
     if pulse:
         single = next(a for a in effects if a['id'] == 'fire_ultimate')
         fire_comparison += f'''<div class="sampler"><div><strong>火焰 Q · 三轮火墙试听</strong><p>低沉喷燃，收柔高频，单轮 {single['duration']:.2f} 秒，按当前每轮 {pulse['interval_seconds']:.2f} 秒间隔连续播放三次。下方 Q 文件只包含一轮声音。</p></div><audio controls preload="none" src="{pulse['file']}" aria-label="火焰 Q 三轮火墙试听"></audio></div>'''
     lightning_comparison = manifest.get("lightning_comparison")
     if lightning_comparison:
-        fire_comparison += f'''<div class="sampler"><div><strong>闪电变体对比 · {lightning_comparison['duration']:.2f} 秒</strong><p>普攻依次为短弧 → 连弧 → 游弧，命中依次为电裂 → 电灼。收掉拨弦般的音高尾音，以断续放电为主体。</p></div><audio controls preload="none" src="{lightning_comparison['file']}" aria-label="闪电变体对比"></audio></div>'''
+        fire_comparison += f'''<div class="sampler"><div><strong>闪电变体对比 · {lightning_comparison['duration']:.2f} 秒</strong><p>普攻依次为短流 → 双涌 → 游流，命中依次为触电 → 余流。持续电流滋滋作响，尾部快速收住。</p></div><audio controls preload="none" src="{lightning_comparison['file']}" aria-label="闪电变体对比"></audio></div>'''
     ice_comparison = manifest.get("ice_impact_comparison")
     if ice_comparison:
         fire_comparison += f'''<div class="sampler"><div><strong>冰霜命中对比 · {ice_comparison['duration']:.2f} 秒</strong><p>冰裂 → 碎冰：明亮清脆的冰晶接触，细碎晶体快速收尾。</p></div><audio controls preload="none" src="{ice_comparison['file']}" aria-label="冰霜命中对比"></audio></div>'''
@@ -67,9 +67,9 @@ def make_preview():
           <div class="card-bottom"><span>原版 Boss 战音乐保留在下方</span><a href="{a['file']}" download>下载主题曲 WAV ↗</a></div>
         </article>''')
     groups = [
-        ("fire", "01", "火焰", "喷燃 / 爆裂 / 推进", "#eaa375"),
+        ("fire", "01", "火焰", "喷燃 / 翻卷 / 附燃", "#eaa375"),
         ("ice", "02", "冰霜", "破空 / 结晶 / 碎裂", "#90cce3"),
-        ("lightning", "03", "闪电", "电弧 / 贯雷 / 放电", "#c1a4ee"),
+        ("lightning", "03", "闪电", "电流 / 滋滋 / 蓄电", "#c1a4ee"),
         ("common", "04", "战斗与界面", "受伤 / 强化 / 胜负", "#c6c88c"),
     ]
     sections = []
@@ -88,7 +88,7 @@ def make_preview():
 .theme-card{margin-top:30px;padding:26px 28px;background:linear-gradient(115deg,#3a302a70,#202532);border-top-color:#d8ba85}.theme-card h3{font-size:23px;margin-top:22px}.theme-card p{min-height:0}.theme-card .wave{height:80px;margin-top:16px}.theme-sections{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:18px}.theme-sections button{color:#c9ba9e;background:#d8ba8508;border:1px solid #d8ba8525;border-radius:6px;padding:10px 8px;font:inherit;font-size:12px;text-align:left;cursor:pointer}.theme-sections button:hover{background:#d8ba851a;border-color:#d8ba8570}.theme-sections small{display:block;font-size:10px;color:#818b98;margin-bottom:6px}@media(max-width:760px){.theme-card{padding:22px}.theme-sections{grid-template-columns:repeat(3,1fr)}}
 </style></head><body><main>
 <header><div class="eyebrow">UNSTABLE MAGE / AUDIO STUDIES · VOL. __REVISION__</div><h1>失控法师 <em>声音试验室</em></h1>
-<p>古老法阵里的电子魔法。先听音色，再决定它如何进入战斗。音乐与法术音效为原创离线合成，玩家受击使用 CC0 真人录音剪辑，尚未接入游戏。</p>
+<p>古老法阵里的电子魔法。先听音色，再决定它如何进入战斗。音乐与法术音效为原创离线合成，玩家受击使用 CC0 真人录音剪辑。战斗音效已接入游戏，主题曲与背景音乐可在此试听。</p>
 <div class="stats"><span><strong>__SFX_COUNT__</strong> 个音效</span><span><strong>3</strong> 段循环音乐</span>__THEME_STAT__<span><strong>44.1</strong> kHz / 无损 WAV</span></div>
 <div class="toolbar"><button id="stop" type="button">停止播放</button><label>试听音量 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.6" aria-label="试听音量"></label></div><div class="status" id="status" role="status">点击播放器开始试听。每次只播放一个声音。</div></header>
 __THEME__

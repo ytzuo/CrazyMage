@@ -1,0 +1,445 @@
+{
+  "environment": {
+    "platform": "macOS-26.6-arm64-arm-64bit",
+    "python": "3.9.6",
+    "numpy": "2.0.2"
+  },
+  "before": [
+    {
+      "id": "fire_cast_01",
+      "title": "火焰 · 普攻 1 / 短喷",
+      "group": "sfx",
+      "file": "sfx/fire_cast_01.wav",
+      "duration": 0.32,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -22.94,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "cast",
+        "variant"
+      ],
+      "sha256": "4815502f21fb787d09f6106d4ccdd9d633c7dcd3b8602935f28b5109f3262c6f",
+      "variant_character": "短喷"
+    },
+    {
+      "id": "fire_cast_02",
+      "title": "火焰 · 普攻 2 / 卷焰",
+      "group": "sfx",
+      "file": "sfx/fire_cast_02.wav",
+      "duration": 0.46,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -21.84,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "cast",
+        "variant"
+      ],
+      "sha256": "9fc0eeee53797b565c0b7e9b03b1460d89c89f974e06af4a8c1b6d1356c2dcc9",
+      "variant_character": "卷焰"
+    },
+    {
+      "id": "fire_cast_03",
+      "title": "火焰 · 普攻 3 / 余烬",
+      "group": "sfx",
+      "file": "sfx/fire_cast_03.wav",
+      "duration": 0.52,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -23.43,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "cast",
+        "variant"
+      ],
+      "sha256": "d52d1b7f5bf85ca4e64656a1c2df05e2edece94b2dae486f44ece047c22a9989",
+      "variant_character": "余烬"
+    },
+    {
+      "id": "fire_impact_01",
+      "title": "火焰 · 命中 1 / 脆裂",
+      "group": "sfx",
+      "file": "sfx/fire_impact_01.wav",
+      "duration": 0.24,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -28.51,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "impact",
+        "variant"
+      ],
+      "sha256": "35b00091351cffbdbb86f86ac814187037cf0a536508dd86972289dea3ee9774",
+      "variant_character": "脆裂"
+    },
+    {
+      "id": "fire_impact_02",
+      "title": "火焰 · 命中 2 / 闷爆",
+      "group": "sfx",
+      "file": "sfx/fire_impact_02.wav",
+      "duration": 0.42,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -21.47,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "impact",
+        "variant"
+      ],
+      "sha256": "cf01a4e705a9ccdd0e7fbafac506ecce084a969200bb5827233c58ad8eb6647f",
+      "variant_character": "闷爆"
+    },
+    {
+      "id": "lightning_cast_01",
+      "title": "闪电 · 普攻 1 / 短弧",
+      "group": "sfx",
+      "file": "sfx/lightning_cast_01.wav",
+      "duration": 0.22,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -26.08,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "cast",
+        "variant"
+      ],
+      "sha256": "cc41dcc15ce80af476334b36f91de82f75aaa4af0904e97d15a4d9c2de9a5780",
+      "variant_character": "短弧"
+    },
+    {
+      "id": "lightning_cast_02",
+      "title": "闪电 · 普攻 2 / 连弧",
+      "group": "sfx",
+      "file": "sfx/lightning_cast_02.wav",
+      "duration": 0.29,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -25.75,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "cast",
+        "variant"
+      ],
+      "sha256": "df4b9c8583d50c150af1f8832e24988592620c8aeebfcf8fc8c5535d8c851c33",
+      "variant_character": "连弧"
+    },
+    {
+      "id": "lightning_cast_03",
+      "title": "闪电 · 普攻 3 / 游弧",
+      "group": "sfx",
+      "file": "sfx/lightning_cast_03.wav",
+      "duration": 0.34,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -25.24,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "cast",
+        "variant"
+      ],
+      "sha256": "b9959623b8235c7c14e5c5f096d7f95822caeba328145d2e978609bd98471632",
+      "variant_character": "游弧"
+    },
+    {
+      "id": "lightning_impact_01",
+      "title": "闪电 · 命中 1 / 电裂",
+      "group": "sfx",
+      "file": "sfx/lightning_impact_01.wav",
+      "duration": 0.18,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -28.56,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "impact",
+        "variant"
+      ],
+      "sha256": "150d4bbc1da4f77e680a73e12448d581dd117380d3b93ed23f394d5866f7328c",
+      "variant_character": "电裂"
+    },
+    {
+      "id": "lightning_impact_02",
+      "title": "闪电 · 命中 2 / 电灼",
+      "group": "sfx",
+      "file": "sfx/lightning_impact_02.wav",
+      "duration": 0.25,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -26.24,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "impact",
+        "variant"
+      ],
+      "sha256": "6af3f3681b905d585fe4cef75c665c651c4f6f28f31a1633d9643da4a7a34008",
+      "variant_character": "电灼"
+    }
+  ],
+  "after": [
+    {
+      "id": "fire_cast_01",
+      "title": "火焰 · 普攻 1 / 短燃",
+      "group": "sfx",
+      "file": "sfx/fire_cast_01.wav",
+      "duration": 0.32,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -20.65,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "cast",
+        "variant"
+      ],
+      "sha256": "32f97b055258586ad5ec935b715684e12de9c80d2005121113ccd26740a33b75",
+      "variant_character": "短燃"
+    },
+    {
+      "id": "fire_cast_02",
+      "title": "火焰 · 普攻 2 / 卷焰",
+      "group": "sfx",
+      "file": "sfx/fire_cast_02.wav",
+      "duration": 0.46,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -20.36,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "cast",
+        "variant"
+      ],
+      "sha256": "439f5c943cb7b706077d7514c7855a3d050575d8cdb5d0ad2fdd4f63df5179f0",
+      "variant_character": "卷焰"
+    },
+    {
+      "id": "fire_cast_03",
+      "title": "火焰 · 普攻 3 / 流焰",
+      "group": "sfx",
+      "file": "sfx/fire_cast_03.wav",
+      "duration": 0.52,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -19.07,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "cast",
+        "variant"
+      ],
+      "sha256": "31fdfcff0fd07d2b8c57fb307043c4ad75685c72c5e69979d4dbee00d75356a3",
+      "variant_character": "流焰"
+    },
+    {
+      "id": "fire_impact_01",
+      "title": "火焰 · 命中 1 / 附燃",
+      "group": "sfx",
+      "file": "sfx/fire_impact_01.wav",
+      "duration": 0.24,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -22.56,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "impact",
+        "variant"
+      ],
+      "sha256": "b98d871ba4827e3e9eab400b526cc57e4617203fe69dadf8b26fe4c0290b25d5",
+      "variant_character": "附燃"
+    },
+    {
+      "id": "fire_impact_02",
+      "title": "火焰 · 命中 2 / 灼烧",
+      "group": "sfx",
+      "file": "sfx/fire_impact_02.wav",
+      "duration": 0.42,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -22.4,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "impact",
+        "variant"
+      ],
+      "sha256": "acb8241a4907cafba7ae1c5878592f2d43a7f55a5c2ea125e61a8d91e4f2ac0c",
+      "variant_character": "灼烧"
+    },
+    {
+      "id": "lightning_cast_01",
+      "title": "闪电 · 普攻 1 / 短流",
+      "group": "sfx",
+      "file": "sfx/lightning_cast_01.wav",
+      "duration": 0.22,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -22.33,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "cast",
+        "variant"
+      ],
+      "sha256": "b4f4cf181849018b3a9d6a4ad505555e4fea318939ddb020680f889bcf6efded",
+      "variant_character": "短流"
+    },
+    {
+      "id": "lightning_cast_02",
+      "title": "闪电 · 普攻 2 / 双涌",
+      "group": "sfx",
+      "file": "sfx/lightning_cast_02.wav",
+      "duration": 0.29,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -21.13,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "cast",
+        "variant"
+      ],
+      "sha256": "76f001b6c10e46d769214d91618ff38513b357f460c5d806110429bcd1a5bb74",
+      "variant_character": "双涌"
+    },
+    {
+      "id": "lightning_cast_03",
+      "title": "闪电 · 普攻 3 / 游流",
+      "group": "sfx",
+      "file": "sfx/lightning_cast_03.wav",
+      "duration": 0.34,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -21.48,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "cast",
+        "variant"
+      ],
+      "sha256": "701d4886be9b9ab6ecd9da735dccb16d05879237d97497250e6fc632073f27fa",
+      "variant_character": "游流"
+    },
+    {
+      "id": "lightning_impact_01",
+      "title": "闪电 · 命中 1 / 触电",
+      "group": "sfx",
+      "file": "sfx/lightning_impact_01.wav",
+      "duration": 0.18,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -23.66,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "impact",
+        "variant"
+      ],
+      "sha256": "eabd8873ea2f390eaa4b0eb079a53cb52f776342e517a5ab7ce237ed199ed8f2",
+      "variant_character": "触电"
+    },
+    {
+      "id": "lightning_impact_02",
+      "title": "闪电 · 命中 2 / 余流",
+      "group": "sfx",
+      "file": "sfx/lightning_impact_02.wav",
+      "duration": 0.25,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -23.62,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "impact",
+        "variant"
+      ],
+      "sha256": "4ae7ad90807eab44e711b8f311f6f284e1222c3bf2f1b157fc7159a73e3d0088",
+      "variant_character": "余流"
+    }
+  ],
+  "checks": {
+    "ten_variants": 10,
+    "same_durations_and_peaks": true,
+    "pcm_format": true,
+    "non_silent": true,
+    "no_clipping": true,
+    "zero_endpoints": true,
+    "deterministic_regeneration": true,
+    "three_reels_exact_samples": true,
+    "http_range": true,
+    "all_manifest_hashes_match": true,
+    "other_wavs_unchanged": 38
+  },
+  "limitations": "Offline sample checks; subjective fire/current likeness, browser audio and in-game mix of these revised samples not auditioned."
+}
