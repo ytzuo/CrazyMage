@@ -1,0 +1,36 @@
+{
+  "scope": "Offline audio drafts and their standalone listening page; no game integration",
+  "environment": {
+    "renderer": "Bundled Python 3.12 with NumPy",
+    "format": "44.1 kHz, signed 16-bit PCM WAV",
+    "preview": "Codex in-app browser at a loopback-only local HTTP service"
+  },
+  "assets": {
+    "sound_effects": 34,
+    "music_loops": 3,
+    "sampler_seconds": 25.23,
+    "headers_and_frame_counts": "passed",
+    "finite_non_silent_samples": "passed",
+    "full_scale_clipping": "none",
+    "sound_effect_endpoints": "at most 2 PCM units from silence",
+    "music_loop_endpoints": "at most 1 PCM unit apart",
+    "music_duration_seconds": [40, 80, 80],
+    "music_bars": [16, 32, 32]
+  },
+  "browser": {
+    "audio_players": 38,
+    "music_and_sampler_playback": "confirmed via controls, decoded durations and playback state",
+    "music_decoded_durations_seconds": [40, 80, 80],
+    "sampler_decoded_duration_seconds": 25.23,
+    "switching_pauses_previous_audio": "passed",
+    "stop_button_pauses_all": "passed",
+    "music_loop_enabled_initially": true,
+    "console_errors_and_warnings_during_check": 0
+  },
+  "limitations": [
+    "No reliable subjective listening or mix review was performed.",
+    "An entire browser loop boundary was not auditioned.",
+    "Mobile, headphones, speakers and game mixing were not tested.",
+    "Q sound concepts do not yet synchronize with actual combat phases."
+  ]
+}

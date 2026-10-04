@@ -1,0 +1,773 @@
+{
+  "version": 1,
+  "title": "失控法师 · 原创合成音频小样",
+  "method": "Deterministic offline NumPy synthesis; no third-party samples.",
+  "integrated_into_game": false,
+  "limitations": "Technical file checks only; subjective listening and device playback require review.",
+  "music": {
+    "bpm": 96,
+    "meter": "4/4",
+    "key_center": "D minor",
+    "loop_master": "WAV, exact bar length; wrapped synthesis and diffusion tails"
+  },
+  "assets": [
+    {
+      "id": "fire_cast_01",
+      "title": "火焰 · 普攻 1",
+      "group": "sfx",
+      "file": "sfx/fire_cast_01.wav",
+      "duration": 0.48,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -21.41,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "cast",
+        "variant"
+      ],
+      "sha256": "e2d0753955d16328357c3cba669fae7d2737d66d765530b6f27e74f421c3035e"
+    },
+    {
+      "id": "fire_cast_02",
+      "title": "火焰 · 普攻 2",
+      "group": "sfx",
+      "file": "sfx/fire_cast_02.wav",
+      "duration": 0.48,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -22.66,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "cast",
+        "variant"
+      ],
+      "sha256": "88bade34b90e21a2bb8d4c98dfa2bfef39c4e5b29cce7ecb9f8b4a3eb41525c0"
+    },
+    {
+      "id": "fire_cast_03",
+      "title": "火焰 · 普攻 3",
+      "group": "sfx",
+      "file": "sfx/fire_cast_03.wav",
+      "duration": 0.48,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -22.33,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "cast",
+        "variant"
+      ],
+      "sha256": "cdf0551fa1a7a6d8651b5748cda40eb8503b46f84a691418078aa4911763ecf9"
+    },
+    {
+      "id": "fire_impact_01",
+      "title": "火焰 · 命中 1",
+      "group": "sfx",
+      "file": "sfx/fire_impact_01.wav",
+      "duration": 0.46,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -22.28,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "impact",
+        "variant"
+      ],
+      "sha256": "70b4ef92295a5bdadc1e80f47167d498ee31d244e76354814ddd196492ed185e"
+    },
+    {
+      "id": "fire_impact_02",
+      "title": "火焰 · 命中 2",
+      "group": "sfx",
+      "file": "sfx/fire_impact_02.wav",
+      "duration": 0.46,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -23.32,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "impact",
+        "variant"
+      ],
+      "sha256": "9403c91659fdd2827854361bf92c87505716e91c538985c8f814e6e8f5582c85"
+    },
+    {
+      "id": "fire_skill",
+      "title": "火焰 · E 技能",
+      "group": "sfx",
+      "file": "sfx/fire_skill.wav",
+      "duration": 1.05,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -2.85,
+      "rms_dbfs": -17.86,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "skill"
+      ],
+      "sha256": "977e50d8d873a1eadde2f8f3a6365b3e7463bdfe050705accf19235ec89f3635"
+    },
+    {
+      "id": "fire_ultimate",
+      "title": "火焰 · Q 大招概念",
+      "group": "sfx",
+      "file": "sfx/fire_ultimate.wav",
+      "duration": 2.1,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -17.25,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "ultimate",
+        "concept"
+      ],
+      "sha256": "da735cb93b47113e34983d00c89838bc4af3e3b706ffdb4a10d2918fcedae10d"
+    },
+    {
+      "id": "fire_embers",
+      "title": "火焰 · 余烬",
+      "group": "sfx",
+      "file": "sfx/fire_embers.wav",
+      "duration": 1.5,
+      "sample_rate": 44100,
+      "channels": 1,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -23.83,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "fire",
+        "special"
+      ],
+      "sha256": "0be7f82f60d9df00649ea9239a1cad42d779ed8f4ee136345bb689f672097d39"
+    },
+    {
+      "id": "ice_cast_01",
+      "title": "冰霜 · 普攻 1",
+      "group": "sfx",
+      "file": "sfx/ice_cast_01.wav",
+      "duration": 0.65,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -24.91,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "ice",
+        "cast",
+        "variant"
+      ],
+      "sha256": "f3ddfc540cf58d874cff7a46c26cea910c906d622d1649afb4a473f9bb3cb80c"
+    },
+    {
+      "id": "ice_cast_02",
+      "title": "冰霜 · 普攻 2",
+      "group": "sfx",
+      "file": "sfx/ice_cast_02.wav",
+      "duration": 0.65,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -24.72,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "ice",
+        "cast",
+        "variant"
+      ],
+      "sha256": "a2e3eb47bf651826d15146b136aefb71fab0991826eddc96cd8a9b0e0d408631"
+    },
+    {
+      "id": "ice_cast_03",
+      "title": "冰霜 · 普攻 3",
+      "group": "sfx",
+      "file": "sfx/ice_cast_03.wav",
+      "duration": 0.65,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -25.8,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "ice",
+        "cast",
+        "variant"
+      ],
+      "sha256": "9a982d994ccc85ae5d899fb33c3382a1df44c45fd2f6ec15de6166627901b12c"
+    },
+    {
+      "id": "ice_impact_01",
+      "title": "冰霜 · 命中 1",
+      "group": "sfx",
+      "file": "sfx/ice_impact_01.wav",
+      "duration": 0.58,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -26.87,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "ice",
+        "impact",
+        "variant"
+      ],
+      "sha256": "a18657e1ebcc49f7649b9f854db910f1964b249f696cc9a63b0072da8c0aef81"
+    },
+    {
+      "id": "ice_impact_02",
+      "title": "冰霜 · 命中 2",
+      "group": "sfx",
+      "file": "sfx/ice_impact_02.wav",
+      "duration": 0.58,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -27.1,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "ice",
+        "impact",
+        "variant"
+      ],
+      "sha256": "059cd3348a651d9e24b58a67ba321f669bb7e514f9f319bbc4566182730de691"
+    },
+    {
+      "id": "ice_skill",
+      "title": "冰霜 · E 技能",
+      "group": "sfx",
+      "file": "sfx/ice_skill.wav",
+      "duration": 1.5,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -2.85,
+      "rms_dbfs": -19.31,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "ice",
+        "skill"
+      ],
+      "sha256": "02196d3e0a511c8cd5cbe31d488dae3f223b55198b05f213c65927842c47fe33"
+    },
+    {
+      "id": "ice_ultimate",
+      "title": "冰霜 · Q 大招概念",
+      "group": "sfx",
+      "file": "sfx/ice_ultimate.wav",
+      "duration": 2.7,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -19.2,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "ice",
+        "ultimate",
+        "concept"
+      ],
+      "sha256": "fecdff6783dd1d4416b0323028c0bcce3d37415ee7b5c70925115051dffa9b85"
+    },
+    {
+      "id": "ice_shatter",
+      "title": "冰霜 · 碎冰处决",
+      "group": "sfx",
+      "file": "sfx/ice_shatter.wav",
+      "duration": 0.85,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -23.13,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "ice",
+        "special"
+      ],
+      "sha256": "e91ddcb6932b6336fb1ad223eb49862cdfcbfa6f9fdfc54134904cb62b48f39e"
+    },
+    {
+      "id": "lightning_cast_01",
+      "title": "闪电 · 普攻 1",
+      "group": "sfx",
+      "file": "sfx/lightning_cast_01.wav",
+      "duration": 0.32,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -25.09,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "cast",
+        "variant"
+      ],
+      "sha256": "3a2b64c052daba7aa30b2ba9f869b2b32d69db4bc514f5438ce1c149573b7d88"
+    },
+    {
+      "id": "lightning_cast_02",
+      "title": "闪电 · 普攻 2",
+      "group": "sfx",
+      "file": "sfx/lightning_cast_02.wav",
+      "duration": 0.32,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -26.7,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "cast",
+        "variant"
+      ],
+      "sha256": "b032e3856c29b0e953846030cf4c3c36c8b9b6f0058436dba6323a6c9cacbffb"
+    },
+    {
+      "id": "lightning_cast_03",
+      "title": "闪电 · 普攻 3",
+      "group": "sfx",
+      "file": "sfx/lightning_cast_03.wav",
+      "duration": 0.32,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -25.63,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "cast",
+        "variant"
+      ],
+      "sha256": "55809e24a71414eb90b06695e3ce6100dac40a1194ba673e1fcce742e50e93fb"
+    },
+    {
+      "id": "lightning_impact_01",
+      "title": "闪电 · 命中 1",
+      "group": "sfx",
+      "file": "sfx/lightning_impact_01.wav",
+      "duration": 0.33,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -28.48,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "impact",
+        "variant"
+      ],
+      "sha256": "84ed48ce66b5b74493303418b15b1192b17f544e9502258790f8d345a7617c72"
+    },
+    {
+      "id": "lightning_impact_02",
+      "title": "闪电 · 命中 2",
+      "group": "sfx",
+      "file": "sfx/lightning_impact_02.wav",
+      "duration": 0.33,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -7.96,
+      "rms_dbfs": -26.29,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "impact",
+        "variant"
+      ],
+      "sha256": "190756515d6bcba3dd4b7a7635c14affae16bde340b327476361242861109e64"
+    },
+    {
+      "id": "lightning_skill",
+      "title": "闪电 · E 技能",
+      "group": "sfx",
+      "file": "sfx/lightning_skill.wav",
+      "duration": 0.82,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -2.85,
+      "rms_dbfs": -21.28,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "skill"
+      ],
+      "sha256": "9fccfb9d0a19ce23823f4e5440f5a27feb4dbdf36d2ee28cc64fc9f6a75be982"
+    },
+    {
+      "id": "lightning_ultimate",
+      "title": "闪电 · Q 大招概念",
+      "group": "sfx",
+      "file": "sfx/lightning_ultimate.wav",
+      "duration": 2.3,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -2.16,
+      "rms_dbfs": -17.67,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "ultimate",
+        "concept"
+      ],
+      "sha256": "3d06904e940beaf2082988e8cb03dcbfb8f607db0e6eeee5ad1d29c48945381e"
+    },
+    {
+      "id": "lightning_discharge",
+      "title": "闪电 · 蓄雷放电",
+      "group": "sfx",
+      "file": "sfx/lightning_discharge.wav",
+      "duration": 0.72,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -28.32,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "lightning",
+        "special"
+      ],
+      "sha256": "c8bed6777bd2ca90d4d05e7d384a8fd360fcde7bf84cb014e60d08c25f93cf5b"
+    },
+    {
+      "id": "player_hurt_01",
+      "title": "玩家受伤 1",
+      "group": "sfx",
+      "file": "sfx/player_hurt_01.wav",
+      "duration": 0.43,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -3.48,
+      "rms_dbfs": -19.98,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "player",
+        "priority"
+      ],
+      "sha256": "c4234c781b62f1b675e258ce7a86f03042052918d9a90fb2c291a202f77ce7d8"
+    },
+    {
+      "id": "player_hurt_02",
+      "title": "玩家受伤 2",
+      "group": "sfx",
+      "file": "sfx/player_hurt_02.wav",
+      "duration": 0.43,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -3.48,
+      "rms_dbfs": -19.32,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "player",
+        "priority"
+      ],
+      "sha256": "761dab0d8aeefff5f38b2ff9333d7674a5a3258929d52e90bb139a25ef0ac2aa"
+    },
+    {
+      "id": "shield_break",
+      "title": "护盾破裂",
+      "group": "sfx",
+      "file": "sfx/shield_break.wav",
+      "duration": 0.85,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -4.01,
+      "rms_dbfs": -22.82,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "player",
+        "priority"
+      ],
+      "sha256": "8a4c7e2f6fcaa57f446c1f6e1e4ed7c0f9d3812312ec15ed6a765ab38445312a"
+    },
+    {
+      "id": "skill_ready",
+      "title": "技能就绪",
+      "group": "sfx",
+      "file": "sfx/skill_ready.wav",
+      "duration": 0.72,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -11.37,
+      "rms_dbfs": -27.83,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "event"
+      ],
+      "sha256": "372bc74a8a1d9dd91f13e2d9f521217c0a20154924c2ec632be7fc31e1c9769d"
+    },
+    {
+      "id": "wave_clear",
+      "title": "清波完成",
+      "group": "sfx",
+      "file": "sfx/wave_clear.wav",
+      "duration": 1.15,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -19.9,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "event"
+      ],
+      "sha256": "aa68d253f7adad6f4b195e6db644360d95c9752194388e5bede82b51f03b9d71"
+    },
+    {
+      "id": "ui_select",
+      "title": "菜单选择",
+      "group": "sfx",
+      "file": "sfx/ui_select.wav",
+      "duration": 0.27,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -12.77,
+      "rms_dbfs": -25.94,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "ui"
+      ],
+      "sha256": "34610a35a2fff638682cf05fff12fd6ea065e8cc9be6574ae0a64bf6e1ce7d7b"
+    },
+    {
+      "id": "upgrade_accept",
+      "title": "强化确认",
+      "group": "sfx",
+      "file": "sfx/upgrade_accept.wav",
+      "duration": 0.95,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -7.33,
+      "rms_dbfs": -22.36,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "event"
+      ],
+      "sha256": "618f707f9543738ead940562e90ed7b8efd8e4e5530b3531a564ee48654fbb5f"
+    },
+    {
+      "id": "victory",
+      "title": "通关收束",
+      "group": "sfx",
+      "file": "sfx/victory.wav",
+      "duration": 2.3,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -3.74,
+      "rms_dbfs": -19.18,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "event"
+      ],
+      "sha256": "2f35c351c1b22c123d3d0a35ae990a0d48ccc77932fd4578c886368fe4e8da61"
+    },
+    {
+      "id": "defeat",
+      "title": "失败收束",
+      "group": "sfx",
+      "file": "sfx/defeat.wav",
+      "duration": 2.1,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -6.02,
+      "rms_dbfs": -20.94,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "event"
+      ],
+      "sha256": "8a0acd081252847106a55505d51d0e2ba4f08d5c7540089b2fee45c4fe5c47f5"
+    },
+    {
+      "id": "boss_arrival",
+      "title": "Boss 登场",
+      "group": "sfx",
+      "file": "sfx/boss_arrival.wav",
+      "duration": 1.85,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -2.5,
+      "rms_dbfs": -17.6,
+      "clipped_samples": 0,
+      "loop": false,
+      "tags": [
+        "boss",
+        "priority"
+      ],
+      "sha256": "070449c9b5464cefa0e35211fe0283e6ac8b78695958504604ca04a8dfc75fa3"
+    },
+    {
+      "id": "menu_loop",
+      "title": "法阵余光 · 主菜单",
+      "group": "music",
+      "file": "music/menu_loop.wav",
+      "duration": 40.0,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -3.35,
+      "rms_dbfs": -16.49,
+      "clipped_samples": 0,
+      "loop": true,
+      "tags": [
+        "menu",
+        "original",
+        "loop"
+      ],
+      "sha256": "5b98a3c8d2e8238273e0670defab4f5f6737ecba4d1bb0354c00e5fee7752834",
+      "bpm": 96,
+      "bars": 16,
+      "boundary_step": 0.0
+    },
+    {
+      "id": "battle_loop",
+      "title": "试验失控 · 普通战斗",
+      "group": "music",
+      "file": "music/battle_loop.wav",
+      "duration": 80.0,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -2.38,
+      "rms_dbfs": -15.97,
+      "clipped_samples": 0,
+      "loop": true,
+      "tags": [
+        "battle",
+        "original",
+        "loop"
+      ],
+      "sha256": "efe53b0e746d7d0f3d9953b817ad2349e22dd1ab11cef3e7936a8827094f9283",
+      "bpm": 96,
+      "bars": 32,
+      "boundary_step": 0.0
+    },
+    {
+      "id": "boss_loop",
+      "title": "魔核苏醒 · Boss 战",
+      "group": "music",
+      "file": "music/boss_loop.wav",
+      "duration": 80.0,
+      "sample_rate": 44100,
+      "channels": 2,
+      "bits": 16,
+      "peak_dbfs": -2.38,
+      "rms_dbfs": -15.56,
+      "clipped_samples": 0,
+      "loop": true,
+      "tags": [
+        "boss",
+        "original",
+        "loop"
+      ],
+      "sha256": "97f2d1a836d22f5071a98bc9e76675e750986f15f61c957e8992090bc1d36bac",
+      "bpm": 96,
+      "bars": 32,
+      "boundary_step": 0.0
+    }
+  ],
+  "sampler": {
+    "file": "sfx_sampler.wav",
+    "duration": 25.23,
+    "order": [
+      "fire_cast_01",
+      "fire_impact_01",
+      "fire_skill",
+      "fire_ultimate",
+      "ice_cast_01",
+      "ice_impact_01",
+      "ice_skill",
+      "ice_shatter",
+      "lightning_cast_01",
+      "lightning_impact_01",
+      "lightning_skill",
+      "lightning_ultimate",
+      "player_hurt_01",
+      "shield_break",
+      "wave_clear",
+      "upgrade_accept",
+      "boss_arrival"
+    ],
+    "gap_seconds": 0.48
+  },
+  "validation": {
+    "pcm_header": true,
+    "non_silent": true,
+    "no_full_scale_clipping": true,
+    "sfx_endpoints": true,
+    "loop_length_and_endpoints": true
+  }
+}
