@@ -272,7 +272,7 @@ button:disabled { opacity: 0.45; cursor: default; }
   #health-fill { transition: none; }
 }
 
-.ultimate-button { --ultimate-color: #ffc385; position: absolute; z-index: 3; left: 50%; bottom: var(--edge-bottom); transform: translateX(-50%); width: 220px; display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--ultimate-color); background: #12221de8; border: 1px solid #a3b79966; border-radius: 10px; text-align: left; touch-action: manipulation; }
+.ultimate-button { --ultimate-color: #ffc385; position: absolute; z-index: 3; left: var(--edge-left); bottom: var(--edge-bottom); transform: none; width: 220px; display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--ultimate-color); background: #12221de8; border: 1px solid #a3b79966; border-radius: 10px; text-align: left; touch-action: manipulation; }
 .ultimate-button[hidden] { display: none; }
 .ultimate-button:disabled { opacity: 0.75; }
 .ultimate-button[data-school-tone="ice"] { --ultimate-color: #aeeaff; }
@@ -505,6 +505,11 @@ button:disabled { opacity: 0.45; cursor: default; }
 }
 @media (max-height: 500px) and (min-width: 600px) {
   #skill { bottom: calc(var(--edge-bottom) + 204px); }
+}
+/* Wide touch layouts reserve the lower-left joystick lane as well. */
+@media (hover: none) and (pointer: coarse) and (min-width: 761px) and (min-height: 501px) {
+  #ultimate { bottom: calc(var(--edge-bottom) + 116px); }
+  #skill { bottom: calc(var(--edge-bottom) + 224px); }
 }
 
 .mode-options { display: flex; gap: 12px; margin: 0 0 20px; }
