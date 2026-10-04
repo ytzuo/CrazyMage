@@ -12,8 +12,8 @@
     "theme_duration_seconds": 160,
     "theme_bars": 64,
     "theme_endpoints": "at most 2 PCM units from silence",
-    "original_master_checksums": "fire refinement: 33 other masters unchanged; five fire cast/impact masters updated",
-    "sampler_seconds": 24.85,
+    "original_master_checksums": "fire Q refinement: 37 other masters unchanged; fire_ultimate updated",
+    "sampler_seconds": 23.07,
     "headers_and_frame_counts": "passed",
     "finite_non_silent_samples": "passed",
     "full_scale_clipping": "none",
@@ -29,17 +29,17 @@
       32,
       32
     ],
-    "fire_comparison_seconds": 5.31
+    "fire_comparison_seconds": 5.31,
+    "fire_pulse_preview_seconds": 1.82
   },
   "browser": {
-    "audio_players": 40,
+    "audio_players": 41,
     "music_and_sampler_playback": "confirmed via controls, decoded durations and playback state",
     "music_decoded_durations_seconds": [
       40,
       80,
       80
     ],
-    "sampler_decoded_duration_seconds": 24.85,
     "switching_pauses_previous_audio": "passed",
     "stop_button_pauses_all": "passed",
     "scene_music_loop_enabled_initially": true,
@@ -65,6 +65,17 @@
       "individual_playback": "all five triggered through native controls; durations decoded",
       "switching_pauses_previous_audio": true,
       "stop_button_pauses_all": true,
+      "console_errors_and_warnings": 0,
+      "sampler_decoded_duration_seconds": 24.85
+    },
+    "sampler_decoded_duration_seconds": 23.07,
+    "fire_pulse_refinement": {
+      "single_round_decoded_duration_seconds": 0.32,
+      "three_round_decoded_duration_seconds": 1.82,
+      "sampler_decoded_duration_seconds": 23.07,
+      "playback": "confirmed through native controls and active positions for all three",
+      "stop_button_pauses_all": true,
+      "audio_players": 41,
       "console_errors_and_warnings": 0
     }
   },
@@ -79,6 +90,6 @@
     "No reliable subjective listening or mix review was performed.",
     "An entire browser loop boundary was not auditioned.",
     "Mobile, headphones, speakers and game mixing were not tested.",
-    "Q sound concepts do not yet synchronize with actual combat phases."
+    "Ice and lightning Q concepts do not yet synchronize with actual combat phases; fire Q has a single-round asset but no game event integration."
   ]
 }

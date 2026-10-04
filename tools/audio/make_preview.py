@@ -28,6 +28,9 @@ def make_preview():
     effects = [a for a in manifest["assets"] if a["group"] == "sfx"]
     comparison = manifest.get("fire_comparison")
     fire_comparison = f'''<div class="sampler"><div><strong>火焰变体对比 · {comparison['duration']:.2f} 秒</strong><p>普攻依次为短喷 → 卷焰 → 余烬，命中依次为脆裂 → 闷爆。每个声音之间留出 0.60 秒。</p></div><audio controls preload="none" src="{comparison['file']}" aria-label="火焰变体对比"></audio></div>''' if comparison else ''
+    pulse = manifest.get("fire_pulse_preview")
+    if pulse:
+        fire_comparison += f'''<div class="sampler"><div><strong>火焰 Q · 三轮火墙试听</strong><p>单轮 0.32 秒，按当前每轮 0.45 秒间隔连续播放三次。下方 Q 文件只包含一轮声音。</p></div><audio controls preload="none" src="{pulse['file']}" aria-label="火焰 Q 三轮火墙试听"></audio></div>'''
     descriptions = {
         "menu_loop": "空灵晶体、缓慢和弦与低声脉冲。法阵尚未醒来。",
         "battle_loop": "主题旋律、跳动低音与轻打击乐。让法术保留前景。",
@@ -83,10 +86,10 @@ __THEME__
 <div class="section-head"><h2>主题与场景音乐</h2><p>共同主题 · D 小调色彩 · 96 BPM · 4/4 拍</p></div>
 <div class="music-grid">__MUSIC__</div>
 <div class="section-head"><h2>法术与战斗反馈</h2><p>普攻三种变体、命中两种变体，另有 E / Q 与特殊反馈</p></div>
-<div class="sampler"><div><strong>25 秒音效速览</strong><p>按火焰 → 冰霜 → 闪电 → 受伤与护盾 → 清波与强化 → Boss 登场排列。各声音之间留有短暂停顿。</p></div><audio controls preload="none" src="sfx_sampler.wav" aria-label="音效速览"></audio></div>
+<div class="sampler"><div><strong>__SAMPLER_SECONDS__ 秒音效速览</strong><p>按火焰 → 冰霜 → 闪电 → 受伤与护盾 → 清波与强化 → Boss 登场排列。各声音之间留有短暂停顿。</p></div><audio controls preload="none" src="sfx_sampler.wav" aria-label="音效速览"></audio></div>
 __FIRE_COMPARE__
 <div class="sound-grid">__SOUNDS__</div>
-<footer>文件已检查：可读取、非静音、无满幅削波，音效首尾与音乐循环端点符合制作约束。听感、实际浏览器循环与手机外放仍待试听。Q 是完整声音概念，后续接入时需按实际技能阶段拆分同步。<br><a href="README.md">制作说明 ↗</a>　·　<a href="manifest.json">素材清单 ↗</a></footer>
+<footer>文件已检查：可读取、非静音、无满幅削波，音效首尾与音乐循环端点符合制作约束。听感、实际浏览器循环与手机外放仍待试听。火焰 Q 已制作成单轮火墙声音；冰霜与闪电 Q 仍是完整声音概念，后续接入时需按实际技能阶段同步。<br><a href="README.md">制作说明 ↗</a>　·　<a href="manifest.json">素材清单 ↗</a></footer>
 </main><script>
 const players = Array.from(document.querySelectorAll('audio'));
 const volume = document.getElementById('volume');
@@ -122,6 +125,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) { sto
 window.addEventListener('pagehide', () => stopAll(false));
 </script></body></html>
 '''.replace("__MUSIC__", ''.join(cards)).replace("__SOUNDS__", ''.join(sections)).replace("__THEME__", ''.join(theme_cards)).replace("__THEME_STAT__", '<span><strong>1</strong> 首主题曲</span>' if themes else '').replace("__FIRE_COMPARE__", fire_comparison).replace("__REVISION__", f"{manifest['version']:02}")
+    html = html.replace("__SAMPLER_SECONDS__", f"{manifest['sampler']['duration']:.0f}")
     (OUT / "index.html").write_text(html, encoding="utf-8")
     print("Built listening page", flush=True)
 

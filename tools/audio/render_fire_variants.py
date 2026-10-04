@@ -33,7 +33,7 @@ def main():
         render_fire_variant("impact", i)
     verify_outputs()
     replacements = {a["id"]: a for a in REPORT}
-    manifest["version"] = 3
+    manifest["version"] = max(manifest.get("version", 1), 3)
     manifest["assets"] = [replacements.get(a["id"], a) for a in manifest["assets"]]
     manifest["sampler"] = render_reel()
     manifest["fire_comparison"] = render_comparison()
