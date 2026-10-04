@@ -201,7 +201,7 @@ def render_fire_variant(kind, index):
 
 
 def render_fire_pulse():
-    save("fire_ultimate", "火焰 · Q 单轮火墙", "sfx", fire("ultimate"), .65,
+    save("fire_ultimate", "火焰 · Q 单轮火墙", "sfx", fire("ultimate"), .78,
          tags=["fire", "ultimate", "pulse"])
     REPORT[-1]["trigger"] = "once per fire-wall round, not once per enemy hit"
 
@@ -210,7 +210,7 @@ def fire(kind, seed=0):
     if kind in FIRE_VARIANTS:
         return fire_basic(kind, seed)
     rng = rng_for(f"fire-{kind}-{seed}")
-    length = {"skill":1.05,"ultimate":.32,"embers":1.5}[kind]
+    length = {"skill":1.05,"ultimate":2.1,"embers":1.5}[kind]
     t = timeline(length)
     breath = noise(t, rng, 70, 3900, -.3)
     grit = noise(t, rng, 500, 6200)
@@ -219,11 +219,18 @@ def fire(kind, seed=0):
         y += .50 * sweep(t, 195, 43, .034) * np.exp(-t/.25)
         y += .11 * sweep(t, 600, 90, .14) * np.exp(-t/.19)
     elif kind == "ultimate":
-        # One rising wall, with no prelude, extra pulses or long reverb tail.
-        envelope = (1-np.exp(-t/.009)) * np.exp(-t/.072)
-        y = .42 * breath * envelope * (1+.12*np.sin(TAU*23*t))
-        y += .36 * sweep(t,180,48,.035) * np.exp(-t/.083)
-        y += .075 * grit * np.exp(-t/.025)
+        # Keep the original sustained combustion texture and its first wall.
+        # Use the original synthesis length so the seeded noise is unchanged.
+        envelope = (1-np.exp(-t/.07)) * np.exp(-t/.50)
+        y = .37 * breath * envelope * (1+.15*np.sin(TAU*11*t))
+        for onset, pitch in ((.05,150),(.43,130),(.83,105)):
+            local = t-onset
+            active = local >= 0
+            lt = np.maximum(local, 0)
+            y += active * .35 * sweep(lt,pitch,43,.055) * np.exp(-lt/.23)
+        y += .09 * grit * envelope
+        # End before the old second wall at 430 ms, with a short smooth release.
+        return fade(fade(y, .004, .06)[:round(.38 * SR)], .004, .055)
     else:
         y = .13 * breath * np.exp(-t/.42)
         for onset in (.03,.17,.28,.41,.64,.91):

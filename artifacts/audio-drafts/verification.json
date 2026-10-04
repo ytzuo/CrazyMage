@@ -13,7 +13,7 @@
     "theme_bars": 64,
     "theme_endpoints": "at most 2 PCM units from silence",
     "original_master_checksums": "fire Q refinement: 37 other masters unchanged; fire_ultimate updated",
-    "sampler_seconds": 23.07,
+    "sampler_seconds": 23.13,
     "headers_and_frame_counts": "passed",
     "finite_non_silent_samples": "passed",
     "full_scale_clipping": "none",
@@ -30,7 +30,7 @@
       32
     ],
     "fire_comparison_seconds": 5.31,
-    "fire_pulse_preview_seconds": 1.82
+    "fire_pulse_preview_seconds": 1.88
   },
   "browser": {
     "audio_players": 41,
@@ -68,12 +68,10 @@
       "console_errors_and_warnings": 0,
       "sampler_decoded_duration_seconds": 24.85
     },
-    "sampler_decoded_duration_seconds": 23.07,
     "fire_pulse_refinement": {
-      "single_round_decoded_duration_seconds": 0.32,
-      "three_round_decoded_duration_seconds": 1.82,
-      "sampler_decoded_duration_seconds": 23.07,
-      "playback": "confirmed through native controls and active positions for all three",
+      "single_round_decoded_duration_seconds": 0.38,
+      "three_round_decoded_duration_seconds": 1.88,
+      "playback": "confirmed through native controls and active playback positions",
       "stop_button_pauses_all": true,
       "audio_players": 41,
       "console_errors_and_warnings": 0

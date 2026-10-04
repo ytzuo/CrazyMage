@@ -13,7 +13,7 @@ def main():
     manifest = json.loads(path.read_text(encoding="utf-8"))
     render_fire_pulse()
     verify_outputs()
-    manifest["version"] = max(manifest.get("version", 1), 4)
+    manifest["version"] = max(manifest.get("version", 1), 5)
     manifest["assets"] = [REPORT[0] if a["id"] == "fire_ultimate" else a
                           for a in manifest["assets"]]
     manifest["sampler"] = render_reel()

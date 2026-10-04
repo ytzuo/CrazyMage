@@ -6,26 +6,6 @@
   },
   "before": {
     "id": "fire_ultimate",
-    "title": "火焰 · Q 大招概念",
-    "group": "sfx",
-    "file": "sfx/fire_ultimate.wav",
-    "duration": 2.1,
-    "sample_rate": 44100,
-    "channels": 1,
-    "bits": 16,
-    "peak_dbfs": -2.16,
-    "rms_dbfs": -17.25,
-    "clipped_samples": 0,
-    "loop": false,
-    "tags": [
-      "fire",
-      "ultimate",
-      "concept"
-    ],
-    "sha256": "da735cb93b47113e34983d00c89838bc4af3e3b706ffdb4a10d2918fcedae10d"
-  },
-  "after": {
-    "id": "fire_ultimate",
     "title": "火焰 · Q 单轮火墙",
     "group": "sfx",
     "file": "sfx/fire_ultimate.wav",
@@ -45,6 +25,27 @@
     "sha256": "ad83ec90743b42fb74d43a1ebda4fb2e9b63964b4a651d6b85affe2d008ca17e",
     "trigger": "once per fire-wall round, not once per enemy hit"
   },
+  "after": {
+    "id": "fire_ultimate",
+    "title": "火焰 · Q 单轮火墙",
+    "group": "sfx",
+    "file": "sfx/fire_ultimate.wav",
+    "duration": 0.38,
+    "sample_rate": 44100,
+    "channels": 1,
+    "bits": 16,
+    "peak_dbfs": -2.16,
+    "rms_dbfs": -13.05,
+    "clipped_samples": 0,
+    "loop": false,
+    "tags": [
+      "fire",
+      "ultimate",
+      "pulse"
+    ],
+    "sha256": "187d2cda987beb9bb44c6445cab4a97e96f487065b7d7611ff810482d7d54138",
+    "trigger": "once per fire-wall round, not once per enemy hit"
+  },
   "checks": {
     "headers_frames_non_silent_endpoints": "passed",
     "full_scale_clipping": "none",
@@ -52,20 +53,30 @@
     "fire_variants_comparison_unchanged": true,
     "three_round_preview_matches_single_file": true,
     "round_interval_seconds": 0.45,
-    "sound_duration_seconds": 0.32,
-    "gap_between_rounds_seconds": 0.13,
-    "preview_duration_seconds": 1.82,
-    "sampler_duration_seconds": 23.07
+    "sound_duration_seconds": 0.38,
+    "gap_between_rounds_seconds": 0.07,
+    "preview_duration_seconds": 1.88,
+    "sampler_duration_seconds": 23.13
   },
   "limitations": [
     "No reliable subjective listening review was performed.",
     "Preview uses current base interval; game event triggering and mix are not integrated or tested."
   ],
+  "style_reference": {
+    "commit": "c1e1751",
+    "original_duration_seconds": 2.1,
+    "original_sha256": "da735cb93b47113e34983d00c89838bc4af3e3b706ffdb4a10d2918fcedae10d",
+    "body_sample_range_seconds": [
+      0.01,
+      0.3
+    ],
+    "body_waveform_pearson_correlation": 0.9999999419817156,
+    "method": "PCM waveform correlation against original burning Q; excludes opening and new release; not a subjective listening score"
+  },
   "browser": {
-    "single_round_decoded_duration_seconds": 0.32,
-    "three_round_decoded_duration_seconds": 1.82,
-    "sampler_decoded_duration_seconds": 23.07,
-    "playback": "confirmed through native controls and active positions for all three",
+    "single_round_decoded_duration_seconds": 0.38,
+    "three_round_decoded_duration_seconds": 1.88,
+    "playback": "confirmed through native controls and active playback positions",
     "stop_button_pauses_all": true,
     "audio_players": 41,
     "console_errors_and_warnings": 0
