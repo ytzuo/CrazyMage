@@ -540,22 +540,22 @@
     },
     {
       "id": "shield_break",
-      "title": "护盾破裂",
+      "title": "护盾破裂 / 玻璃炸裂",
       "group": "sfx",
       "file": "sfx/shield_break.wav",
-      "duration": 0.85,
+      "duration": 1.0,
       "sample_rate": 44100,
       "channels": 2,
       "bits": 16,
       "peak_dbfs": -4.01,
-      "rms_dbfs": -22.82,
+      "rms_dbfs": -25.06,
       "clipped_samples": 0,
       "loop": false,
       "tags": [
         "player",
         "priority"
       ],
-      "sha256": "8a4c7e2f6fcaa57f446c1f6e1e4ed7c0f9d3812312ec15ed6a765ab38445312a"
+      "sha256": "b5a037d35786c96b826e5e2a521386fb5bc803ba49ee6602c9c118fcd2378d45"
     },
     {
       "id": "skill_ready",
@@ -818,7 +818,7 @@
   ],
   "sampler": {
     "file": "sfx_sampler.wav",
-    "duration": 22.04,
+    "duration": 22.19,
     "order": [
       "fire_cast_01",
       "fire_impact_01",

@@ -1,0 +1,58 @@
+{
+  "environment": {
+    "platform": "macOS-26.6-arm64-arm-64bit",
+    "python": "3.9.6",
+    "numpy": "2.0.2"
+  },
+  "before": {
+    "id": "shield_break",
+    "title": "护盾破裂 / 脆裂与碎片",
+    "group": "sfx",
+    "file": "sfx/shield_break.wav",
+    "duration": 0.64,
+    "sample_rate": 44100,
+    "channels": 2,
+    "bits": 16,
+    "peak_dbfs": -4.01,
+    "rms_dbfs": -28.65,
+    "clipped_samples": 0,
+    "loop": false,
+    "tags": [
+      "player",
+      "priority"
+    ],
+    "sha256": "0cbb86145ef28c8da1051cfc14c1975d5e9aba1ec0a54cd1b3ce9ee22de082a4"
+  },
+  "after": {
+    "id": "shield_break",
+    "title": "护盾破裂 / 玻璃炸裂",
+    "group": "sfx",
+    "file": "sfx/shield_break.wav",
+    "duration": 1.0,
+    "sample_rate": 44100,
+    "channels": 2,
+    "bits": 16,
+    "peak_dbfs": -4.01,
+    "rms_dbfs": -25.06,
+    "clipped_samples": 0,
+    "loop": false,
+    "tags": [
+      "player",
+      "priority"
+    ],
+    "sha256": "b5a037d35786c96b826e5e2a521386fb5bc803ba49ee6602c9c118fcd2378d45"
+  },
+  "checks": {
+    "wav_pcm_header": true,
+    "non_silent": true,
+    "no_full_scale_clipping": true,
+    "zero_endpoints": true,
+    "deterministic_regeneration": true,
+    "all_asset_hashes_match_manifest": true,
+    "sampler_exact_samples": true,
+    "http_range": true,
+    "preview_entry_present": true,
+    "other_wavs_unchanged": 42
+  },
+  "limitations": "Offline sample, file and HTTP checks only; no subjective listening, browser audio playback, mobile-speaker or in-game validation."
+}

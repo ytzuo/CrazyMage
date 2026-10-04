@@ -474,6 +474,47 @@ def chime(notes, spacing=.09, seconds=1, decay=.17):
     return room(y,.25)
 
 
+def render_shield_break():
+    """Glass pane fracture followed by bright, inharmonic shards and bounces."""
+    rng = rng_for("shield-break-glass-v9")
+    t = timeline(1.0)
+    y = np.zeros((len(t), 2))
+    # Thin glass: a sharp broad crack and a brief, irregular pane resonance.
+    crack = noise(t, rng, 1700, 9800)
+    crunch = noise(t, rng, 750, 5500)
+    local = np.maximum(t - .003, 0)
+    attack = (1 - np.exp(-local / .0007))
+    core = attack * (.30 * crack * np.exp(-local / .014)
+                     + .13 * crunch * np.exp(-local / .041))
+    for frequency, gain in ((1180, .11), (2630, .10), (4370, .08), (6910, .05)):
+        core += attack * gain * np.sin(TAU * frequency * local) * np.exp(-local / .037)
+    place(y, core, 0)
+
+    # Audible glass tinkles carry the material cue after the initial fracture.
+    # Unequal modal ratios avoid a bell melody; small shards ring higher.
+    onsets = (.012, .021, .032, .046, .061, .079, .098, .119,
+              .143, .170, .199, .231, .266, .304, .346, .391,
+              .439, .492, .549, .610, .676, .747)
+    for i, at in enumerate(onsets):
+        st = timeline(.18)
+        decay = rng.uniform(.029, .052)
+        grit = noise(st, rng, 2100, 10000)
+        chip = .22 * grit * np.exp(-st / .004)
+        frequency = rng.uniform(1650, 3600)
+        for ratio, gain in ((1, .48), (1.463, .31), (2.179, .19), (2.713, .10)):
+            mode = frequency * ratio * rng.uniform(.985, 1.015)
+            chip += gain * np.sin(TAU * mode * st) * np.exp(-st / (decay / np.sqrt(ratio)))
+        chip = fade(chip, .0006, .025)
+        gain = .30 * np.exp(-at / .46) * rng.uniform(.75, 1.15)
+        pan = rng.uniform(-.65, .65)
+        place(y, chip, at, gain, pan)
+        if i % 3 == 1:
+            # Same shard rebounds nearby, more softly, without a room echo.
+            place(y, chip, at + rng.uniform(.024, .046), gain * .38, pan * .9)
+    save("shield_break", "护盾破裂 / 玻璃炸裂", "sfx", y, .63,
+         tags=["player", "priority"])
+
+
 def render_effects():
     schools = {"fire":(fire,"火焰"),"ice":(ice,"冰霜"),"lightning":(lightning,"闪电")}
     for school,(make,label) in schools.items():
@@ -510,7 +551,7 @@ def render_effects():
         y += .15*noise(t,rng,180,2800)*np.exp(-t/.05)
         y += .12*np.sin(TAU*330*t)*np.exp(-t/.075)
         save(f"player_hurt_{i+1:02}",f"玩家受伤 {i+1}","sfx",room(y,.06),.67,tags=["player","priority"])
-    save("shield_break","护盾破裂","sfx",ice("shatter",3)+chime([77,70],.11,.85,.14)*.32,.63,tags=["player","priority"])
+    render_shield_break()
     for name,title,notes,seconds,peak in (
         ("skill_ready","技能就绪",[81,86],.72,.27),
         ("wave_clear","清波完成",[74,77,81,86],1.15,.50),
