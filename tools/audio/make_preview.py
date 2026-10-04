@@ -31,7 +31,7 @@ def make_preview():
     pulse = manifest.get("fire_pulse_preview")
     if pulse:
         single = next(a for a in effects if a['id'] == 'fire_ultimate')
-        fire_comparison += f'''<div class="sampler"><div><strong>火焰 Q · 三轮火墙试听</strong><p>保留原版喷燃质感，单轮 {single['duration']:.2f} 秒，按当前每轮 {pulse['interval_seconds']:.2f} 秒间隔连续播放三次。下方 Q 文件只包含一轮声音。</p></div><audio controls preload="none" src="{pulse['file']}" aria-label="火焰 Q 三轮火墙试听"></audio></div>'''
+        fire_comparison += f'''<div class="sampler"><div><strong>火焰 Q · 三轮火墙试听</strong><p>低沉喷燃，收柔高频，单轮 {single['duration']:.2f} 秒，按当前每轮 {pulse['interval_seconds']:.2f} 秒间隔连续播放三次。下方 Q 文件只包含一轮声音。</p></div><audio controls preload="none" src="{pulse['file']}" aria-label="火焰 Q 三轮火墙试听"></audio></div>'''
     descriptions = {
         "menu_loop": "空灵晶体、缓慢和弦与低声脉冲。法阵尚未醒来。",
         "battle_loop": "主题旋律、跳动低音与轻打击乐。让法术保留前景。",

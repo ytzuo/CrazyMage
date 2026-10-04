@@ -9,27 +9,6 @@
     "title": "火焰 · Q 单轮火墙",
     "group": "sfx",
     "file": "sfx/fire_ultimate.wav",
-    "duration": 0.32,
-    "sample_rate": 44100,
-    "channels": 1,
-    "bits": 16,
-    "peak_dbfs": -3.74,
-    "rms_dbfs": -18.79,
-    "clipped_samples": 0,
-    "loop": false,
-    "tags": [
-      "fire",
-      "ultimate",
-      "pulse"
-    ],
-    "sha256": "ad83ec90743b42fb74d43a1ebda4fb2e9b63964b4a651d6b85affe2d008ca17e",
-    "trigger": "once per fire-wall round, not once per enemy hit"
-  },
-  "after": {
-    "id": "fire_ultimate",
-    "title": "火焰 · Q 单轮火墙",
-    "group": "sfx",
-    "file": "sfx/fire_ultimate.wav",
     "duration": 0.38,
     "sample_rate": 44100,
     "channels": 1,
@@ -44,6 +23,27 @@
       "pulse"
     ],
     "sha256": "187d2cda987beb9bb44c6445cab4a97e96f487065b7d7611ff810482d7d54138",
+    "trigger": "once per fire-wall round, not once per enemy hit"
+  },
+  "after": {
+    "id": "fire_ultimate",
+    "title": "火焰 · Q 单轮火墙",
+    "group": "sfx",
+    "file": "sfx/fire_ultimate.wav",
+    "duration": 0.38,
+    "sample_rate": 44100,
+    "channels": 1,
+    "bits": 16,
+    "peak_dbfs": -3.74,
+    "rms_dbfs": -14.0,
+    "clipped_samples": 0,
+    "loop": false,
+    "tags": [
+      "fire",
+      "ultimate",
+      "pulse"
+    ],
+    "sha256": "7ba2a2668728644d5998e04804abc742173cbd3c23c5e196d591c0e92c4d87fd",
     "trigger": "once per fire-wall round, not once per enemy hit"
   },
   "checks": {
@@ -62,16 +62,20 @@
     "No reliable subjective listening review was performed.",
     "Preview uses current base interval; game event triggering and mix are not integrated or tested."
   ],
-  "style_reference": {
-    "commit": "c1e1751",
-    "original_duration_seconds": 2.1,
-    "original_sha256": "da735cb93b47113e34983d00c89838bc4af3e3b706ffdb4a10d2918fcedae10d",
-    "body_sample_range_seconds": [
-      0.01,
-      0.3
-    ],
-    "body_waveform_pearson_correlation": 0.9999999419817156,
-    "method": "PCM waveform correlation against original burning Q; excludes opening and new release; not a subjective listening score"
+  "tone_refinement": {
+    "reference_commit": "820b189",
+    "filter": "950 Hz smooth low-pass, 24 dB/octave asymptotic rolloff, applied offline with reflection padding",
+    "method": "Hann-windowed full-file PCM power spectrum; these measurements do not establish subjective comfort",
+    "before": {
+      "power_centroid_hz": 905.25,
+      "power_above_2000hz_fraction": 0.15352243050106018,
+      "power_below_1000hz_fraction": 0.6460399367151369
+    },
+    "after": {
+      "power_centroid_hz": 268.16,
+      "power_above_2000hz_fraction": 0.00013948457779660103,
+      "power_below_1000hz_fraction": 0.9725465493521255
+    }
   },
   "browser": {
     "single_round_decoded_duration_seconds": 0.38,

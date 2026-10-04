@@ -201,7 +201,7 @@ def render_fire_variant(kind, index):
 
 
 def render_fire_pulse():
-    save("fire_ultimate", "火焰 · Q 单轮火墙", "sfx", fire("ultimate"), .78,
+    save("fire_ultimate", "火焰 · Q 单轮火墙", "sfx", fire("ultimate"), .65,
          tags=["fire", "ultimate", "pulse"])
     REPORT[-1]["trigger"] = "once per fire-wall round, not once per enemy hit"
 
@@ -229,6 +229,13 @@ def fire(kind, seed=0):
             lt = np.maximum(local, 0)
             y += active * .35 * sweep(lt,pitch,43,.055) * np.exp(-lt/.23)
         y += .09 * grit * envelope
+        # Smoothly roll off the sharp hiss, retaining the combustion envelope.
+        # Reflect-padding keeps the offline filter from wrapping the endpoints.
+        padding = round(.10 * SR)
+        padded = np.pad(y, (padding, padding), mode="reflect")
+        frequencies = np.fft.rfftfreq(len(padded), 1 / SR)
+        response = 1 / np.sqrt(1 + (frequencies / 950) ** 8)
+        y = np.fft.irfft(np.fft.rfft(padded) * response, n=len(padded))[padding:-padding]
         # End before the old second wall at 430 ms, with a short smooth release.
         return fade(fade(y, .004, .06)[:round(.38 * SR)], .004, .055)
     else:
