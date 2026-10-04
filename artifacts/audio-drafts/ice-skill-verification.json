@@ -1,0 +1,75 @@
+{
+  "scope": "Offline ice E emerging spikes; no game integration",
+  "environment": "Bundled Python with NumPy; 44.1 kHz / stereo / 16-bit PCM WAV",
+  "before": {
+    "id": "ice_skill",
+    "title": "冰霜 · E 技能",
+    "group": "sfx",
+    "file": "sfx/ice_skill.wav",
+    "duration": 1.5,
+    "sample_rate": 44100,
+    "channels": 2,
+    "bits": 16,
+    "peak_dbfs": -2.85,
+    "rms_dbfs": -19.31,
+    "clipped_samples": 0,
+    "loop": false,
+    "tags": [
+      "ice",
+      "skill"
+    ],
+    "sha256": "02196d3e0a511c8cd5cbe31d488dae3f223b55198b05f213c65927842c47fe33"
+  },
+  "after": {
+    "id": "ice_skill",
+    "title": "冰霜 · E 冰刺升起",
+    "group": "sfx",
+    "file": "sfx/ice_skill.wav",
+    "duration": 1.0,
+    "sample_rate": 44100,
+    "channels": 2,
+    "bits": 16,
+    "peak_dbfs": -2.85,
+    "rms_dbfs": -21.96,
+    "clipped_samples": 0,
+    "loop": false,
+    "tags": [
+      "ice",
+      "skill"
+    ],
+    "sha256": "cb853b20f24b995a6ba498ec1070e92324672d6bbfa6eb568045105b2df89e4c",
+    "character": "ground crack, rising spike fan, short crystal settling"
+  },
+  "design": {
+    "stages": [
+      "short ground crack",
+      "brightening air scrape",
+      "closely staggered shafts emerging",
+      "small crystal settling"
+    ],
+    "shaft_onsets_seconds": [
+      0.025,
+      0.052,
+      0.087,
+      0.125,
+      0.168
+    ],
+    "air_swell_center_seconds": 0.125,
+    "pitch_material": "short inharmonic/random crystal modes; no MIDI scale"
+  },
+  "checks": {
+    "headers_frames_non_silent_endpoints": "passed",
+    "full_scale_clipping": "none",
+    "other_masters_matching_before_render_working_manifest": 37,
+    "unrelated_parallel_changes_excluded": []
+  },
+  "limitations": [
+    "Subjective rising-spike identity and mix need user listening.",
+    "Not synchronized with game animation or tested in the live combat mix."
+  ],
+  "browser": {
+    "decoded_duration_seconds": 1.0,
+    "playback": "confirmed by native control, active playback position, and no media error",
+    "console_errors_and_warnings": 0
+  }
+}

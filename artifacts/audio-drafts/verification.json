@@ -12,8 +12,8 @@
     "theme_duration_seconds": 160,
     "theme_bars": 64,
     "theme_endpoints": "at most 2 PCM units from silence",
-    "original_master_checksums": "ice impact refinement: 36 other masters unchanged in this isolated commit; two ice impacts updated",
-    "sampler_seconds": 22.54,
+    "original_master_checksums": "ice E refinement: 37 other masters unchanged in this isolated commit; ice_skill updated",
+    "sampler_seconds": 22.04,
     "headers_and_frame_counts": "passed",
     "finite_non_silent_samples": "passed",
     "full_scale_clipping": "none",
@@ -102,6 +102,11 @@
       "stop_button_pauses_all": true,
       "console_errors_and_warnings": 0,
       "check_context": "Shared working page includes a separate player hurt preview; combined page has 44 players."
+    },
+    "ice_skill_refinement": {
+      "decoded_duration_seconds": 1.0,
+      "playback": "confirmed by native control, active playback position, and no media error",
+      "console_errors_and_warnings": 0
     }
   },
   "preview_http": {

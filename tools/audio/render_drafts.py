@@ -295,9 +295,49 @@ def render_ice_impact(index):
     REPORT[-1]["variant_character"] = character
 
 
+def ice_spikes():
+    """Ground crack, rising ice shafts and a short crystal settling tail."""
+    rng = rng_for("ice-spikes-v11")
+    t = timeline(1.0)
+    y = np.zeros((len(t),2))
+    ground = noise(t,rng,120,1800,-.25)*np.exp(-t/.032)
+    ground += .45*noise(t,rng,1000,5000,-.2)*np.exp(-t/.011)
+    place(y,fade(ground,.002,.04),0,.10)
+    # Air brightens as the shafts rise; this is a swell, not a pitched scale.
+    low_air = noise(t,rng,450,2300,-.25)
+    high_air = noise(t,rng,1400,4700,-.2)
+    lift = np.clip(t/.19,0,1)
+    swell = np.exp(-((t-.125)/.078)**2)*(1-np.exp(-t/.012))
+    place(y,(low_air*(1-lift)+high_air*lift)*swell,0,.16)
+    # Closely staggered shafts emerge as one fan of spikes, not separate notes.
+    for at,gain,pan in ((.025,.16,-.24),(.052,.21,.14),(.087,.27,-.08),(.125,.22,.24),(.168,.15,-.16)):
+        st = timeline(.27)
+        scrape = noise(st,rng,850,4600,-.25)
+        tip = noise(st,rng,1800,6200,-.18)
+        env = (1-np.exp(-st/.009))*np.exp(-st/.046)
+        shaft = .65*scrape*env+.19*tip*np.exp(-st/.010)
+        frequency = rng.uniform(1850,2450)
+        for ratio,level in ((1,.26),(1.79,.13),(2.57,.07)):
+            shaft += level*np.sin(TAU*frequency*ratio*st)*np.exp(-st/(.026/np.sqrt(ratio)))
+        place(y,fade(shaft,.002,.025),at,gain,pan)
+    for at,gain in ((.29,.027),(.345,.021),(.405,.014),(.475,.009)):
+        st=timeline(.13)
+        fragment=noise(st,rng,1800,5500,-.2)*np.exp(-st/.012)
+        fragment+=.30*np.sin(TAU*rng.uniform(2600,3900)*st)*np.exp(-st/.018)
+        place(y,fade(fragment,.001,.025),at,gain,rng.uniform(-.25,.25))
+    return fade(y,.002,.05)
+
+
+def render_ice_skill():
+    save("ice_skill","冰霜 · E 冰刺升起","sfx",ice_spikes(),.72,tags=["ice","skill"])
+    REPORT[-1]["character"]="ground crack, rising spike fan, short crystal settling"
+
+
 def ice(kind, seed=0):
     if kind == "impact":
         return ice_impact(seed)
+    if kind == "skill":
+        return ice_spikes()
     rng = rng_for(f"ice-{kind}-{seed}")
     length = {"cast":.65,"impact":.58,"skill":1.5,"ultimate":2.7,"shatter":.85}[kind]
     t = timeline(length)
@@ -453,7 +493,10 @@ def render_effects():
                 render_ice_impact(i)
             else:
                 save(f"{school}_impact_{i+1:02}",f"{label} · 命中 {i+1}","sfx",make("impact",i),.40,tags=[school,"impact","variant"])
-        save(f"{school}_skill",f"{label} · E 技能","sfx",make("skill"),.72,tags=[school,"skill"])
+        if school == "ice":
+            render_ice_skill()
+        else:
+            save(f"{school}_skill",f"{label} · E 技能","sfx",make("skill"),.72,tags=[school,"skill"])
         if school == "fire":
             render_fire_pulse()
         else:

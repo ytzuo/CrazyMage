@@ -1,6 +1,6 @@
-# 失控法师 · 原创合成音频小样 V10
+# 失控法师 · 原创合成音频小样 V11
 
-34 个音效、3 段循环音乐、一首 2 分 40 秒主题曲，以及一个 22.54 秒音效速览。音色均由离线波形与噪声合成生成，没有导入第三方采样、现成歌曲或外部音频素材。没有接入游戏，也没有修改游戏入口、战斗逻辑、构建配置或生产界面。
+34 个音效、3 段循环音乐、一首 2 分 40 秒主题曲，以及一个 22.04 秒音效速览。音色均由离线波形与噪声合成生成，没有导入第三方采样、现成歌曲或外部音频素材。没有接入游戏，也没有修改游戏入口、战斗逻辑、构建配置或生产界面。
 
 ## 试听
 
@@ -89,6 +89,12 @@
 
 [两种命中对比](ice_impacts_comparison.wav) 为 2.11 秒，依次播放冰裂、碎冰。峰值均沿用约 −7.96 dBFS，不代表感知响度已完全匹配。文件检查见 [冰系命中验证](ice-impacts-verification.json)，音色、强度与舒适度仍需用户试听。
 
+## 冰霜 E 冰刺升起
+
+[冰霜 E](sfx/ice_skill.wav) 从原 1.50 秒音阶式概念重做为 1.00 秒冰刺升起：先有短地面裂响，再由暗到亮的寒气摩擦逐渐抬起，五根冰刺紧密错开出地，最后细小冰晶收尾。冰晶共鸣使用非整数倍与随机频率，不按音乐音阶排列；不包含持续驻留区域的循环声音。
+
+首根冰刺在约 25 毫秒出现，五根在约 168 毫秒内推出，寒气起势在约 125 毫秒达到中心；这些是声音内部的层次安排，尚未与实际游戏动画逐帧同步。峰值沿用约 −2.85 dBFS。文件检查见 [冰刺升起验证](ice-skill-verification.json)，实际上升感、响度与空间感仍需试听。
+
 ## 文件与检查
 
 - 全部为 44.1 kHz、16 位 PCM WAV；部分短音效为单声道，带空间扩散的音效和音乐为双声道。
@@ -110,6 +116,7 @@ python3 tools/audio/render_fire_variants.py
 python3 tools/audio/render_fire_pulse.py
 python3 tools/audio/render_lightning_variants.py
 python3 tools/audio/render_ice_impacts.py
+python3 tools/audio/render_ice_skill.py
 python3 tools/audio/make_preview.py
 ```
 
@@ -126,3 +133,5 @@ python3 tools/audio/serve_preview.py
 仅重新生成雷系普攻、命中与对比音频时，执行 `render_lightning_variants.py` 与 `make_preview.py`。
 
 仅重新生成冰系两种命中与对比音频时，执行 `render_ice_impacts.py` 与 `make_preview.py`。
+
+仅重新生成冰系 E 时，执行 `render_ice_skill.py` 与 `make_preview.py`。
