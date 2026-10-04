@@ -12,8 +12,8 @@
     "theme_duration_seconds": 160,
     "theme_bars": 64,
     "theme_endpoints": "at most 2 PCM units from silence",
-    "original_master_checksums": "lightning refinement: 33 other masters unchanged in this isolated commit; five lightning basic sounds updated",
-    "sampler_seconds": 22.88,
+    "original_master_checksums": "ice impact refinement: 36 other masters unchanged in this isolated commit; two ice impacts updated",
+    "sampler_seconds": 22.54,
     "headers_and_frame_counts": "passed",
     "finite_non_silent_samples": "passed",
     "full_scale_clipping": "none",
@@ -32,7 +32,8 @@
     "fire_comparison_seconds": 5.31,
     "fire_pulse_preview_seconds": 1.88,
     "lightning_comparison_seconds": 4.63,
-    "listening_page_audio_players": 42
+    "listening_page_audio_players": 43,
+    "ice_comparison_seconds": 2.11
   },
   "browser": {
     "music_and_sampler_playback": "confirmed via controls, decoded durations and playback state",
@@ -90,6 +91,17 @@
       "stop_button_pauses_all": true,
       "console_errors_and_warnings": 0,
       "check_context": "Shared working page included one unrelated player hurt preview; its combined page had 43 players."
+    },
+    "ice_refinement": {
+      "comparison_decoded_duration_seconds": 2.11,
+      "individual_decoded_durations_seconds": [
+        0.24,
+        0.32
+      ],
+      "playback": "Updated bright version: native controls confirmed active comparison playback and both individual decoded durations without media errors",
+      "stop_button_pauses_all": true,
+      "console_errors_and_warnings": 0,
+      "check_context": "Shared working page includes a separate player hurt preview; combined page has 44 players."
     }
   },
   "preview_http": {

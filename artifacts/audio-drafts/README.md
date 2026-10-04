@@ -1,6 +1,6 @@
-# 失控法师 · 原创合成音频小样 V7
+# 失控法师 · 原创合成音频小样 V10
 
-34 个音效、3 段循环音乐、一首 2 分 40 秒主题曲，以及一个 22.88 秒音效速览。音色均由离线波形与噪声合成生成，没有导入第三方采样、现成歌曲或外部音频素材。没有接入游戏，也没有修改游戏入口、战斗逻辑、构建配置或生产界面。
+34 个音效、3 段循环音乐、一首 2 分 40 秒主题曲，以及一个 22.54 秒音效速览。音色均由离线波形与噪声合成生成，没有导入第三方采样、现成歌曲或外部音频素材。没有接入游戏，也没有修改游戏入口、战斗逻辑、构建配置或生产界面。
 
 ## 试听
 
@@ -78,6 +78,17 @@
 
 [五变体连续对比](lightning_variants_comparison.wav) 为 4.63 秒，按三种普攻、两种命中排列，中间各空出 0.60 秒。普攻峰值约 −6.02 dBFS、命中约 −7.96 dBFS，沿用原播放强度；不代表感知响度完全一致。音高聚集程度与文件检查见 [雷系打磨验证](lightning-variants-verification.json)，仍需要用户试听判断电感、响度和舒适度。
 
+## 冰霜命中打磨
+
+两种命中从原来的 0.58 秒共鸣声调整为短促、明亮的冰晶接触与碎片声。减弱闷响与低频噪声，增加约 24 毫秒衰减的非整数倍晶体共鸣，让接触瞬间更清脆；碎片含短共鸣与少量高频摩擦。去掉长扩散，不使用长铃音。其他冰系普攻、E、Q 和碎冰处决保持原样。
+
+| 文件 | 制作方向 | 时长 |
+| --- | --- | --- |
+| `ice_impact_01.wav` | 冰裂：清脆短接触，细小冰晶碎屑迅速收尾 | 0.24 秒 |
+| `ice_impact_02.wav` | 碎冰：清脆接触，少量错开的明亮冰晶尾音 | 0.32 秒 |
+
+[两种命中对比](ice_impacts_comparison.wav) 为 2.11 秒，依次播放冰裂、碎冰。峰值均沿用约 −7.96 dBFS，不代表感知响度已完全匹配。文件检查见 [冰系命中验证](ice-impacts-verification.json)，音色、强度与舒适度仍需用户试听。
+
 ## 文件与检查
 
 - 全部为 44.1 kHz、16 位 PCM WAV；部分短音效为单声道，带空间扩散的音效和音乐为双声道。
@@ -98,6 +109,7 @@ python3 tools/audio/render_theme.py
 python3 tools/audio/render_fire_variants.py
 python3 tools/audio/render_fire_pulse.py
 python3 tools/audio/render_lightning_variants.py
+python3 tools/audio/render_ice_impacts.py
 python3 tools/audio/make_preview.py
 ```
 
@@ -112,3 +124,5 @@ python3 tools/audio/serve_preview.py
 所有生成物仅写入本目录。音乐是无损制作文件，当前包未进行交付体积压缩；后续确认声音方向后，再选择游戏用编码和加载方式。
 
 仅重新生成雷系普攻、命中与对比音频时，执行 `render_lightning_variants.py` 与 `make_preview.py`。
+
+仅重新生成冰系两种命中与对比音频时，执行 `render_ice_impacts.py` 与 `make_preview.py`。

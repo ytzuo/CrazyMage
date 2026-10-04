@@ -252,7 +252,52 @@ def crystal(t, frequency, decay, rng, strength=1):
     return y * strength
 
 
+ICE_IMPACTS = [("冰裂", .24), ("碎冰", .32)]
+
+
+def ice_impact(index):
+    """Short ice contact, with tiny inharmonic shards rather than a ringing chord."""
+    _, seconds = ICE_IMPACTS[index]
+    t = timeline(seconds)
+    rng = rng_for(f"ice-impact-v10-{index}")
+    crack = noise(t, rng, 1700, 6700, -.18)
+    crunch = noise(t, rng, 950, 3900, -.15)
+    # Brief inharmonic ice modes give the contact a clear, bright edge.
+    frequency = (2250, 1850)[index]
+    contact = np.zeros(len(t))
+    for ratio, gain in ((1,.55),(1.73,.28),(2.61,.17)):
+        contact += gain*np.sin(TAU*frequency*ratio*t+rng.uniform(-.15,.15))*np.exp(-t/(.024/np.sqrt(ratio)))
+    if index == 0:
+        y = .20 * crack * np.exp(-t/.007) + .04 * crunch * np.exp(-t/.014)
+        y += .30 * contact
+        shards = ((.018,.010,.07),(.042,.008,.05),(.072,.007,.03),(.103,.006,.018))
+    else:
+        y = .15 * crack * np.exp(-t/.009) + .055 * crunch * np.exp(-t/.020)
+        y += .26 * contact
+        shards = ((.024,.014,.09),(.053,.010,.065),(.090,.009,.04),(.130,.008,.022))
+    for at, decay, gain in shards:
+        local = np.maximum(t-at, 0)
+        alive = t >= at
+        grit = noise(t, rng, 1800, 6500, -.22)
+        modes = np.zeros(len(t))
+        # Random fragment modes decay within a few milliseconds, with no melody.
+        for frequency in rng.uniform(2400, 5200, 3):
+            modes += np.sin(TAU*frequency*local+rng.uniform(-np.pi,np.pi))/3
+        env = alive * (1-np.exp(-local/.0008)) * np.exp(-local/decay)
+        y += gain * (.45*grit + .85*modes) * env
+    return fade(y, .001, .035)
+
+
+def render_ice_impact(index):
+    character, _ = ICE_IMPACTS[index]
+    save(f"ice_impact_{index+1:02}", f"冰霜 · 命中 {index+1} / {character}",
+         "sfx", ice_impact(index), .40, tags=["ice", "impact", "variant"])
+    REPORT[-1]["variant_character"] = character
+
+
 def ice(kind, seed=0):
+    if kind == "impact":
+        return ice_impact(seed)
     rng = rng_for(f"ice-{kind}-{seed}")
     length = {"cast":.65,"impact":.58,"skill":1.5,"ultimate":2.7,"shatter":.85}[kind]
     t = timeline(length)
@@ -404,6 +449,8 @@ def render_effects():
                 render_fire_variant("impact", i)
             elif school == "lightning":
                 render_lightning_variant("impact", i)
+            elif school == "ice":
+                render_ice_impact(i)
             else:
                 save(f"{school}_impact_{i+1:02}",f"{label} · 命中 {i+1}","sfx",make("impact",i),.40,tags=[school,"impact","variant"])
         save(f"{school}_skill",f"{label} · E 技能","sfx",make("skill"),.72,tags=[school,"skill"])

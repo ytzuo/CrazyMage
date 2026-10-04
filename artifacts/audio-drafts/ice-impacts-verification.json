@@ -1,0 +1,83 @@
+{
+  "scope": "Two offline ice impacts; no game integration",
+  "environment": "44.1 kHz / mono / 16-bit PCM WAV; bundled Python with NumPy",
+  "assets": [
+    {
+      "id": "ice_impact_01",
+      "before_seconds": 0.58,
+      "after": {
+        "id": "ice_impact_01",
+        "title": "冰霜 · 命中 1 / 冰裂",
+        "group": "sfx",
+        "file": "sfx/ice_impact_01.wav",
+        "duration": 0.24,
+        "sample_rate": 44100,
+        "channels": 1,
+        "bits": 16,
+        "peak_dbfs": -7.96,
+        "rms_dbfs": -29.72,
+        "clipped_samples": 0,
+        "loop": false,
+        "tags": [
+          "ice",
+          "impact",
+          "variant"
+        ],
+        "sha256": "ca9ea1b4247d0ece6fb15af9c617776d167aedd8937516434854d76380946978",
+        "variant_character": "冰裂"
+      }
+    },
+    {
+      "id": "ice_impact_02",
+      "before_seconds": 0.58,
+      "after": {
+        "id": "ice_impact_02",
+        "title": "冰霜 · 命中 2 / 碎冰",
+        "group": "sfx",
+        "file": "sfx/ice_impact_02.wav",
+        "duration": 0.32,
+        "sample_rate": 44100,
+        "channels": 1,
+        "bits": 16,
+        "peak_dbfs": -7.96,
+        "rms_dbfs": -29.92,
+        "clipped_samples": 0,
+        "loop": false,
+        "tags": [
+          "ice",
+          "impact",
+          "variant"
+        ],
+        "sha256": "f4c5d645bcb3068374481e2efda1c1a09fa8bcbe64641437f44c45245f5bcbf7",
+        "variant_character": "碎冰"
+      }
+    }
+  ],
+  "checks": {
+    "headers_frames_non_silent_endpoints": "passed",
+    "full_scale_clipping": "none",
+    "comparison_exactly_matches_assets": true,
+    "comparison_seconds": 2.11,
+    "other_masters_matching_before_render_working_manifest": 33,
+    "unrelated_parallel_changes_excluded": [
+      "player_hurt_01",
+      "player_hurt_02",
+      "shield_break"
+    ]
+  },
+  "limitations": [
+    "Subjective ice identity, impact strength and loudness need user listening.",
+    "Game mix, rapid repeated hits and device speakers were not tested."
+  ],
+  "browser": {
+    "comparison_decoded_duration_seconds": 2.11,
+    "individual_decoded_durations_seconds": [
+      0.24,
+      0.32
+    ],
+    "playback": "Updated bright version: native controls confirmed active comparison playback and both individual decoded durations without media errors",
+    "stop_button_pauses_all": true,
+    "console_errors_and_warnings": 0
+  },
+  "design": "Bright, short inharmonic ice contact modes (~24 ms decay), reduced low/mid crunch, small crystal fragments, no long room tail"
+}

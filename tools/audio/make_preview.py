@@ -35,6 +35,9 @@ def make_preview():
     lightning_comparison = manifest.get("lightning_comparison")
     if lightning_comparison:
         fire_comparison += f'''<div class="sampler"><div><strong>闪电变体对比 · {lightning_comparison['duration']:.2f} 秒</strong><p>普攻依次为短弧 → 连弧 → 游弧，命中依次为电裂 → 电灼。收掉拨弦般的音高尾音，以断续放电为主体。</p></div><audio controls preload="none" src="{lightning_comparison['file']}" aria-label="闪电变体对比"></audio></div>'''
+    ice_comparison = manifest.get("ice_impact_comparison")
+    if ice_comparison:
+        fire_comparison += f'''<div class="sampler"><div><strong>冰霜命中对比 · {ice_comparison['duration']:.2f} 秒</strong><p>冰裂 → 碎冰：明亮清脆的冰晶接触，细碎晶体快速收尾。</p></div><audio controls preload="none" src="{ice_comparison['file']}" aria-label="冰霜命中对比"></audio></div>'''
     descriptions = {
         "menu_loop": "空灵晶体、缓慢和弦与低声脉冲。法阵尚未醒来。",
         "battle_loop": "主题旋律、跳动低音与轻打击乐。让法术保留前景。",
