@@ -7,6 +7,7 @@
   background: radial-gradient(ellipse at 72% 45%, #33413855, transparent 47%), radial-gradient(ellipse at 50% 110%, #53533d30, transparent 60%), #0e1615;
 }
 .launch-page[hidden] { display: none; }
+.launch-guides { display:flex; justify-content:center; gap:24px; }
 .launch-page[data-launch-school="ice"] { --launch-accent: #abdfea; --launch-glow: #63b7d0; }
 .launch-page[data-launch-school="lightning"] { --launch-accent: #ddd0ff; --launch-glow: #ac8de4; }
 .launch-page::before {

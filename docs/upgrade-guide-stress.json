@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "seconds": 180.00549999980595,
+  "frames": 21589,
+  "cases": 40,
+  "maxRoots": 107,
+  "maxProjectiles": 17,
+  "maxUltimate": 22,
+  "afterReset": {
+    "actors": 0,
+    "roots": 6,
+    "textures": 129,
+    "projectiles": 0,
+    "impacts": 0,
+    "ultimate": 0,
+    "fields": 0,
+    "elapsed": 4324.999999999999,
+    "casts": 1,
+    "loop": true,
+    "paused": false,
+    "health": 120,
+    "shield": 0,
+    "damage": 0
+  },
+  "scope": "Three active minutes, one scene and up to eight real targets; no GPU or memory profile."
+}

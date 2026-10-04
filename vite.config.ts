@@ -4,7 +4,7 @@ export default defineConfig({
   base: './',
   build: {
     rollupOptions: {
-      input: { game: 'index.html', bestiary: 'bestiary.html' },
+      input: { game: 'index.html', bestiary: 'bestiary.html', upgrades: 'upgrades.html' },
       output: { manualChunks: { phaser: ['phaser'] } },
     },
   },

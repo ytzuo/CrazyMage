@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#101815"><title>强化图鉴 · 失控法师</title></head>
+<body>
+  <main class="book">
+    <header class="book-top"><a href="./index.html" class="back">‹ 返回主菜单</a><h1>强化图鉴</h1><a href="./bestiary.html">敌人图鉴 ›</a></header>
+    <aside class="catalogue" aria-label="强化目录">
+      <nav id="schools" aria-label="流派筛选"></nav>
+      <label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="查找强化" aria-label="查找强化" autocomplete="off"></label>
+      <nav id="categories" aria-label="类型筛选"></nav>
+      <div id="upgrade-list"></div><p id="empty" hidden>没有匹配的强化</p>
+    </aside>
+    <section class="detail" aria-labelledby="upgrade-name">
+      <header class="entry"><div class="entry-kicker"><span id="entry-kind"></span><span id="entry-layers"></span></div><h2 id="upgrade-name"></h2><p id="note"></p></header>
+      <section class="theatre" aria-label="强化动画演示">
+        <div class="theatre-top"><span id="subject"></span><div id="comparison" role="group" aria-label="强化对比"><button data-version="before" aria-pressed="false">强化前</button><button data-version="after" aria-pressed="true">强化后</button></div></div>
+        <div id="stage"><span id="loading">法阵准备中…</span></div>
+        <div class="controls"><div><button id="play" aria-label="暂停演示">Ⅱ 暂停</button><button id="replay">↻ 重播</button><select id="speed" aria-label="演示速度"><option value="1">正常速度</option><option value="0.5">半速</option></select></div><span id="live-state" aria-live="polite"></span></div>
+      </section>
+      <section class="numbers" aria-label="强化数值"><div class="numbers-top"><span>数值对比</span><div id="layers" role="group" aria-label="强化层数"></div></div><div id="metrics"></div><p class="scope">竞速模式 · 单项强化 · 其余参数为初始值</p></section>
+      <div id="dev-tools"></div>
+    </section>
+  </main>
+  <script type="module" src="/src/upgrade-guide/main.ts"></script>
+</body></html>

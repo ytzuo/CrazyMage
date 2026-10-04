@@ -39,7 +39,7 @@ export class SchoolPicker {
         }).join('')}</div>
         <p id="launch-record" class="launch-record"></p>
         <div class="launch-start"><p id="launch-summary" class="launch-sr-only" aria-live="polite"></p><button id="start-run" disabled><span aria-hidden="true">✦</span>开始试验<span aria-hidden="true">✦</span></button></div>
-        <a class="launch-guide" data-bestiary href="./bestiary.html"><span aria-hidden="true">◇</span>敌人图鉴</a>
+        <nav class="launch-guides" aria-label="图鉴"><a class="launch-guide" data-bestiary href="./bestiary.html"><span aria-hidden="true">◇</span>敌人图鉴</a><a class="launch-guide" data-upgrades href="./upgrades.html"><span aria-hidden="true">✧</span>强化图鉴</a></nav>
       </section>
     </section>`;
     document.addEventListener('visibilitychange',()=>host.classList.toggle('preview-sleep',document.hidden),{signal:this.abort.signal});
