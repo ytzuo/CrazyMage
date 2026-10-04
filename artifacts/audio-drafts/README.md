@@ -1,4 +1,4 @@
-# 失控法师 · 音频小样 V18
+# 失控法师 · 音频小样 V19
 
 36 个音效、3 段循环音乐、一首 2 分 40 秒主题曲，以及一个 23.38 秒音效速览。音乐与 32 个音效由离线合成生成；四个玩家受击音效采用 CC0 真人录音剪辑，作者、许可与原始来源见[人声来源](sources/README.md)。36 个事件音效与首页主题曲已接入游戏，包含 Boss 登场短乐句；三段循环背景音乐与试听合集仍仅供独立试听。
 
@@ -10,11 +10,11 @@
 - [火焰变体对比](fire_variants_comparison.wav)：5.31 秒，依次播放三种普攻与两种命中，声音之间空出 0.60 秒。
 - [火焰 Q 三轮试听](fire_wall_rounds_preview.wav)：1.88 秒，按每轮 0.45 秒间隔播放三次单轮火墙音效。
 - [法阵余光 · 主菜单](music/menu_loop.wav)：40 秒，16 小节，稀疏晶体音、缓慢和弦与低声脉冲。
-- [试验失控 · 普通战斗](music/battle_loop.wav)：80 秒，32 小节，主题旋律、合成低音、琶音与轻打击乐。
+- [试验失控 · 普通战斗](music/battle_loop.wav)：76.8 秒，32 小节，100 BPM；重写四音动机的问答、切分低音与轻打击乐，中段留白。
 - [魔核苏醒 · Boss 战](music/boss_loop.wav)：80 秒，32 小节，更密的节奏、低音五度与重鼓点。
 - [魔核苏醒 · 失控法师主题曲](music/unstable_mage_theme.wav)：160 秒，64 小节，在原 Boss 编排上增加前奏、过渡、高潮与尾声。游戏首页在首次用户操作后以 0.16 媒体音量单次播放，进入战斗停止；试听页提供六个段落跳转按钮。
 
-音乐共用 96 BPM、4/4 拍与 D 小调色彩，采用同一个四音主题动机。三段循环音乐保留完整小节长度；合成声音和扩散尾音跨越循环结尾后折回开头，不使用首尾静音淡出。最后对 5 毫秒边界做微小偏移修正，消除样本端点跳变；这不是实际游戏循环听感的验证。
+普通战斗曲为 100 BPM，其余音乐为 96 BPM；共用 4/4 拍与 D 小调色彩，采用同一个四音主题动机。三段循环音乐保留完整小节长度；合成声音和扩散尾音跨越循环结尾后折回开头，不使用首尾静音淡出。最后对 5 毫秒边界做微小偏移修正，消除样本端点跳变；这不是实际游戏循环听感的验证。
 
 ## 主题曲结构
 
@@ -120,6 +120,7 @@
 ```sh
 python3 tools/audio/render_drafts.py
 python3 tools/audio/render_theme.py
+python3 tools/audio/render_battle.py
 python3 tools/audio/render_fire_variants.py
 python3 tools/audio/render_fire_pulse.py
 python3 tools/audio/render_lightning_variants.py
@@ -151,3 +152,9 @@ python3 tools/audio/serve_preview.py
 仅重新生成护盾破裂时，执行 `render_shield_break.py` 与 `make_preview.py`；仅重新生成受伤音效与连续试听时，执行 `render_player_hurt.py` 与 `make_preview.py`。
 
 仅重新生成 Boss 登场时，执行 `render_boss_arrival.py` 与 `make_preview.py`。
+
+## 普通战斗曲重写（2026-10-04）
+
+保留 D–F–E–A 四音动机与晶体拨弦音色，速度从 96 小幅提高至 100 BPM，重新编排为主题推进、旋律回应、留白呼吸、主题回归四段，各 19.2 秒。上行回应只短暂抬高旋律，轻鼓与切分低音维持推进，不加入铜管、合唱、大鼓阵或持续高八度叠奏。峰值保持原来的约 −2.38 dBFS。尾音跨边界折回，导出为 76.8 秒循环 WAV。
+
+仅制作并替换试听素材，尚未接入游戏战斗播放；首页主题曲和 Boss 音乐保持原样。单独重建使用 `python3 tools/audio/render_battle.py`，随后执行 `python3 tools/audio/make_preview.py`。文件格式、长度、单声道兼容、削波与循环端点检查见[验证记录](battle-rewrite-verification.json)；这不替代人工听感、浏览器连续循环和实战混音验证。

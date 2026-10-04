@@ -1,5 +1,5 @@
 {
-  "version": 18,
+  "version": 19,
   "title": "失控法师 · 音频小样",
   "method": "Offline NumPy synthesis with four edited CC0 human vocal takes; see sources/README.md.",
   "limitations": "Technical file checks only; subjective listening and device playback require review.",
@@ -8,7 +8,13 @@
     "meter": "4/4",
     "key_center": "D minor",
     "loop_master": "WAV, exact bar length; wrapped synthesis and diffusion tails",
-    "theme_master": "WAV, 64 bars, intro and resolved coda; not a loop"
+    "theme_master": "WAV, 64 bars, intro and resolved coda; not a loop",
+    "bpm_by_asset": {
+      "menu_loop": 96,
+      "battle_loop": 100,
+      "boss_loop": 96,
+      "unstable_mage_theme": 96
+    }
   },
   "assets": [
     {
@@ -832,23 +838,47 @@
       "title": "试验失控 · 普通战斗",
       "group": "music",
       "file": "music/battle_loop.wav",
-      "duration": 80.0,
+      "duration": 76.8,
       "sample_rate": 44100,
       "channels": 2,
       "bits": 16,
       "peak_dbfs": -2.38,
-      "rms_dbfs": -15.97,
+      "rms_dbfs": -17.11,
       "clipped_samples": 0,
       "loop": true,
       "tags": [
         "battle",
         "original",
-        "loop"
+        "loop",
+        "restrained-rewrite"
       ],
-      "sha256": "efe53b0e746d7d0f3d9953b817ad2349e22dd1ab11cef3e7936a8827094f9283",
-      "bpm": 96,
+      "sha256": "3bf973bc77881175869baf3bd6da3b1116d1ccfd4c5e81a8b7ebf0f365d40a2d",
+      "bpm": 100,
       "bars": 32,
-      "boundary_step": 0.0
+      "boundary_step": 0.0,
+      "motif": "D–F–E–A",
+      "sections": [
+        {
+          "title": "主题推进",
+          "start_seconds": 0.0,
+          "end_seconds": 19.2
+        },
+        {
+          "title": "旋律回应",
+          "start_seconds": 19.2,
+          "end_seconds": 38.4
+        },
+        {
+          "title": "留白呼吸",
+          "start_seconds": 38.4,
+          "end_seconds": 57.6
+        },
+        {
+          "title": "主题回归",
+          "start_seconds": 57.6,
+          "end_seconds": 76.8
+        }
+      ]
     },
     {
       "id": "boss_loop",

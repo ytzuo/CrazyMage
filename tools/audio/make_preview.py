@@ -42,14 +42,14 @@ def make_preview():
         fire_comparison += f'''<div class="sampler"><div><strong>冰霜命中对比 · {ice_comparison['duration']:.2f} 秒</strong><p>冰裂 → 碎冰：明亮清脆的冰晶接触，细碎晶体快速收尾。</p></div><audio controls preload="none" src="{ice_comparison['file']}" aria-label="冰霜命中对比"></audio></div>'''
     descriptions = {
         "menu_loop": "空灵晶体、缓慢和弦与低声脉冲。法阵尚未醒来。",
-        "battle_loop": "主题旋律、跳动低音与轻打击乐。让法术保留前景。",
+        "battle_loop": "沿用四音动机，100 BPM 切分低音与轻鼓推进；中段留白，回归时略微扬起。",
         "boss_loop": "更密的节奏、低音五度与沉重鼓点。魔核开始回应。",
     }
     colors = {"menu_loop": "#9dbfd0", "battle_loop": "#d8ae73", "boss_loop": "#b9a2e3"}
     cards = []
     for i, a in enumerate(music):
         cards.append(f'''<article class="music-card" style="--tint:{colors[a['id']]}">
-          <div class="card-top"><span class="eyebrow">0{i+1} / {a['duration']:.0f} 秒</span><span class="chip">96 BPM</span></div>
+          <div class="card-top"><span class="eyebrow">0{i+1} / {a['duration']:.0f} 秒</span><span class="chip">{a['bpm']} BPM</span></div>
           <h3>{escape(a['title'])}</h3><p>{descriptions[a['id']]}</p>
           {waveform(a['file'])}
           <audio controls preload="none" data-music data-loop="true" src="{a['file']}" aria-label="{escape(a['title'])}"></audio>
@@ -95,7 +95,7 @@ def make_preview():
 <div class="stats"><span><strong>__SFX_COUNT__</strong> 个音效</span><span><strong>3</strong> 段循环音乐</span>__THEME_STAT__<span><strong>44.1</strong> kHz / 无损 WAV</span></div>
 <div class="toolbar"><button id="stop" type="button">停止播放</button><label>试听音量 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.6" aria-label="试听音量"></label></div><div class="status" id="status" role="status">点击播放器开始试听。每次只播放一个声音。</div></header>
 __THEME__
-<div class="section-head"><h2>主题与场景音乐</h2><p>共同主题 · D 小调色彩 · 96 BPM · 4/4 拍</p></div>
+<div class="section-head"><h2>主题与场景音乐</h2><p>共同主题 · D 小调色彩 · 战斗 100 / 其他 96 BPM · 4/4 拍</p></div>
 <div class="music-grid">__MUSIC__</div>
 <div class="section-head"><h2>法术与战斗反馈</h2><p>普攻三种变体、命中两种变体，另有 E / Q 与特殊反馈</p></div>
 <div class="sampler"><div><strong>__SAMPLER_SECONDS__ 秒音效速览</strong><p>按火焰 → 冰霜 → 闪电 → 受伤与护盾 → 清波与强化 → Boss 登场排列。各声音之间留有短暂停顿。</p></div><audio controls preload="none" src="sfx_sampler.wav" aria-label="音效速览"></audio></div>
