@@ -11,15 +11,15 @@ test('each school offers only its own modules and shared passives, retaining his
   for(const school of SCHOOLS){
     const store=new BuildStore(()=>0);store.reset(school);
     let count=0;
-    for(let wave=1;wave<=20;wave++){
+    for(let wave=1;wave<=30;wave++){
       store.completeWave(wave);const batch=store.pendingChoice;
       if(!batch)continue;
-      assert.ok(batch.options.every(id=>id.startsWith(school+'.')||id.startsWith('passive.')));
+      assert.ok(batch.options.every(id=>id.startsWith(school+'.')||id.startsWith('skill.'+school+'.')||id.startsWith('passive.')));
       const other=SCHOOLS.find(x=>x!==school)+'.damage';assert.equal(store.choose(batch.id,other,0),false);
       assert.ok(store.choose(batch.id,batch.options[0],wave*1000));count++;
     }
-    assert.equal(count,12);assert.equal(store.snapshot.build.spellLevel,4);
-    assert.equal(store.snapshot.history.length,12);assert.equal(store.snapshot.exhausted,true);
+    assert.equal(count,25);assert.equal(store.snapshot.build.spellLevel,8);
+    assert.equal(store.snapshot.history.length,25);assert.equal(store.snapshot.exhausted,true);
     assert.ok(store.snapshot.effective.breakdown.every(line=>!line.includes(school==='ice'?'电能增幅':'深度寒霜')));
     assert.throws(()=>applyUpgrade(store.snapshot.build, SCHOOLS.find(x=>x!==school)+'.damage'));
     store.reset(school);assert.equal(store.snapshot.build.spellLevel,1);assert.equal(store.snapshot.history.length,0);
@@ -29,7 +29,15 @@ test('ice modules combine independently of order and echo snapshots remain immut
   const ids=['ice.radius','ice.cold','ice.echo','passive.cooldown'];
   const a=compileBuild(build('ice',...ids)),b=compileBuild(build('ice',...ids.toReversed()));
   assert.deepEqual(a.ice,b.ice);
-  assert.deepEqual(a.ice,{damage:18,cooldown:990,radius:200,slow:0.4,duration:2000,pulses:2,echoDelay:180});
+  assert.deepEqual(a.ice,{
+    reach:560,speed:620,hitRadius:16,ground:null,
+    effects:{
+      hitShards:{damage:24*0.35,targets:3,radius:180,slow:0.4,duration:1500},
+      shards:null,
+      frost:{gain:1,threshold:3,duration:1000},
+    },
+    damage:24,cooldown:900,radius:200,slow:0.4,duration:2000,pulses:2,echoDelay:180,
+  });
   assert.equal(a.school,'ice');assert.ok(Object.isFrozen(a.ice));
   assert.equal(a.breakdown.length,4);assert.equal(a.fireball.damage,20);
 });
@@ -37,7 +45,7 @@ test('lightning modules retain jump counts, distance and stable conduction toget
   const ids=['lightning.chain','lightning.range','lightning.conduction','passive.cooldown'];
   const a=compileBuild(build('lightning',...ids)),b=compileBuild(build('lightning',...ids.toReversed()));
   assert.deepEqual(a.lightning,b.lightning);
-  assert.deepEqual(a.lightning,{damage:20,cooldown:810,range:550,jumpRange:225,maxTargets:5,falloff:0.95});
+  assert.deepEqual(a.lightning,{damage:20,cooldown:810,range:550,jumpRange:225,maxTargets:5,falloff:0.95,fork:null,charge:null});
   assert.equal(compileBuild(build('lightning','lightning.chain','lightning.chain')).lightning.maxTargets,7);
   assert.equal(compileBuild(build('ice','ice.cold','ice.cold')).ice.slow,0.5);
 });

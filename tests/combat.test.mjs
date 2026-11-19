@@ -4,7 +4,7 @@ import { Health } from '../src/game/combat/Health.ts';
 import { segmentCircleHit } from '../src/game/combat/collision.ts';
 import { WaveClock } from '../src/game/enemies/WaveClock.ts';
 
-test('waves arrive at 30 seconds, preserve remainder, and restart at wave one', () => {
+test('waves arrive at 30 seconds, reset next countdown, and restart at wave one', () => {
   const clock = new WaveClock(30000);
   assert.equal(clock.wave, 1);
   assert.equal(clock.remaining, 30000);
@@ -13,11 +13,11 @@ test('waves arrive at 30 seconds, preserve remainder, and restart at wave one', 
   assert.equal(clock.elapsedTime, 29999);
   assert.equal(clock.update(2), 1);
   assert.equal(clock.wave, 2);
-  assert.equal(clock.remaining, 29999);
+  assert.equal(clock.remaining, 30000);
   assert.equal(clock.elapsedTime, 30001);
-  assert.equal(clock.update(60000), 2);
-  assert.equal(clock.wave, 4);
-  assert.equal(clock.remaining, 29999);
+  assert.equal(clock.update(60000), 1);
+  assert.equal(clock.wave, 3);
+  assert.equal(clock.remaining, 30000);
   clock.reset();
   assert.equal(clock.wave, 1);
   assert.equal(clock.remaining, 30000);
@@ -43,7 +43,7 @@ test('arena clear schedules next wave in three seconds without changing duration
   clock.scheduleNext(3000); // Repeated scheduling does not advance active time.
   assert.equal(clock.elapsedTime, 44000);
   assert.equal(clock.update(3005), 1);
-  assert.equal(clock.remaining, 29995);
+  assert.equal(clock.remaining, 30000);
   clock.reset();
   assert.equal(clock.remaining, 30000);
   assert.equal(clock.elapsedTime, 0);

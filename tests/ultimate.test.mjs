@@ -16,8 +16,9 @@ test('ultimate kills cannot recharge themselves and reset discards stored energy
 test('school ultimates preserve distinct ranges and control while levels scale damage only',()=>{
   for(const school of ['fire','ice','lightning']){
     const first=ultimateSpec(school,1),last=ultimateSpec(school,4);
-    assert.equal(last.damage,first.damage+45);assert.equal(last.radius,first.radius);assert.equal(last.targets,first.targets);
+    assert.equal(last.damage,first.damage+(school==='ice'?6:45));
+    assert.equal(last.radius,first.radius);assert.equal(last.targets,first.targets);
     assert.deepEqual(ultimateSpec(school,99),last);assert.ok(Object.isFrozen(last));
   }
-  assert.equal(ultimateSpec('ice',1).freeze,1800);assert.equal(ultimateSpec('lightning',1).targets,4);
+  assert.equal(ultimateSpec('ice',1).freeze,1000);assert.equal(ultimateSpec('lightning',1).targets,4);
 });

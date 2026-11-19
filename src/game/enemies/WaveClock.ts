@@ -4,9 +4,12 @@ export class WaveClock {
   private countdown: number;
   private total = 0;
   readonly interval: number;
+  private readonly durationForWave: (wave: number) => number;
 
-  constructor(interval: number, private durationForWave: (wave: number) => number = () => interval) {
-    this.interval = interval; this.countdown = durationForWave(this.wave);
+  constructor(interval: number, durationForWave: (wave: number) => number = () => interval) {
+    this.interval = interval;
+    this.durationForWave = durationForWave;
+    this.countdown = durationForWave(this.wave);
   }
 
   get remaining(): number { return this.countdown; }

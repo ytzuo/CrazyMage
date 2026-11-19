@@ -31,9 +31,9 @@ test('additive damage, repeated multi and cooldown respect defined coefficients'
 });
 
 test('spell levels, module caps and three passive slots are enforced', () => {
-  const full = buildWith('fire.multi','fire.pierce','fire.explosion');
-  assert.equal(full.spellLevel, 4); assert.throws(() => applyUpgrade(full, 'fire.damage'));
-  assert.throws(() => applyUpgrade(buildWith('fire.multi', 'fire.multi'), 'fire.multi'));
+  const full = buildWith('fire.multi','fire.multi','fire.pierce','fire.pierce','fire.explosion','fire.burn','fire.burn');
+  assert.equal(full.spellLevel, 8); assert.throws(() => applyUpgrade(full, 'fire.damage'));
+  assert.throws(() => applyUpgrade(buildWith('fire.explosion'), 'fire.explosion'));
   const slots = buildWith('passive.speed', 'passive.health', 'passive.shield');
   assert.equal(canAcquire(slots, definition('passive.cooldown')), false);
   assert.equal(canAcquire(slots, definition('passive.speed')), true);
@@ -86,12 +86,12 @@ test('overlapping waves finish independently; empty capped waves do not reward; 
 test('fully upgraded offers stop without fourth passive or empty choice panel', () => {
   const store=new BuildStore(()=>0);store.reset();
   let choices=0;
-  for(let wave=1;wave<=20;wave++) {
+  for(let wave=1;wave<=30;wave++) {
     store.completeWave(wave);
     const batch=store.snapshot.choice;
     if(batch){assert.ok(batch.options.every(id=>canAcquire(store.snapshot.build,definition(id))));store.choose(batch.id,batch.options[0],0);choices++;}
   }
-  assert.equal(choices,12);assert.equal(store.snapshot.exhausted,true);
+  assert.equal(choices,25);assert.equal(store.snapshot.exhausted,true);
   assert.equal(store.snapshot.choice,null);assert.equal(store.snapshot.pendingRewards,0);
   assert.equal(Object.keys(store.snapshot.build.passives).length,3);
 });
