@@ -28,4 +28,4 @@
 - 死亡、清场、重开与场景关闭由 EnemySystem.reset/BossCombat.remove 回收部件、预警、符印、路径、魔核、残影与状态。共享纹理保留；新增 11 张缓存纹理、146304 源像素，只初始化生成，无逐帧绘图、Tween、网页定时器或生产 DOM 更新。
 - 共用 72 敌人容量；守卫独立保留 24 区域预算。祭司护盾、结界不覆盖两种 Boss；冰霜冻结都保留 Boss 的 35% 时长。
 
-开发入口：[织主预览与检查](../tests/weaver-runtime.html)。证据见 [验证记录](weaver-verification.md)。
+开发入口：[织主预览与检查](../tests/weaver-runtime.html)。
