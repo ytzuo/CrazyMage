@@ -181,7 +181,7 @@ button:disabled { opacity: 0.45; cursor: default; }
 .build-card small { color: #a6c1a2; font-size: 12px; }
 .build-card header button { flex-shrink: 0; padding: 8px 14px; border: 1px solid #8da67960; color: #d9e8ce; background: #2a3c2d; border-radius: 5px; }
 .upgrade-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.upgrade-option { display: flex; flex-direction: column; align-items: flex-start; text-align: left; min-height: 280px; padding: 22px; background: #22362a; color: #e3edd7; border: 1px solid #a2bd8160; border-radius: 8px; }
+.upgrade-option { display: flex; flex-direction: column; align-items: flex-start; width: 100%; justify-self: stretch; text-align: left; min-height: 280px; padding: 22px; background: #22362a; color: #e3edd7; border: 1px solid #a2bd8160; border-radius: 8px; }
 .upgrade-option h3 { margin: 16px 0 6px; font-size: 21px; }
 .upgrade-option p { font-size: 13px; line-height: 1.7; color: #b7cbb0; }
 .upgrade-option .upgrade-change { color: #a4dfcd; font-size: 12px; }
@@ -324,13 +324,13 @@ button:disabled { opacity: 0.45; cursor: default; }
 
 /* Reward cards: finite 3D reveal, no timer and no looping shimmer. */
 .reward-options { --reward-height: 410px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: 6px 2px 10px; }
-.upgrade-option.reward-card { --reward-color: #ffbd82; --reward-wash: #b6612a20; display: block; padding: 0; min-height: 0; background: none; border: 0; border-radius: 16px; overflow: visible; perspective: 1100px; animation: none; color: #f2ece0; }
+.upgrade-option.reward-card { --reward-color: #ffbd82; --reward-wash: #b6612a20; display: block; width: 100%; justify-self: stretch; padding: 0; min-height: 0; background: none; border: 0; border-radius: 16px; overflow: visible; perspective: 1100px; animation: none; color: #f2ece0; }
 .reward-card.school-ice { --reward-color: #a9e7fa; --reward-wash: #69bfd520; }
 .reward-card.school-lightning { --reward-color: #f2df8c; --reward-wash: #d2b95720; }
 .reward-card.reward-passive { --reward-color: #c5dda8; --reward-wash: #9bba7420; }
 .reward-card span { margin: 0; padding: 0; color: inherit; }
-.reward-turner { position: relative; display: block; height: var(--reward-height); transform-style: preserve-3d; animation: reward-flip 360ms cubic-bezier(.22,.65,.28,1) both; animation-delay: calc(var(--card-index, 0) * 60ms); }
-.reward-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; border: 1px solid #bda78465; border-radius: 16px; box-shadow: 0 12px 28px #0005, inset 0 0 0 5px #ffffff03; overflow: hidden; }
+.reward-turner { position: relative; display: block; width: 100%; height: var(--reward-height); transform-style: preserve-3d; animation: reward-flip 360ms cubic-bezier(.22,.65,.28,1) both; animation-delay: calc(var(--card-index, 0) * 60ms); }
+.reward-face { width: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border: 1px solid #bda78465; border-radius: 16px; box-shadow: 0 12px 28px #0005, inset 0 0 0 5px #ffffff03; overflow: hidden; }
 .reward-card .reward-front { display: flex; position: relative; flex-direction: column; align-items: center; height: 100%; min-height: 0; padding: 22px; background: radial-gradient(ellipse at 50% 22%, var(--reward-wash), transparent 65%), linear-gradient(155deg, #26302a, #14201c); }
 .reward-face::before { content: ''; position: absolute; inset: 8px; border: 1px solid #bda78430; border-radius: 10px; pointer-events: none; }
 .reward-card .reward-back { position: absolute; inset: 0; display: grid; place-items: center; transform: rotateY(180deg); background: repeating-linear-gradient(45deg, #b8a46c09 0 1px, transparent 1px 14px), #182b26; }

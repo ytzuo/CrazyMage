@@ -126,5 +126,6 @@ h2{margin:4px 0;font-size:28px;letter-spacing:.05em}
   #stage{height:230px;flex:0 0 230px}
   .theatre-bottom .interaction-row{margin-left:0;width:100%}
   #move-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  #move-buttons button{width:100%}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
