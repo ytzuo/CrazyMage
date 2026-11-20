@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bg-sanctum" cx="50%" cy="46%" r="68%">
+      <stop offset="0%" stop-color="#2c4438"/>
+      <stop offset="56%" stop-color="#17251f"/>
+      <stop offset="100%" stop-color="#0b1310"/>
+    </radialGradient>
+    <radialGradient id="fire-aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffae55" stop-opacity="0.38"/>
+      <stop offset="48%" stop-color="#d6653c" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#a54b3c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rim-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe1a8" stop-opacity="0.65"/>
+      <stop offset="50%" stop-color="#c99652" stop-opacity="0.42"/>
+      <stop offset="100%" stop-color="#7c4734" stop-opacity="0.5"/>
+    </linearGradient>
+    <radialGradient id="bottom-vignette" cx="50%" cy="100%" r="60%">
+      <stop offset="0%" stop-color="#0c1310" stop-opacity="0.72"/>
+      <stop offset="100%" stop-color="#0c1310" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="portrait-shadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#090e0c" flood-opacity="0.55"/>
+    </filter>
+    <filter id="flame-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="2.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Full-bleed dark emerald sanctum background -->
+  <rect width="1024" height="1024" fill="url(#bg-sanctum)"/>
+  <rect width="1024" height="1024" fill="url(#fire-aura)"/>
+
+  <!-- Subtle arcane seal behind portrait -->
+  <g fill="none" stroke="url(#rim-gold)" opacity="0.62">
+    <circle cx="512" cy="512" r="404" stroke-width="5"/>
+    <circle cx="512" cy="512" r="376" stroke-width="3" stroke-dasharray="6 22"/>
+    <circle cx="512" cy="512" r="322" stroke-width="2.5" opacity="0.5"/>
+    <polygon points="512,174 805,681 219,681" stroke-width="2" opacity="0.32"/>
+    <polygon points="512,850 219,343 805,343" stroke-width="2" opacity="0.24"/>
+  </g>
+
+  <!-- Warm drifting fire embers -->
+  <g fill="#ffbe6b">
+    <circle cx="206" cy="300" r="8" opacity="0.55"/>
+    <circle cx="834" cy="272" r="6" opacity="0.65"/>
+    <circle cx="790" cy="408" r="10" fill="#ff9642" opacity="0.4"/>
+    <circle cx="230" cy="458" r="5" opacity="0.5"/>
+    <circle cx="748" cy="216" r="4.5" fill="#ffe499" opacity="0.7"/>
+    <circle cx="294" cy="212" r="5.5" fill="#ffe499" opacity="0.6"/>
+  </g>
+
+  <!-- Female Fire Mage portrait (exact in-game vector layers) -->
+  <g transform="translate(75.35, -133.00) scale(7.1)" filter="url(#portrait-shadow)">
+    <!-- Robe torso & shoulders -->
+    <polygon points="47,112 80,112 91,163 78,176 63,172 45,177 30,164" fill="#a54b3c" stroke="#252b35" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <polygon points="44,119 57,126 49,166 34,163" fill="#e18a59" stroke="#a54b3c" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <polygon points="71,119 83,116 93,164 77,169" fill="#602e38" stroke="#602e38" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <line x1="44" y1="128" x2="39" y2="159" stroke="#ffd19a" stroke-width="2" stroke-linecap="round"/>
+    <line x1="56" y1="135" x2="53" y2="164" stroke="#ffd19a" stroke-width="2" stroke-linecap="round"/>
+    <line x1="70" y1="133" x2="74" y2="166" stroke="#602e38" stroke-width="2" stroke-linecap="round"/>
+    <line x1="84" y1="140" x2="88" y2="159" stroke="#602e38" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="43,113 32,125 30,145 41,148 49,123" fill="#a54b3c" stroke="#252b35" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <rect x="30" y="141" width="11" height="10" rx="4" fill="#e3bf99"/>
+    <rect x="42" y="127" width="42" height="9" rx="2" fill="#584839"/>
+    <rect x="59" y="127" width="10" height="9" fill="none" stroke="#b49765" stroke-width="2"/>
+    <rect x="75" y="132" width="13" height="15" rx="3" fill="#8a6248"/>
+    <line x1="77" y1="137" x2="86" y2="137" stroke="#c59464" stroke-width="1" stroke-linecap="round"/>
+    <polygon points="42,112 62,123 84,112 78,104 48,104" fill="#b5c6d0" stroke="#252b35" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <polygon points="49,112 63,119 56,128" fill="#e18a59" stroke="#252b35" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+
+    <!-- Golden cascading curls -->
+    <polygon points="42,91 55,88 51,116 47,134 43,150 32,147 35,129 32,112 37,99" fill="#dbaa4b" stroke="#252b35" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <polygon points="75,89 86,94 94,109 90,125 96,139 88,153 78,147 81,130 77,112" fill="#dbaa4b" stroke="#252b35" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="42" cy="103" r="8" fill="#9c6b2f"/>
+    <circle cx="42" cy="102" r="6.5" fill="#e9bb5e"/>
+    <ellipse cx="40" cy="101" rx="1.5" ry="4" fill="#ffe499" opacity="0.85"/>
+    <ellipse cx="43" cy="104" rx="3.5" ry="4" fill="none" stroke="#b77d36" stroke-width="1.5"/>
+    <circle cx="85" cy="103" r="8" fill="#9c6b2f"/>
+    <circle cx="85" cy="102" r="6.5" fill="#e9bb5e"/>
+    <ellipse cx="83" cy="101" rx="1.5" ry="4" fill="#ffe499" opacity="0.85"/>
+    <ellipse cx="86" cy="104" rx="3.5" ry="4" fill="none" stroke="#b77d36" stroke-width="1.5"/>
+    <circle cx="38" cy="117" r="8" fill="#9c6b2f"/>
+    <circle cx="38" cy="116" r="6.5" fill="#e9bb5e"/>
+    <ellipse cx="36" cy="115" rx="1.5" ry="4" fill="#ffe499" opacity="0.85"/>
+    <ellipse cx="39" cy="118" rx="3.5" ry="4" fill="none" stroke="#b77d36" stroke-width="1.5"/>
+    <circle cx="89" cy="117" r="8" fill="#9c6b2f"/>
+    <circle cx="89" cy="116" r="6.5" fill="#e9bb5e"/>
+    <ellipse cx="87" cy="115" rx="1.5" ry="4" fill="#ffe499" opacity="0.85"/>
+    <ellipse cx="90" cy="118" rx="3.5" ry="4" fill="none" stroke="#b77d36" stroke-width="1.5"/>
+    <circle cx="42" cy="131" r="8" fill="#9c6b2f"/>
+    <circle cx="42" cy="130" r="6.5" fill="#e9bb5e"/>
+    <ellipse cx="40" cy="129" rx="1.5" ry="4" fill="#ffe499" opacity="0.85"/>
+    <ellipse cx="43" cy="132" rx="3.5" ry="4" fill="none" stroke="#b77d36" stroke-width="1.5"/>
+    <circle cx="85" cy="131" r="8" fill="#9c6b2f"/>
+    <circle cx="85" cy="130" r="6.5" fill="#e9bb5e"/>
+    <ellipse cx="83" cy="129" rx="1.5" ry="4" fill="#ffe499" opacity="0.85"/>
+    <ellipse cx="86" cy="132" rx="3.5" ry="4" fill="none" stroke="#b77d36" stroke-width="1.5"/>
+    <circle cx="38" cy="145" r="8" fill="#9c6b2f"/>
+    <circle cx="38" cy="144" r="6.5" fill="#e9bb5e"/>
+    <ellipse cx="36" cy="143" rx="1.5" ry="4" fill="#ffe499" opacity="0.85"/>
+    <ellipse cx="39" cy="146" rx="3.5" ry="4" fill="none" stroke="#b77d36" stroke-width="1.5"/>
+    <circle cx="89" cy="145" r="8" fill="#9c6b2f"/>
+    <circle cx="89" cy="144" r="6.5" fill="#e9bb5e"/>
+    <ellipse cx="87" cy="143" rx="1.5" ry="4" fill="#ffe499" opacity="0.85"/>
+    <ellipse cx="90" cy="146" rx="3.5" ry="4" fill="none" stroke="#b77d36" stroke-width="1.5"/>
+
+    <!-- Face -->
+    <rect x="46" y="91" width="36" height="26" rx="8" fill="#ab785b"/>
+    <rect x="47" y="89" width="32" height="24" rx="8" fill="#e6bf94"/>
+    <ellipse cx="57" cy="97" rx="8.5" ry="6.5" fill="#f8d9ad"/>
+    <polygon points="45,88 58,88 45,103" fill="#e9bb5e"/>
+    <polygon points="79,88 70,89 80,103" fill="#e9bb5e"/>
+    <rect x="53" y="98" width="5" height="8" rx="2" fill="#252b35"/>
+    <rect x="69" y="98" width="5" height="8" rx="2" fill="#252b35"/>
+    <rect x="54" y="98" width="2" height="2" fill="#ffffff"/>
+    <rect x="70" y="98" width="2" height="2" fill="#ffffff"/>
+    <line x1="61" y1="110" x2="66" y2="110" stroke="#9f6958" stroke-width="1" stroke-linecap="round"/>
+    <line x1="51" y1="99" x2="56" y2="97" stroke="#252b35" stroke-width="2" stroke-linecap="round"/>
+    <line x1="71" y1="97" x2="76" y2="99" stroke="#252b35" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="51" cy="107" rx="3" ry="1.5" fill="#d98d88" opacity="0.5"/>
+    <ellipse cx="76" cy="107" rx="3" ry="1.5" fill="#d98d88" opacity="0.5"/>
+    <circle cx="81" cy="108" r="2.5" fill="#ffd19a"/>
+
+    <!-- Fire Mage Hat -->
+    <polygon points="34,88 52,41 63,36 67,51 84,88" fill="#a54b3c" stroke="#252b35" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <polygon points="37,86 53,44 59,42 53,85" fill="#e18a59" stroke="#e18a59" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <polygon points="65,51 82,86 65,84" fill="#602e38" stroke="#602e38" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <line x1="49" y1="64" x2="45" y2="77" stroke="#b3d2db" stroke-width="1" stroke-linecap="round"/>
+    <line x1="36" y1="83" x2="80" y2="83" stroke="#d6b77a" stroke-width="2" stroke-linecap="round"/>
+    <rect x="36" y="82" width="47" height="7" rx="2" fill="#a98553"/>
+    <rect x="59" y="82" width="8" height="7" fill="#ebd59e"/>
+    <polygon points="28,88 42,86 81,86 98,91 93,98 36,97 25,93" fill="#602e38" stroke="#252b35" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <line x1="29" y1="89" x2="48" y2="91" stroke="#ffd19a" stroke-width="2" stroke-linecap="round"/>
+    <line x1="48" y1="91" x2="91" y2="91" stroke="#ffd19a" stroke-width="2" stroke-linecap="round"/>
+    <g filter="url(#flame-glow)">
+      <circle cx="61" cy="64" r="2" fill="#ffae55"/>
+      <circle cx="66" cy="74" r="1.5" fill="#ffae55"/>
+      <polygon points="60,57 56,69 63,67 67,72 69,63 64,53" fill="#ffae55" stroke="#ffd19a" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- Subtle bottom vignette to ground the bust cleanly -->
+  <rect y="740" width="1024" height="284" fill="url(#bottom-vignette)"/>
+</svg>
