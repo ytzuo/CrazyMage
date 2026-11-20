@@ -47,8 +47,9 @@ npm run tauri:android:build
 
 ## 4. GitHub Actions 四端自动构建
 
-工作流位于 [.github/workflows/release.yml](../.github/workflows/release.yml)：
+工作流配置见 [release.yml](../.github/workflows/release.yml)。
 
+- 推送到 `main` 后自动运行类型检查、单测和网页构建。验证通过后打包 macOS、Windows、Linux 和 Android，产物可在该次 Actions 运行中下载。
 - **手动触发**：在 GitHub 仓库的 `Actions` → `Build & Release (Desktop + Android)` 点击 `Run workflow`，构建完成后直接下载四端产物。
 - **标签发布**：推送 `v*` 标签（例如 `git tag v0.1.0 && git push origin v0.1.0`），自动构建四端并生成草稿 GitHub Release。
 
