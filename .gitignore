@@ -29,3 +29,9 @@ Thumbs.db
 /artifacts/*.jpg
 /artifacts/*.jpeg
 /artifacts/*.webp
+
+# Tauri desktop & Android build outputs and signing keys
+src-tauri/target/
+src-tauri/gen/
+*.keystore
+*.jks
