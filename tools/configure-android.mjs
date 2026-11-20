@@ -55,7 +55,7 @@ const icBgPath = resolve(appMain, 'res/values/ic_launcher_background.xml');
 if (existsSync(icBgPath)) {
   const bg = readFileSync(icBgPath, 'utf8').replace(
     /(<color name="ic_launcher_background">)[^<]*(<\/color>)/,
-    '$1#17251F$2',
+    '$1#1B1414$2',
   );
   writeFileSync(icBgPath, bg, 'utf8');
 }

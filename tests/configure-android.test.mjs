@@ -42,7 +42,7 @@ test('configure-android patches orientation, Chinese app label, MainActivity, an
     assert.match(strings, /<string name="app_name">失控法师<\/string>/);
 
     const bg = readFileSync(join(appMain, 'res/values/ic_launcher_background.xml'), 'utf8');
-    assert.match(bg, /#17251F/);
+    assert.match(bg, /#1B1414/);
 
     const activity = readFileSync(join(appMain, 'java/com/unstablemage/game/MainActivity.kt'), 'utf8');
     assert.match(activity, /FLAG_KEEP_SCREEN_ON/);

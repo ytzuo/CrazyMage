@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdirSync, writeFileSync, renameSync, rmSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -40,37 +40,36 @@ for (let i = 0; i < 4; i++) {
   }
 }
 
-// Position the portrait so hat tip, curls, and face sit cleanly inside desktop squircle & Android safe zones.
-const scale = 7.1;
+// Position the portrait inside the translucent arcane medallion so hat tip, face, and curls stay centered.
+const scale = 6.9;
 const cx = 61.5;
 const cy = 90;
 const tx = 512 - cx * scale;
-const ty = 506 - cy * scale;
+const ty = 516 - cy * scale;
 
 const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
   <defs>
-    <radialGradient id="bg-sanctum" cx="50%" cy="46%" r="68%">
-      <stop offset="0%" stop-color="#2c4438"/>
-      <stop offset="56%" stop-color="#17251f"/>
-      <stop offset="100%" stop-color="#0b1310"/>
+    <radialGradient id="bg-translucent" cx="50%" cy="48%" r="50%">
+      <stop offset="0%" stop-color="#261816" stop-opacity="0.58"/>
+      <stop offset="68%" stop-color="#171113" stop-opacity="0.44"/>
+      <stop offset="100%" stop-color="#100c0e" stop-opacity="0.24"/>
     </radialGradient>
-    <radialGradient id="fire-aura" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#ffae55" stop-opacity="0.38"/>
-      <stop offset="48%" stop-color="#d6653c" stop-opacity="0.18"/>
+    <radialGradient id="fire-aura" cx="50%" cy="50%" r="48%">
+      <stop offset="0%" stop-color="#ffae55" stop-opacity="0.42"/>
+      <stop offset="52%" stop-color="#d6653c" stop-opacity="0.18"/>
       <stop offset="100%" stop-color="#a54b3c" stop-opacity="0"/>
     </radialGradient>
     <linearGradient id="rim-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffe1a8" stop-opacity="0.65"/>
-      <stop offset="50%" stop-color="#c99652" stop-opacity="0.42"/>
-      <stop offset="100%" stop-color="#7c4734" stop-opacity="0.5"/>
+      <stop offset="0%" stop-color="#ffe7b8" stop-opacity="0.88"/>
+      <stop offset="50%" stop-color="#d6a056" stop-opacity="0.62"/>
+      <stop offset="100%" stop-color="#9e5b3c" stop-opacity="0.72"/>
     </linearGradient>
-    <radialGradient id="bottom-vignette" cx="50%" cy="100%" r="60%">
-      <stop offset="0%" stop-color="#0c1310" stop-opacity="0.72"/>
-      <stop offset="100%" stop-color="#0c1310" stop-opacity="0"/>
-    </radialGradient>
-    <filter id="portrait-shadow" x="-15%" y="-15%" width="130%" height="130%">
-      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#090e0c" flood-opacity="0.55"/>
+    <clipPath id="medallion-clip">
+      <circle cx="512" cy="512" r="446"/>
+    </clipPath>
+    <filter id="portrait-shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="2.5" stdDeviation="3.2" flood-color="#0d0808" flood-opacity="0.45"/>
     </filter>
     <filter id="flame-glow" x="-40%" y="-40%" width="180%" height="180%">
       <feGaussianBlur stdDeviation="2.2" result="blur"/>
@@ -81,30 +80,32 @@ const svg = `<?xml version="1.0" encoding="UTF-8"?>
     </filter>
   </defs>
 
-  <!-- Full-bleed dark emerald sanctum background -->
-  <rect width="1024" height="1024" fill="url(#bg-sanctum)"/>
-  <rect width="1024" height="1024" fill="url(#fire-aura)"/>
+  <!-- Semi-transparent circular backdrop & warm fire aura (no green background) -->
+  <circle cx="512" cy="512" r="446" fill="url(#bg-translucent)"/>
+  <circle cx="512" cy="512" r="446" fill="url(#fire-aura)"/>
 
-  <!-- Subtle arcane seal behind portrait -->
-  <g fill="none" stroke="url(#rim-gold)" opacity="0.62">
+  <!-- Arcane seal behind portrait -->
+  <g fill="none" stroke="url(#rim-gold)" opacity="0.82">
+    <circle cx="512" cy="512" r="446" stroke-width="4" opacity="0.55"/>
     <circle cx="512" cy="512" r="404" stroke-width="5"/>
-    <circle cx="512" cy="512" r="376" stroke-width="3" stroke-dasharray="6 22"/>
-    <circle cx="512" cy="512" r="322" stroke-width="2.5" opacity="0.5"/>
-    <polygon points="512,174 805,681 219,681" stroke-width="2" opacity="0.32"/>
-    <polygon points="512,850 219,343 805,343" stroke-width="2" opacity="0.24"/>
+    <circle cx="512" cy="512" r="376" stroke-width="3.2" stroke-dasharray="6 22"/>
+    <circle cx="512" cy="512" r="322" stroke-width="2.5" opacity="0.58"/>
+    <polygon points="512,174 805,681 219,681" stroke-width="2.4" opacity="0.42"/>
+    <polygon points="512,850 219,343 805,343" stroke-width="2.4" opacity="0.34"/>
   </g>
 
   <!-- Warm drifting fire embers -->
-  <g fill="#ffbe6b">
-    <circle cx="206" cy="300" r="8" opacity="0.55"/>
-    <circle cx="834" cy="272" r="6" opacity="0.65"/>
-    <circle cx="790" cy="408" r="10" fill="#ff9642" opacity="0.4"/>
-    <circle cx="230" cy="458" r="5" opacity="0.5"/>
-    <circle cx="748" cy="216" r="4.5" fill="#ffe499" opacity="0.7"/>
-    <circle cx="294" cy="212" r="5.5" fill="#ffe499" opacity="0.6"/>
+  <g fill="#ffbe6b" clip-path="url(#medallion-clip)">
+    <circle cx="206" cy="300" r="8" opacity="0.62"/>
+    <circle cx="834" cy="272" r="6" opacity="0.7"/>
+    <circle cx="790" cy="408" r="10" fill="#ff9642" opacity="0.46"/>
+    <circle cx="230" cy="458" r="5" opacity="0.56"/>
+    <circle cx="748" cy="216" r="4.5" fill="#ffe499" opacity="0.75"/>
+    <circle cx="294" cy="212" r="5.5" fill="#ffe499" opacity="0.65"/>
   </g>
 
-  <!-- Female Fire Mage portrait (exact in-game vector layers) -->
+  <!-- Female Fire Mage portrait clipped cleanly to the translucent medallion -->
+  <g clip-path="url(#medallion-clip)">
   <g transform="translate(${tx.toFixed(2)}, ${ty.toFixed(2)}) scale(${scale})" filter="url(#portrait-shadow)">
     <!-- Robe torso & shoulders -->
     ${poly([47, 112, 80, 112, 91, 163, 78, 176, 63, 172, 45, 177, 30, 164], FIRE.robe)}
@@ -162,9 +163,10 @@ const svg = `<?xml version="1.0" encoding="UTF-8"?>
       ${poly([60, 57, 56, 69, 63, 67, 67, 72, 69, 63, 64, 53], FIRE.crystal, FIRE.trim, 1.8)}
     </g>
   </g>
+  </g>
 
-  <!-- Subtle bottom vignette to ground the bust cleanly -->
-  <rect y="740" width="1024" height="284" fill="url(#bottom-vignette)"/>
+  <!-- Subtle outer gold rim over clipped bust -->
+  <circle cx="512" cy="512" r="446" fill="none" stroke="url(#rim-gold)" stroke-width="5" opacity="0.72"/>
 </svg>
 `;
 
@@ -173,13 +175,30 @@ const pngPath = resolve(assetsDir, 'app-icon.png');
 writeFileSync(svgPath, svg, 'utf8');
 
 if (!process.argv.includes('--svg-only')) {
-  // Rasterize SVG to 1024x1024 PNG via macOS qlmanage (or rsvg-convert on Linux).
-  try {
-    execFileSync('qlmanage', ['-t', '-s', '1024', '-o', assetsDir, svgPath], { stdio: 'ignore' });
-    const generated = resolve(assetsDir, 'icon-source.svg.png');
-    rmSync(pngPath, { force: true });
-    renameSync(generated, pngPath);
-  } catch {
+  // Rasterize SVG to 1024x1024 transparent RGBA PNG via headless Chrome (macOS/Linux) or rsvg-convert.
+  const chromeCandidates = [
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    'google-chrome',
+    'chromium',
+  ];
+  let rendered = false;
+  for (const bin of chromeCandidates) {
+    try {
+      execFileSync(bin, [
+        '--headless=new',
+        '--disable-gpu',
+        '--hide-scrollbars',
+        '--default-background-color=00000000',
+        '--force-device-scale-factor=1',
+        '--window-size=1024,1024',
+        `--screenshot=${pngPath}`,
+        `file://${svgPath}`,
+      ], { stdio: 'ignore' });
+      rendered = true;
+      break;
+    } catch { /* Try next candidate. */ }
+  }
+  if (!rendered) {
     execFileSync('rsvg-convert', ['-w', '1024', '-h', '1024', svgPath, '-o', pngPath], { stdio: 'inherit' });
   }
 }

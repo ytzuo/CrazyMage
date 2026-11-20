@@ -40,7 +40,7 @@ npm run tauri:android:build
 - **应用图标**（火属性女法师头像）：
   - 源图生成脚本：[tools/generate-app-icon.mjs](../tools/generate-app-icon.mjs)（基于 [CharacterTextures.ts](../src/game/art/CharacterTextures.ts) 的女法师火系矢量绘制）
   - 产物：`assets/icon-source.svg` 与 `assets/app-icon.png`（1024×1024）
-  - 重新生成全平台图标：`npm run tauri:icons`（若修改图标后重跑，请确认 `src-tauri/icons/android/values/ic_launcher_background.xml` 背景色保持 `#17251F`）
+  - 重新生成全平台图标：`npm run tauri:icons`（若修改图标后重跑，请确认 `src-tauri/icons/android/values/ic_launcher_background.xml` 背景色保持 `#1B1414`）
 - **运行时音频**：
   - 原始母带 WAV 保留在 `artifacts/audio-drafts/`
   - 压缩运行时 `.m4a`（AAC）位于 `src/game/audio/media/`，由 [tools/compress-audio.sh](../tools/compress-audio.sh) 生成（`dist/` 体积由约 46 MB 压缩至约 6.3 MB）
