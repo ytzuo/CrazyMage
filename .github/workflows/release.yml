@@ -1,0 +1,203 @@
+name: Build & Release (Desktop + Android)
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    name: Typecheck, Unit Tests & Web Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  build-desktop:
+    name: Desktop (${{ matrix.label }})
+    needs: verify
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: macOS-universal
+            os: macos-latest
+            rust_targets: aarch64-apple-darwin,x86_64-apple-darwin
+            tauri_args: --target universal-apple-darwin
+            artifact_paths: |
+              src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+          - label: Windows-x64
+            os: windows-latest
+            rust_targets: x86_64-pc-windows-msvc
+            tauri_args: ''
+            artifact_paths: |
+              src-tauri/target/release/bundle/msi/*.msi
+              src-tauri/target/release/bundle/nsis/*.exe
+          - label: Linux-x64
+            os: ubuntu-22.04
+            rust_targets: x86_64-unknown-linux-gnu
+            tauri_args: ''
+            artifact_paths: |
+              src-tauri/target/release/bundle/deb/*.deb
+              src-tauri/target/release/bundle/rpm/*.rpm
+              src-tauri/target/release/bundle/appimage/*.AppImage
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux WebKitGTK & bundle dependencies
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            gstreamer1.0-plugins-good \
+            gstreamer1.0-libav
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_targets }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ./src-tauri
+
+      - run: npm ci
+
+      - name: Build Tauri desktop bundle
+        run: npx tauri build ${{ matrix.tauri_args }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-${{ matrix.label }}
+          path: ${{ matrix.artifact_paths }}
+          if-no-files-found: error
+
+  build-android:
+    name: Android (APK)
+    needs: verify
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_NDK_VERSION: 27.2.12479018
+      ANDROID_BUILD_TOOLS: 35.0.0
+      ANDROID_PLATFORM: android-35
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: |
+            platform-tools
+            platforms;android-35
+            build-tools;35.0.0
+            ndk;27.2.12479018
+
+      - name: Export Android SDK & NDK paths
+        run: |
+          echo "ANDROID_HOME=${ANDROID_HOME:-$ANDROID_SDK_ROOT}" >> "$GITHUB_ENV"
+          echo "NDK_HOME=${ANDROID_HOME:-$ANDROID_SDK_ROOT}/ndk/${ANDROID_NDK_VERSION}" >> "$GITHUB_ENV"
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: ./src-tauri
+
+      - run: npm ci
+
+      - name: Initialize & configure Android shell
+        run: |
+          npx tauri android init --ci --skip-targets-install
+          node tools/configure-android.mjs
+
+      - name: Prepare optional release keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "${RUNNER_TEMP}/release.keystore"
+            echo "ANDROID_KEYSTORE_PATH=${RUNNER_TEMP}/release.keystore" >> "$GITHUB_ENV"
+            echo "RELEASE_SIGNED=true" >> "$GITHUB_ENV"
+          else
+            echo "RELEASE_SIGNED=false" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build Android APK
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: npx tauri android build --apk --target aarch64 --target armv7 --target x86_64 --ci
+
+      - name: Collect & ensure installable APK
+        run: |
+          mkdir -p dist-android
+          APK_DIR="src-tauri/gen/android/app/build/outputs/apk/universal/release"
+          if [ "$RELEASE_SIGNED" = "true" ] && [ -f "${APK_DIR}/app-universal-release.apk" ]; then
+            cp "${APK_DIR}/app-universal-release.apk" dist-android/unstable-mage-android.apk
+          else
+            UNSIGNED_APK="${APK_DIR}/app-universal-release-unsigned.apk"
+            ALIGNED_APK="${RUNNER_TEMP}/aligned.apk"
+            TEST_KEYSTORE="${RUNNER_TEMP}/ci-test.keystore"
+            keytool -genkeypair -v -keystore "$TEST_KEYSTORE" -storepass android -keypass android \
+              -alias ci-test -keyalg RSA -keysize 2048 -validity 3650 \
+              -dname "CN=Unstable Mage CI, OU=Dev, O=UnstableMage, L=NA, ST=NA, C=CN"
+            "${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/zipalign" -f -p 4 "$UNSIGNED_APK" "$ALIGNED_APK"
+            "${ANDROID_HOME}/build-tools/${ANDROID_BUILD_TOOLS}/apksigner" sign \
+              --ks "$TEST_KEYSTORE" --ks-pass pass:android --key-pass pass:android \
+              --out dist-android/unstable-mage-android-test-signed.apk "$ALIGNED_APK"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: dist-android/*.apk
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build-desktop, build-android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          generate_release_notes: true
+          files: release-artifacts/*

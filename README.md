@@ -68,6 +68,7 @@ npm test
 - [性能保障指南](docs/performance-guide.md)：渲染、战斗循环、对象回收、暂停、启动与性能回归检查。
 - [启动卡顿检查](docs/performance.md)：本次已确认的问题、优化方式和实测局限。
 - [项目编码约定](AGENTS.md)：后续编码的需求与性能指南入口。
+- [桌面与安卓打包发布](docs/packaging.md)：Tauri v2 四端本地打包、图标与音频维护及 GitHub Actions 自动构建。
 
 ## 结构
 
