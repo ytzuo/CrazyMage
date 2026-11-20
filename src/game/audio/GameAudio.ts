@@ -51,7 +51,12 @@ export class GameAudio {
     }
     const signal = this.listeners.signal;
     const unlock = () => {
-      if (this.context?.state === 'suspended') void this.context.resume().catch(() => {});
+      if (this.context?.state === 'suspended') {
+        void this.context.resume().then(() => {
+          this.startHomeMusic();
+          this.startBattleMusic();
+        }).catch(() => {});
+      }
       this.startHomeMusic();
       this.startBattleMusic();
     };
