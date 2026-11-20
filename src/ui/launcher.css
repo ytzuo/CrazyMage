@@ -1,5 +1,6 @@
 .arena.launching > :not(#school-overlay) { visibility: hidden; pointer-events: none; }
 .arena.launching #sound { visibility: visible; pointer-events: auto; }
+.arena.launching #guide-overlay:not([hidden]) { visibility: visible; pointer-events: auto; }
 .launch-page {
   --launch-accent: #efb16d;
   --launch-glow: #e48d3e;

@@ -5,6 +5,7 @@ import { enemySpec } from '../game/enemies/roster';
 import type { GameMode } from '../game/modes';
 import { PreviewScene, type PreviewSelection } from './PreviewScene';
 import { setupAppShell } from '../platform/shell';
+import { requestCloseEmbeddedGuide, setupGuidePage } from '../platform/guideBridge';
 const $=<T extends HTMLElement=HTMLElement>(id:string)=>document.getElementById(id) as T;
 let entryIndex=0,formIndex=0,demo:DemoMode='attack',move='sweep',wave=1,growth:GameMode='race';
 let portraits=new Map<string,string>(),lastPhase='';
@@ -78,9 +79,10 @@ $<HTMLSelectElement>('growth').onchange=()=>{
   growth=$<HTMLSelectElement>('growth').value as GameMode;$<HTMLInputElement>('wave').max=growth==='race'?'20':'100';
   wave=Math.min(wave,growth==='race'?20:100);renderEntry();
 };
-const disposeShell=setupAppShell({onBack:()=>{window.location.href='./index.html';return true;}});
-window.addEventListener('pagehide',event=>{if(event.persisted)scene.pause('后台');else{disposeShell();game.destroy(true);game.loop.wake();}});
-if(import.meta.hot)import.meta.hot.dispose(()=>{disposeShell();game.destroy(true);game.loop.wake();});
+const disposeGuide=setupGuidePage();
+const disposeShell=setupAppShell({onBack:()=>{if(!requestCloseEmbeddedGuide())window.location.href='./index.html';return true;}});
+window.addEventListener('pagehide',event=>{if(event.persisted)scene.pause('后台');else{disposeGuide();disposeShell();game.destroy(true);game.loop.wake();}});
+if(import.meta.hot)import.meta.hot.dispose(()=>{disposeGuide();disposeShell();game.destroy(true);game.loop.wake();});
 renderList();renderEntry();
 if(import.meta.env.DEV) {
   void import('./verification').then(({installVerification})=>installVerification(scene,$('dev-tools'),()=>{renderEntry();}));

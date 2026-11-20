@@ -39,7 +39,7 @@ export class GameAudio {
       this.homeMusicUrl = homeMusicUrl;
       this.homeMusic.volume = 0.16;
       this.homeMusic.muted = this.muted;
-      this.homeMusic.loop = false;
+      this.homeMusic.loop = true;
     }
     if (battleMusicUrl) {
       this.battleMusic = new Audio();
@@ -50,21 +50,23 @@ export class GameAudio {
       this.battleMusic.loop = true;
     }
     const signal = this.listeners.signal;
-    const unlock = () => {
-      if (this.context?.state === 'suspended') {
-        void this.context.resume().then(() => {
-          this.startHomeMusic();
-          this.startBattleMusic();
-        }).catch(() => {});
-      }
-      this.startHomeMusic();
-      this.startBattleMusic();
-    };
+    const unlock = () => this.unlock();
     window.addEventListener('pointerdown', unlock, { signal, capture: true });
     window.addEventListener('keydown', unlock, { signal, capture: true });
-    window.addEventListener('blur', () => { this.stop(); this.pauseHomeMusic(false); this.pauseBattleMusic(false); }, { signal });
-    document.addEventListener('visibilitychange', () => { if (document.hidden) { this.stop(); this.pauseHomeMusic(false); this.pauseBattleMusic(false); } }, { signal });
+    window.addEventListener('blur', () => { this.stop(); this.pauseBattleMusic(false); }, { signal });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) { this.stop(); this.pauseBattleMusic(false); } }, { signal });
     this.ready = this.load(urls);
+  }
+  unlock(): void {
+    if (this.disposed) return;
+    if (this.context?.state === 'suspended') {
+      void this.context.resume().then(() => {
+        this.startHomeMusic();
+        this.startBattleMusic();
+      }).catch(() => {});
+    }
+    this.startHomeMusic();
+    this.startBattleMusic();
   }
   private async load(urls: Record<string, string>): Promise<void> {
     const context = this.context;
@@ -98,7 +100,7 @@ export class GameAudio {
   }
   private startHomeMusic(): void {
     const music = this.homeMusic;
-    if (!music || !this.homeMusicActive || this.muted || this.disposed || document.hidden || !music.paused || music.ended) return;
+    if (!music || !this.homeMusicActive || this.muted || this.disposed || !music.paused || music.ended) return;
     if (!music.src && !navigator.userActivation?.isActive && this.context?.state !== 'running') return;
     if (!music.src) music.src = this.homeMusicUrl;
     void music.play().catch(() => { /* A later trusted gesture retries playback. */ });

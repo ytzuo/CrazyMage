@@ -24,6 +24,11 @@ export interface AppShellOptions {
 
 const ZOOM_KEYS = new Set(['Equal', 'Minus', 'Digit0', 'NumpadAdd', 'NumpadSubtract', 'Numpad0']);
 
+export function isGuideReturnHref(href: string | null): boolean {
+  if (!href) return false;
+  return /(?:^|\/)index\.html(?:[?#].*)?$/.test(href.trim());
+}
+
 export function isTauriRuntime(): boolean {
   return typeof window !== 'undefined' && typeof window.__TAURI_INTERNALS__ === 'object' && window.__TAURI_INTERNALS__ !== null;
 }

@@ -13,6 +13,7 @@ import { BattleNotice } from './ui/BattleNotice';
 import { SCHOOL_INFO, definition } from './game/upgrades/definitions';
 import type { BuildSnapshot } from './game/upgrades/BuildStore';
 import { setupAppShell } from './platform/shell';
+import { GuideOverlay } from './ui/GuideOverlay';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <main class="arena launching" aria-label="魔法试验场操控原型">
@@ -58,6 +59,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     </button>
     <div id="battle-notice" class="battle-notice" role="status" aria-live="polite" hidden></div>
     <div id="school-overlay" class="launch-page" role="dialog" aria-modal="true" aria-label="启动页面" hidden></div>
+    <div id="guide-overlay" class="guide-overlay" hidden></div>
     <div id="build-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="法术构筑与升级" hidden></div>
     <div id="pause-overlay" class="pause-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-title" hidden>
       <div class="pause-card"><h2 id="pause-title">已暂停</h2><p id="death-duration" hidden></p><button id="resume">继续 <span>→</span></button><button id="back-launch" class="back-launch">返回主菜单</button></div>
@@ -252,6 +254,21 @@ panel = new BuildPanel(element('build-overlay'), (batch, id) => {
 }, inspectBuild);
 
 picker = new SchoolPicker(element('school-overlay'), (school,mode,gender) => { if(scene.chooseSchool(school,mode,gender)) { notice.show(`${SCHOOL_INFO[school].name}流派`, `${SCHOOL_INFO[school].spell}已就绪`, school); syncPause(); } }, gender => scene.schoolArtwork(gender));
+const guideOverlay = new GuideOverlay(element('guide-overlay'), {
+  onUnlockAudio: () => scene.audio?.unlock(),
+  onVisibilityChange: (open) => {
+    element('school-overlay').classList.toggle('preview-sleep', open || document.hidden);
+  },
+});
+element('school-overlay').addEventListener('click', (event) => {
+  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  const link = event.target instanceof Element ? event.target.closest<HTMLAnchorElement>('a[data-bestiary], a[data-upgrades]') : null;
+  const href = link?.getAttribute('href');
+  if (!href) return;
+  event.preventDefault();
+  scene.audio?.unlock();
+  guideOverlay.open(href, link?.textContent?.trim() || '图鉴');
+}, listenerOptions);
 
 game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -341,8 +358,8 @@ window.addEventListener('keydown', (event) => {
   if (event.code === 'KeyU' || (event.code === 'Escape' && inspecting)) inspectBuild();
   else if (!latestBuild?.choice) setPaused(!paused);
 }, listenerOptions);
-window.addEventListener('blur', () => setPaused(true), listenerOptions);
-document.addEventListener('visibilitychange', () => { if (document.hidden) setPaused(true); }, listenerOptions);
+window.addEventListener('blur', () => { if (!guideOverlay.isOpen) setPaused(true); }, listenerOptions);
+document.addEventListener('visibilitychange', () => { if (document.hidden && !guideOverlay.isOpen) setPaused(true); }, listenerOptions);
 const resizeObserver = new ResizeObserver(() => {
   const width = element('game').clientWidth;
   const height = element('game').clientHeight;
@@ -352,6 +369,7 @@ resizeObserver.observe(element('game'));
 
 const disposeShell = setupAppShell({
   onBack: () => {
+    if (guideOverlay.isOpen) { guideOverlay.close(); return true; }
     if (inspecting) { inspectBuild(); return true; }
     if (latestBuild?.choice) return true;
     if (dead) { restart(); return true; }
@@ -362,6 +380,7 @@ const disposeShell = setupAppShell({
 
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
+    guideOverlay.destroy();
     disposeShell();
     listeners.abort();
     resizeObserver.disconnect();

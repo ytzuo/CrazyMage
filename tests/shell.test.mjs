@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { shouldBlockBrowserShortcut } from '../src/platform/shell.ts';
+import { isGuideReturnHref, shouldBlockBrowserShortcut } from '../src/platform/shell.ts';
 
 const key = (code, mods = {}) => ({
   code,
@@ -29,4 +29,13 @@ test('gameplay keys, dev mode, and regular browser sessions remain unaffected', 
   assert.equal(shouldBlockBrowserShortcut(key('F5'), true, false), false);
   assert.equal(shouldBlockBrowserShortcut(key('F5'), false, true), false);
   assert.equal(shouldBlockBrowserShortcut(key('KeyR', { ctrlKey: true }), false, true), false);
+});
+
+test('guide return link matcher only intercepts main-menu index.html links', () => {
+  assert.equal(isGuideReturnHref('./index.html'), true);
+  assert.equal(isGuideReturnHref('/index.html'), true);
+  assert.equal(isGuideReturnHref('index.html?from=guide'), true);
+  assert.equal(isGuideReturnHref('./bestiary.html'), false);
+  assert.equal(isGuideReturnHref('./upgrades.html'), false);
+  assert.equal(isGuideReturnHref(null), false);
 });
