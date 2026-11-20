@@ -121,11 +121,12 @@ jobs:
 
       - uses: android-actions/setup-android@v3
         with:
-          packages: |
+          # setup-android v3 splits package names on spaces.
+          packages: >-
             platform-tools
-            platforms;android-35
-            build-tools;35.0.0
-            ndk;27.2.12479018
+            platforms;${{ env.ANDROID_PLATFORM }}
+            build-tools;${{ env.ANDROID_BUILD_TOOLS }}
+            ndk;${{ env.ANDROID_NDK_VERSION }}
 
       - name: Export Android SDK & NDK paths
         run: |
