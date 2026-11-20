@@ -83,8 +83,13 @@ export class ArenaScene extends Phaser.Scene {
 
   private centerCamera(): void {
     if (this.player) {
+      const width = this.scale.width;
+      const height = this.scale.height;
+      if (this.cameras.main.width !== width || this.cameras.main.height !== height) {
+        this.cameras.main.setViewport(0, 0, width, height);
+      }
       // A viewport larger than the world still fills the screen without revealing empty space.
-      this.cameras.main.setZoom(Math.max(1, this.scale.width / ARENA.width, this.scale.height / ARENA.height));
+      this.cameras.main.setZoom(Math.max(1, width / ARENA.width, height / ARENA.height));
       this.cameras.main.centerOn(this.player.view.x, this.player.view.y);
     }
   }

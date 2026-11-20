@@ -315,6 +315,17 @@ function syncSoundButton(): void {
   element('sound').title = muted ? '开启声音' : '关闭声音';
 }
 
+function syncViewportSize(): void {
+  if (!game) return;
+  const host = element('game');
+  const width = host.clientWidth;
+  const height = host.clientHeight;
+  if (width <= 0 || height <= 0) return;
+  if (width !== game.scale.width || height !== game.scale.height || width !== game.canvas?.width || height !== game.canvas?.height) {
+    game.scale.setParentSize(width, height);
+  }
+}
+
 function syncPause(): void {
   if (!game) return;
   const choosing = !!latestBuild?.choice;
@@ -324,7 +335,7 @@ function syncPause(): void {
     appliedPause = next;
     scene.setPaused(next);
     if (next) { game.pause(); game.loop.sleep(); }
-    else { game.resume(); game.loop.wake(); }
+    else { syncViewportSize(); game.resume(); game.loop.wake(); }
   }
   if (import.meta.env.DEV && game.canvas) game.canvas.dataset.loopRunning = String(game.loop.running);
   element('pause-overlay').hidden = !dead && (!paused || selectingSchool || inspecting || choosing);
@@ -376,11 +387,7 @@ window.addEventListener('keydown', (event) => {
 }, listenerOptions);
 window.addEventListener('blur', () => { if (!selectingSchool && !guideOverlay.isOpen) setPaused(true); }, listenerOptions);
 document.addEventListener('visibilitychange', () => { if (document.hidden && !selectingSchool && !guideOverlay.isOpen) setPaused(true); }, listenerOptions);
-const resizeObserver = new ResizeObserver(() => {
-  const width = element('game').clientWidth;
-  const height = element('game').clientHeight;
-  if (width !== game.scale.width || height !== game.scale.height) game.scale.resize(width, height);
-});
+const resizeObserver = new ResizeObserver(syncViewportSize);
 resizeObserver.observe(element('game'));
 
 const disposeShell = setupAppShell({
