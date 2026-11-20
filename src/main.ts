@@ -58,6 +58,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       <span class="ultimate-key" aria-hidden="true">Q</span><span class="ultimate-content"><strong id="ultimate-name"></strong><span id="ultimate-kind" class="skill-kind"></span><small id="ultimate-charge">0 / 15 击杀</small><span class="ultimate-track" aria-hidden="true"><span id="ultimate-fill"></span></span></span>
     </button>
     <div id="battle-notice" class="battle-notice" role="status" aria-live="polite" hidden></div>
+    <div id="start-countdown" class="start-countdown" role="status" aria-live="polite" hidden><span id="start-countdown-num"></span></div>
     <div id="school-overlay" class="launch-page" role="dialog" aria-modal="true" aria-label="启动页面" hidden></div>
     <div id="guide-overlay" class="guide-overlay" hidden></div>
     <div id="build-overlay" class="build-overlay" role="dialog" aria-modal="true" aria-label="法术构筑与升级" hidden></div>
@@ -86,6 +87,7 @@ let selectingSchool = true;
 let lastCombat = '';
 let lastUltimate = '';
 let lastSkill = '';
+let lastCountdown = '';
 let ultimateEnergy = 0;
 let ultimateCasts = 0;
 let ultimateRun = -1;
@@ -103,12 +105,26 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
   selectingSchool = state.selectingSchool;
   picker?.update(selectingSchool);
   const school = state.progression.build.school;
-  const skillKey = `${school}/${state.skillEnergy}/${Math.ceil(state.skillRemaining/1000)}/${state.paused}/${selectingSchool}/${state.dead}/${state.won}/${state.progression.choice?.id}`;
+  const countdownKey = `${state.countdown}/${state.paused}/${selectingSchool}/${state.dead}/${state.won}/${school}`;
+  if (countdownKey !== lastCountdown) {
+    const visible = state.countdown > 0 && !state.paused && !selectingSchool && !state.dead && !state.won;
+    const overlay = element('start-countdown');
+    const num = element('start-countdown-num');
+    overlay.hidden = !visible;
+    overlay.dataset.school = school;
+    if (visible) {
+      num.textContent = String(state.countdown);
+      num.classList.toggle('pop-a', state.countdown % 2 === 1);
+      num.classList.toggle('pop-b', state.countdown % 2 === 0);
+    }
+    lastCountdown = countdownKey;
+  }
+  const skillKey = `${school}/${state.skillEnergy}/${Math.ceil(state.skillRemaining/1000)}/${state.paused}/${selectingSchool}/${state.countdown > 0}/${state.dead}/${state.won}/${state.progression.choice?.id}`;
   if (skillKey !== lastSkill) {
     const spec = SCHOOL_SKILLS[school], ready = state.skillRemaining === 0;
     const button = element<HTMLButtonElement>('skill');
     button.hidden = selectingSchool;
-    button.disabled = !ready || state.paused || selectingSchool || state.dead || state.won || !!state.progression.choice;
+    button.disabled = !ready || state.paused || selectingSchool || state.countdown > 0 || state.dead || state.won || !!state.progression.choice;
     button.dataset.schoolTone = school;
     button.classList.toggle('ready', ready);
     button.title = spec.description;
@@ -121,13 +137,13 @@ const scene = new ArenaScene(movement, (state: MovementState) => {
     element('skill-fill').style.transform = `scaleX(${state.skillEnergy/100})`;
     lastSkill = skillKey;
   }
-  const ultimateKey = `${school}/${state.progression.build.revision}/${state.ultimateKills}/${state.ultimateKillsRequired}/${state.paused}/${selectingSchool}/${state.dead}/${state.won}/${state.progression.choice?.id}`;
+  const ultimateKey = `${school}/${state.progression.build.revision}/${state.ultimateKills}/${state.ultimateKillsRequired}/${state.paused}/${selectingSchool}/${state.countdown > 0}/${state.dead}/${state.won}/${state.progression.choice?.id}`;
   if (ultimateKey !== lastUltimate) {
     const spec = state.progression.effective.ultimate;
     const ready = state.ultimateKills === state.ultimateKillsRequired;
     const button = element<HTMLButtonElement>('ultimate');
     button.hidden = selectingSchool;
-    button.disabled = !ready || state.paused || selectingSchool || state.dead || state.won || !!state.progression.choice;
+    button.disabled = !ready || state.paused || selectingSchool || state.countdown > 0 || state.dead || state.won || !!state.progression.choice;
     button.dataset.schoolTone = school;
     button.classList.toggle('ready', ready);
     const chargeRule = school === 'fire' ? '普通法术和火墙爆炸击杀可充能，火墙直接击杀不回充' : '普通法术击杀可充能，大招击杀不回充';
@@ -253,7 +269,7 @@ panel = new BuildPanel(element('build-overlay'), (batch, id) => {
   }
 }, inspectBuild);
 
-picker = new SchoolPicker(element('school-overlay'), (school,mode,gender) => { if(scene.chooseSchool(school,mode,gender)) { notice.show(`${SCHOOL_INFO[school].name}流派`, `${SCHOOL_INFO[school].spell}已就绪`, school); syncPause(); } }, gender => scene.schoolArtwork(gender));
+picker = new SchoolPicker(element('school-overlay'), (school,mode,gender) => { if(scene.chooseSchool(school,mode,gender)) { paused = false; inspecting = false; notice.show(`${SCHOOL_INFO[school].name}流派`, `${SCHOOL_INFO[school].spell}已就绪`, school); syncPause(); } }, gender => scene.schoolArtwork(gender));
 const guideOverlay = new GuideOverlay(element('guide-overlay'), {
   onUnlockAudio: () => scene.audio?.unlock(),
   onVisibilityChange: (open) => {
@@ -358,8 +374,8 @@ window.addEventListener('keydown', (event) => {
   if (event.code === 'KeyU' || (event.code === 'Escape' && inspecting)) inspectBuild();
   else if (!latestBuild?.choice) setPaused(!paused);
 }, listenerOptions);
-window.addEventListener('blur', () => { if (!guideOverlay.isOpen) setPaused(true); }, listenerOptions);
-document.addEventListener('visibilitychange', () => { if (document.hidden && !guideOverlay.isOpen) setPaused(true); }, listenerOptions);
+window.addEventListener('blur', () => { if (!selectingSchool && !guideOverlay.isOpen) setPaused(true); }, listenerOptions);
+document.addEventListener('visibilitychange', () => { if (document.hidden && !selectingSchool && !guideOverlay.isOpen) setPaused(true); }, listenerOptions);
 const resizeObserver = new ResizeObserver(() => {
   const width = element('game').clientWidth;
   const height = element('game').clientHeight;

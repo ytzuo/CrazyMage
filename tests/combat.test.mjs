@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { Health } from '../src/game/combat/Health.ts';
 import { segmentCircleHit } from '../src/game/combat/collision.ts';
 import { WaveClock } from '../src/game/enemies/WaveClock.ts';
+import { START_COUNTDOWN_MS, stepStartCountdown } from '../src/game/config.ts';
 
 test('waves arrive at 30 seconds, reset next countdown, and restart at wave one', () => {
   const clock = new WaveClock(30000);
@@ -90,4 +91,22 @@ test('overlapping spawn and tangent contact are hits; stationary miss is safe', 
   const near = segmentCircleHit(0, 0, 100, 0, 30, 0, 10);
   const far = segmentCircleHit(0, 0, 100, 0, 70, 0, 10);
   assert.ok(near < far);
+});
+
+test('start countdown ticks 3 -> 2 -> 1 -> 0 in bounded active-time steps', () => {
+  let remaining = START_COUNTDOWN_MS;
+  assert.equal(remaining, 3000);
+  const steps = [];
+  const first = stepStartCountdown(remaining, 2000);
+  assert.equal(first.remainingMs, 2950);
+  assert.equal(first.afterSeconds, 3);
+  assert.equal(first.changed, false);
+  remaining = first.remainingMs;
+  while (remaining > 0) {
+    const tick = stepStartCountdown(remaining, 50);
+    remaining = tick.remainingMs;
+    if (tick.changed) steps.push(tick.afterSeconds);
+  }
+  assert.deepEqual(steps, [2, 1, 0]);
+  assert.equal(remaining, 0);
 });

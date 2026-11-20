@@ -3,7 +3,7 @@ import { soundUrls, themeUrl, battleMusicUrl } from '../audio/assets';
 import { isBoss } from '../enemies/roster';
 import { RACE_WAVES, type GameMode } from '../modes';
 import Phaser from 'phaser';
-import { ARENA, FIREBALL, PLAYER, type Direction, type MovementState } from '../config';
+import { ARENA, FIREBALL, PLAYER, START_COUNTDOWN_MS, stepStartCountdown, type Direction, type MovementState } from '../config';
 import { Player } from '../entities/Player';
 import type { MovementInput } from '../input/MovementInput';
 import { SpellRunner } from '../spells/SpellRunner';
@@ -24,6 +24,7 @@ export class ArenaScene extends Phaser.Scene {
   private skill!: SchoolSkill;
   private aimIndicator!: AimIndicator;
   private selectingSchool = true;
+  private countdownMs = 0;
   private paused = false;
   private won = false;
   private mode: GameMode = 'race';
@@ -163,6 +164,21 @@ export class ArenaScene extends Phaser.Scene {
     if (!this.player || this.paused || this.selectingSchool || this.won || this.builds.pendingChoice || this.player.health.dead) return;
     // Prevent a long suspended frame from teleporting the player on resume.
     const step = Math.min(delta, 50);
+    if (this.countdownMs > 0) {
+      const tick = stepStartCountdown(this.countdownMs, step);
+      this.countdownMs = tick.remainingMs;
+      this.enemies.effects.update(step);
+      if (tick.changed) {
+        if (tick.afterSeconds > 0) {
+          this.audio.play('ui_select', { combat: false, volume: 0.25, priority: 2, gap: 0.05 });
+        } else {
+          this.movement.setEnabled(!this.paused && !this.selectingSchool && !this.player.health.dead && !this.won);
+          this.audio.play('skill_ready', { combat: false, volume: 0.35, priority: 2, gap: 0.05 });
+        }
+        this.publish();
+      }
+      return;
+    }
     const attack = this.movement.readAttack() ?? this.touchAim();
     this.player.update(this.movement.read(), step, attack);
     const basicAim = attack ?? this.player.aimDirection;
@@ -206,7 +222,7 @@ export class ArenaScene extends Phaser.Scene {
   setPaused(paused: boolean): void {
     this.paused = paused;
     this.audio?.setPaused(paused);
-    this.movement.setEnabled(!paused && !this.selectingSchool && !this.player?.health.dead && !this.won);
+    this.movement.setEnabled(!paused && !this.selectingSchool && this.countdownMs === 0 && !this.player?.health.dead && !this.won);
     this.publish();
   }
 
@@ -215,6 +231,7 @@ export class ArenaScene extends Phaser.Scene {
     this.movement.reset();
     if (!this.player) return;
     this.selectingSchool = true;
+    this.countdownMs = 0;
     this.audio.setHomeMusic(true);
     this.won = false;
     this.builds.reset();
@@ -241,10 +258,11 @@ export class ArenaScene extends Phaser.Scene {
     this.ultimate.reset(school);
     this.skill.reset(school);
     this.selectingSchool = false;
+    this.countdownMs = START_COUNTDOWN_MS;
     this.audio.setBattleMusic(true);
     this.audio.play('ui_select', { combat: false, priority: 2 });
     this.enemies.effects.empower(this.player.view.x, this.player.view.y, school);
-    this.movement.setEnabled(!this.paused);
+    this.movement.setEnabled(false);
     this.publish();
     return true;
   }
@@ -272,7 +290,7 @@ export class ArenaScene extends Phaser.Scene {
   }
 
   castSkill(): boolean {
-    if (!this.player || this.paused || this.selectingSchool || this.won || this.player.health.dead || this.builds.pendingChoice) return false;
+    if (!this.player || this.paused || this.selectingSchool || this.countdownMs > 0 || this.won || this.player.health.dead || this.builds.pendingChoice) return false;
     const aim = this.skillAim();
     if (!this.skill.cast(this.player.view.x, this.player.view.y, aim, this.enemies)) return false;
     this.player.cast(aim, this.builds.snapshot.build.school);
@@ -282,7 +300,7 @@ export class ArenaScene extends Phaser.Scene {
   }
 
   castUltimate(): boolean {
-    if (!this.player || this.paused || this.selectingSchool || this.won || this.player.health.dead || this.builds.pendingChoice) return false;
+    if (!this.player || this.paused || this.selectingSchool || this.countdownMs > 0 || this.won || this.player.health.dead || this.builds.pendingChoice) return false;
     const aim=this.movement.readAttack() ?? this.touchAim() ?? this.player.aimDirection;
     if (!this.ultimate.cast(this.player.view.x, this.player.view.y, this.enemies, aim)) return false;
     this.player.cast(aim, this.builds.snapshot.build.school);
@@ -339,7 +357,8 @@ export class ArenaScene extends Phaser.Scene {
 
   private publish(): void {
     if (!this.player) return;
-    if (this.paused || this.selectingSchool || this.won || this.builds.pendingChoice || this.player.health.dead) this.aimIndicator?.hide();
-    this.onState({ mode:this.mode, won:this.won, clearedWaves:this.enemies.waves.cleared, skillEnergy: this.skill.energy, skillRemaining: this.skill.remainingMs, ultimateEnergy: this.ultimate.charge.energy, ultimateKills:this.ultimate.charge.kills, ultimateKillsRequired:this.ultimate.charge.requiredKills, ultimateCasts: this.ultimate.casts, ultimateEffects: this.ultimate.effectCount, selectingSchool: this.selectingSchool, x: this.player.view.x, y: this.player.view.y, moving: this.player.moving && !this.paused, paused: this.paused, distance: this.player.distance, attacking: !this.paused && this.movement.readAttack() !== null, casts: this.spell.casts, health: this.player.health.current, maxHealth: this.player.health.maximum, shield: this.player.health.shield, waveRemaining: this.enemies.waves.remaining(this.enemies.waveClock.wave), progression: this.builds.snapshot, dead: this.player.health.dead, enemies: this.enemies.enemies.length, kills: this.enemies.kills, objects: this.children.list.length, projectiles: this.spell.projectileCount, impacts: this.spell.impactCount+this.enemies.fireFieldCount, enemyPositions: this.enemies.enemies.map(enemy => ({ id: enemy.id, x: enemy.view.x, y: enemy.view.y, boss: isBoss(enemy.spec.kind) })), wave: this.enemies.waveClock.wave, nextWaveIn: this.enemies.waveClock.remaining, elapsedTime: this.enemies.waveClock.elapsedTime });
+    const countdown = Math.ceil(this.countdownMs / 1000);
+    if (this.paused || this.selectingSchool || countdown > 0 || this.won || this.builds.pendingChoice || this.player.health.dead) this.aimIndicator?.hide();
+    this.onState({ mode:this.mode, won:this.won, clearedWaves:this.enemies.waves.cleared, countdown, skillEnergy: this.skill.energy, skillRemaining: this.skill.remainingMs, ultimateEnergy: this.ultimate.charge.energy, ultimateKills:this.ultimate.charge.kills, ultimateKillsRequired:this.ultimate.charge.requiredKills, ultimateCasts: this.ultimate.casts, ultimateEffects: this.ultimate.effectCount, selectingSchool: this.selectingSchool, x: this.player.view.x, y: this.player.view.y, moving: this.player.moving && !this.paused && countdown === 0, paused: this.paused, distance: this.player.distance, attacking: !this.paused && countdown === 0 && this.movement.readAttack() !== null, casts: this.spell.casts, health: this.player.health.current, maxHealth: this.player.health.maximum, shield: this.player.health.shield, waveRemaining: this.enemies.waves.remaining(this.enemies.waveClock.wave), progression: this.builds.snapshot, dead: this.player.health.dead, enemies: this.enemies.enemies.length, kills: this.enemies.kills, objects: this.children.list.length, projectiles: this.spell.projectileCount, impacts: this.spell.impactCount+this.enemies.fireFieldCount, enemyPositions: this.enemies.enemies.map(enemy => ({ id: enemy.id, x: enemy.view.x, y: enemy.view.y, boss: isBoss(enemy.spec.kind) })), wave: this.enemies.waveClock.wave, nextWaveIn: this.enemies.waveClock.remaining, elapsedTime: this.enemies.waveClock.elapsedTime });
   }
 }

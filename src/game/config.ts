@@ -6,13 +6,24 @@ export const FIREBALL = { speed: 560, cooldown: 550, lifetime: 1400, damage: 20,
 export const ICE = { cooldown: 1000 } as const;
 export const LIGHTNING = { cooldown: 900 } as const;
 export const ENEMY = { waveInterval: 30000, bossWaveInterval: 45000, clearDelay: 3000, spawnWarning: 500, initialCapacity: 48, capacityStep: 2, maxCount: 72 } as const;
+export const START_COUNTDOWN_MS = 3000;
 export interface Direction { x: number; y: number }
+
+export function stepStartCountdown(remainingMs: number, deltaMs: number): { remainingMs: number; beforeSeconds: number; afterSeconds: number; changed: boolean } {
+  const safeRemaining = Math.max(0, remainingMs);
+  const beforeSeconds = Math.ceil(safeRemaining / 1000);
+  const step = Math.min(Math.max(0, deltaMs), 50);
+  const nextRemaining = Math.max(0, safeRemaining - step);
+  const afterSeconds = Math.ceil(nextRemaining / 1000);
+  return { remainingMs: nextRemaining, beforeSeconds, afterSeconds, changed: afterSeconds !== beforeSeconds };
+}
 
 export interface MovementState {
   mode: GameMode;
   won: boolean;
   clearedWaves: number;
   selectingSchool: boolean;
+  countdown: number;
   skillEnergy: number;
   skillRemaining: number;
   ultimateEnergy: number;
