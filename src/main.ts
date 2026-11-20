@@ -12,6 +12,7 @@ import { describeUltimate } from './game/ultimates/definitions';
 import { BattleNotice } from './ui/BattleNotice';
 import { SCHOOL_INFO, definition } from './game/upgrades/definitions';
 import type { BuildSnapshot } from './game/upgrades/BuildStore';
+import { setupAppShell } from './platform/shell';
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <main class="arena launching" aria-label="魔法试验场操控原型">
@@ -349,8 +350,19 @@ const resizeObserver = new ResizeObserver(() => {
 });
 resizeObserver.observe(element('game'));
 
+const disposeShell = setupAppShell({
+  onBack: () => {
+    if (inspecting) { inspectBuild(); return true; }
+    if (latestBuild?.choice) return true;
+    if (dead) { restart(); return true; }
+    if (!selectingSchool) { setPaused(!paused); return true; }
+    return false;
+  },
+});
+
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
+    disposeShell();
     listeners.abort();
     resizeObserver.disconnect();
     movement.destroy();
