@@ -194,7 +194,7 @@ jobs:
 
   release:
     name: Publish GitHub Release
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || startsWith(github.ref, 'refs/tags/v')
     needs: [build-desktop, build-android]
     runs-on: ubuntu-latest
     steps:
@@ -203,7 +203,25 @@ jobs:
           path: release-artifacts
           merge-multiple: true
 
-      - uses: softprops/action-gh-release@v2
+      - name: Publish main prerelease
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: main build ${{ github.run_number }}
+          tag_name: main-build-${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          make_latest: 'false'
+          body: |
+            `main` build for commit `${{ github.sha }}`.
+
+            [GitHub Actions run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          fail_on_unmatched_files: true
+          files: release-artifacts/*
+
+      - name: Create versioned release draft
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
         with:
           draft: true
           generate_release_notes: true
